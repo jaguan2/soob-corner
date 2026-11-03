@@ -4,12 +4,19 @@ Reviewed October 30, 2026 with an independent Codex session. This pass preserves
 the current interface and saved-data formats while separating application wiring
 from reusable behavior.
 
+November 3 follow-up: `useVideoAudio` now owns saved video volume, startup mute,
+and mute/volume gestures. Its controls live only in the playback bar; the M
+shortcut remains bound by `App` and calls the same hook action.
+
 ## Changes implemented
 
 | Boundary | Responsibility | Reason |
 | --- | --- | --- |
 | `src/App.tsx` | Compose player, timer, progression, screens, and tools | Keep integration visible without owning every feature's persistence |
-| `src/hooks/useAppearance.ts` | Validate saved appearance, apply root styles, persist selections | Share one owner across the welcome screen, sidebar, and appearance panel |
+| `src/hooks/useVideoAudio.ts` | Saved volume, startup mute, and audio gestures | Share consistent behavior between the playback bar and M shortcut |
+| `src/hooks/useAppearance.ts` | Validate saved appearance, apply root styles, persist selections | Share one owner across welcome and dock Settings views |
+| `src/hooks/usePreferences.ts` | Validate and save optional display preferences | Keep choices such as milestone visibility separate from earned progression |
+| `src/components/SettingsCard.tsx` | Group appearance and profile display controls | Reuse the same settings view before and during study sessions |
 | `src/lib/theme.ts` | Palette derivation and shared `Theme` type | Components depend on the domain rather than importing from `App` |
 | `src/hooks/useVideoCatalog.ts` | Selection, filters, favorites, blocked videos, last selection, URL | Test navigation with an injected catalog without creating a player |
 | `src/lib/workspace.ts` | Stable tool IDs, labels, icons, and order | Define tools once and derive the selection type from that definition |
@@ -21,8 +28,9 @@ adapts to the registry length. Stable IDs preserve panel identity across renders
 
 The catalog hook has no knowledge of iframe creation. It calls `onRepeat` when
 the only matching video should replay, and `onBlocked` when a failed embed is
-excluded. `App` connects these events to the player and notices. Mute state,
-Pomodoro playback integration, and keyboard shortcuts remain in `App`.
+excluded. `App` connects these events to the player and notices. Pomodoro playback
+integration and keyboard shortcuts remain in `App`; video audio belongs to
+`useVideoAudio`.
 
 ## Preserved behavior and verification
 
@@ -48,11 +56,11 @@ after runtime changes. These checks do not verify live third-party playback.
    when migrating a profile. Introduce a task-specific read adapter shared by
    both, then a task controller hook. Keep drafts and DOM focus in the component;
    preserve IDs, migration, Undo ordering, and once-per-task XP rules.
-2. **Timer transitions.** Before separating deadline scheduling from Pomodoro
-   transitions and completion effects, add mounted fake-clock coverage for
-   completion exactly once, throttled pause/resume, phase changes, skip-break,
-   restart, and reset without rewards. Timer helper tests alone are insufficient
-   protection for that refactor.
+2. **Timer transitions.** The November 3 study-time fix adds mounted fake-clock
+   timer/profile coverage for partial time, completion, pause/reset/relaunch,
+   Pomodoro phases and skip-break, mode changes, nudges, throttling, and save
+   recovery. Preserve these regressions and extend boundary cases before a
+   future separation of scheduling, state transitions, and completion effects.
 3. **Larger catalogs.** Profile search and welcome-grid rendering as the catalog
    grows. Precomputed searchable metadata, membership sets, or pagination can
    address measured bottlenecks. No performance improvement is claimed by this

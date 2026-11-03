@@ -14,6 +14,8 @@ export interface Progression {
   avatar: ProfileAvatar
   /** Per-day high-water marks retain lifetime study credit after stats prune old days. */
   focusDays: DayLog
+  /** Actual elapsed focus time; null until legacy completed history is backfilled. */
+  studyMilliseconds: number | null
   bonusXP: number
   /** Lifetime claims survive task reopening, deletion and Undo. */
   taskClaims: string[]
@@ -41,6 +43,8 @@ export function normalizeProgression(value: unknown): Progression {
     name: typeof source.name === 'string' ? source.name.trim().slice(0, 32) : '',
     avatar: PROFILE_AVATARS.includes(source.avatar!) ? source.avatar! : 'leaf',
     focusDays: normalizeDays(source.focusDays),
+    studyMilliseconds: typeof source.studyMilliseconds === 'number' && Number.isFinite(source.studyMilliseconds)
+      && source.studyMilliseconds >= 0 ? whole(source.studyMilliseconds, MAX_XP * 60_000) : null,
     bonusXP: whole(source.bonusXP),
     taskClaims: Array.isArray(source.taskClaims) ? [...new Set(source.taskClaims.filter(validTaskId))] : [],
     lastCheckIn, checkInStreak,
@@ -64,6 +68,22 @@ export function levelForXP(value: number) {
 }
 export function totalFocusMinutes(state: Progression): number {
   return Math.min(MAX_XP, Object.values(state.focusDays).reduce((sum, minutes) => sum + minutes, 0))
+}
+
+export function totalStudyMilliseconds(state: Progression): number {
+  return state.studyMilliseconds ?? totalFocusMinutes(state) * 60_000
+}
+
+/** Initialize once after history backfill, without overwriting new elapsed-time data. */
+export function initializeStudyTime(state: Progression): Progression {
+  return state.studyMilliseconds === null ? { ...state, studyMilliseconds: totalStudyMilliseconds(state) } : state
+}
+
+/** Separate from completion XP: pauses/resets retain elapsed time without rewarding a block. */
+export function addStudyTime(state: Progression, milliseconds: number): Progression {
+  if (!Number.isFinite(milliseconds) || milliseconds <= 0) return state
+  return { ...state, studyMilliseconds: Math.min(MAX_XP * 60_000,
+    totalStudyMilliseconds(state) + Math.floor(milliseconds)) }
 }
 export function progressionLevel(state: Progression) {
   return levelForXP(totalFocusMinutes(state) * XP_RULES.studyMinute + state.bonusXP)

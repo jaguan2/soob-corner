@@ -26,6 +26,7 @@ function Harness({ hidden = false, running = false }: { hidden?: boolean; runnin
       tasks: <StatefulPanel id="tasks" />,
       profile: <StatefulPanel id="profile" />,
       social: <StatefulPanel id="social" />,
+      settings: <StatefulPanel id="settings" />,
     }} />
 }
 

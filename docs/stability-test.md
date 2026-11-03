@@ -2,6 +2,20 @@
 
 Run on October 14, 2026, on the `dev` branch.
 
+## November 3: live study-time accounting
+
+The profile counter originally read completed focus minutes only. Running a
+25-minute timer briefly, pausing, or resetting left it at zero; sub-minute
+completed tests could also round to zero. **Total time studied** now uses actual
+elapsed focus milliseconds, shows seconds, and saves unfinished work separately
+from completion XP. Existing completed history is migrated once.
+
+Mounted timer/profile tests cover partial sessions, pause/reset/relaunch,
+short completions, Pomodoro breaks and automatic phase changes, skip-break,
+switching running modes/presets, nudges, throttled deadline catch-up, page hide,
+unmount, and failed-save recovery. Session tests cover concurrent time updates
+and replay without duplication. Time checkpoints never award completion XP.
+
 ## Bugs reproduced and patched
 
 | Area | Reproduced failure | Patch |
@@ -90,3 +104,52 @@ Web Locks, live YouTube playback/recovery, and desktop interaction remain
 unverified; automated tests use a shared lock queue and a mocked player.
 
 Suggested commit message: `fix: preserve cross-tab progression and retry failed video loading`
+
+## Video queue — November 3, 2026
+
+Added a shared, locally saved Up next queue to the welcome catalog and Videos &
+sound. Queue entries override filters for Next and automatic video endings.
+Previous stays in filtered order. Queue operations never recreate the player.
+
+Verification: **214 tests passed across 20 files**, lint and production build
+passed. Twelve new catalog-hook cases cover queue persistence and cleanup,
+invalid saved data, deduplication, ordering/removal/clearing, starting a chosen
+entry, filter independence, current-video replay, and unavailable embeds.
+
+Production browser checks used an isolated profile and a mocked YouTube player
+to exercise queue actions, reload persistence, Next/end advancement with zero
+matching results, exhaustion, repeat, and an embed error. The player was created
+once throughout the workspace checks. No page errors or horizontal overflow at
+1440, 1000, 768, 375, and 320 pixels. These checks simulate player events; they
+do not verify live YouTube transitions. The [queue screenshot](images/video-queue.jpg)
+shows the running catalog with real thumbnails and example queue selections.
+The Windows executable was rebuilt, all 61 bundled frontend assets match `dist/`,
+and its headless startup self-test passed. `git diff --check` also passed.
+
+Suggested commit message: `feat: add a persistent video playback queue`
+
+## Settings and optional milestones — November 3, 2026
+
+Added the sixth dock tab, Settings, and a matching welcome-screen disclosure.
+They share appearance controls and the saved Show milestones switch. Removed
+the toolbar Appearance disclosure and duplicate palette shortcuts; display
+preferences use `sws.preferences`, leaving progression and appearance keys intact.
+
+Verification: **220 tests passed across 21 files**, lint and production build
+passed. Six new preference cases cover persisted visibility, hiding/restoring
+earned cards without changing progression, malformed saved preferences, and
+storage failures. The mounted-tools suite now includes Settings and still
+checks that tab changes preserve drafts and mounted panels.
+
+Browser checks exercised all palettes, custom hex entry and cleanup, opacity
+and milestone persistence, profile visibility, and Space on the switch without
+pausing playback. Timer state and the same mocked YouTube player survived tab
+changes. There were no page errors or document/tab-label overflow at 1440, 1000,
+768, 375, and 320 pixels; welcome settings also fit 320 pixels. A 320-pixel
+Settings label clipping issue was patched by tightening tab gutters. These
+checks use simulated video playback. The [Settings screenshot](images/settings-tab.jpg)
+shows the actual running interface with an isolated demo profile.
+The rebuilt Windows executable contains all 61 frontend assets matching `dist/`
+and passed its headless startup self-test. `git diff --check` passed.
+
+Suggested commit message: `feat: add settings tab with appearance and milestone preferences`

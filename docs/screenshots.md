@@ -14,6 +14,25 @@ documentation. Capture the running app, including real playback when available.
 
 ## Current dark-mode screenshots
 
+### Video queue — November 3, 2026
+
+The start screen's **Up next** list saves your selected videos in order. Use
+the arrows to reorder, remove individual entries, or **Play queue** to begin.
+The same queue is available in the **Videos & sound** tab during study sessions.
+This capture uses an isolated browser profile with three catalog videos queued.
+
+![Saved video queue and Add to queue controls](images/video-queue.jpg)
+
+### Settings — November 3, 2026
+
+The sixth tools tab now groups palettes, panel opacity, and optional milestone
+cards. The same settings are accessible before choosing a video. This capture
+uses an isolated demo profile; the running timer remains available in the footer.
+
+![Settings tab with appearance and milestone visibility](images/settings-tab.jpg)
+
+### October workspace captures
+
 Captured October 18, 2026 from the Windows app with the neutral charcoal Dark
 preset and an isolated demo profile. The workspace uses actual YouTube playback,
 paused for consistent captures. The example tasks and progress are demo data.

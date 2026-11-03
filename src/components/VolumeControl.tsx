@@ -2,17 +2,20 @@ import { Slider } from './Slider'
 
 interface VolumeControlProps {
   volume: number
+  muted: boolean
+  onToggleMute: () => void
   onChange: (volume: number) => void
 }
 
-export function VolumeControl({ volume, onChange }: VolumeControlProps) {
+export function VolumeControl({ volume, muted, onToggleMute, onChange }: VolumeControlProps) {
+  const silent = muted || volume === 0
+  const action = silent ? 'Unmute video' : 'Mute video'
   return (
-    <div>
-      <p className="text-sm font-semibold text-ink-800 dark:text-cream-200">Video volume</p>
-      <div className="mt-2.5 flex items-center gap-3">
-        <SpeakerIcon muted={volume === 0} />
-        <Slider value={volume} onChange={onChange} ariaLabel="Video volume" />
-      </div>
+    <div className="video-volume" role="group" aria-label="Video audio">
+      <button onClick={onToggleMute} aria-label={action} aria-pressed={silent}
+        title={`${action} (M)`} className="video-mute-button"><SpeakerIcon muted={silent} /></button>
+      <Slider value={volume} onChange={onChange} ariaLabel="Video volume" className="video-volume-slider" />
+      <span className="video-volume-value">{volume}%</span>
     </div>
   )
 }
@@ -26,6 +29,7 @@ function SpeakerIcon({ muted }: { muted: boolean }) {
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
+      aria-hidden="true"
       className="shrink-0 text-ink-700 dark:text-cream-300"
     >
       <path d="M4 9v6h4l5 5V4L8 9H4z" strokeLinecap="round" strokeLinejoin="round" />

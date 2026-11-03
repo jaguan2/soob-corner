@@ -1,17 +1,18 @@
 import { memo, useEffect, useMemo, useState } from 'react'
 import {
   currentCheckInStreak, PROFILE_AVATARS, progressionLevel, progressionMilestones,
-  totalFocusMinutes, XP_RULES, type ProfileAvatar, type Progression,
+  totalStudyMilliseconds, XP_RULES, type ProfileAvatar, type Progression,
 } from '../lib/progression'
 import { UIIcon } from './UIIcon'
 
 interface ProfileCardProps {
   progression: Progression
   onUpdateProfile: (name: string, avatar: ProfileAvatar) => Promise<boolean>
+  showMilestones: boolean
 }
 const AVATAR_LABELS: Record<ProfileAvatar, string> = { leaf: 'Little leaf', book: 'Open book', moon: 'Night owl', coffee: 'Coffee break' }
 
-function ProfileCardInner({ progression, onUpdateProfile }: ProfileCardProps) {
+function ProfileCardInner({ progression, onUpdateProfile, showMilestones }: ProfileCardProps) {
   const level = useMemo(() => progressionLevel(progression), [progression])
   const milestones = useMemo(() => progressionMilestones(progression), [progression])
   const [nameDraft, setNameDraft] = useState(progression.name)
@@ -19,9 +20,10 @@ function ProfileCardInner({ progression, onUpdateProfile }: ProfileCardProps) {
   const [saveMessage, setSaveMessage] = useState('')
   const [saving, setSaving] = useState(false)
   useEffect(() => { setNameDraft(progression.name); setAvatarDraft(progression.avatar) }, [progression.name, progression.avatar])
-  const minutes = totalFocusMinutes(progression)
-  const studiedHours = Math.floor(minutes / 60)
-  const studiedMinutes = minutes % 60
+  const seconds = Math.floor(totalStudyMilliseconds(progression) / 1000)
+  const studiedHours = Math.floor(seconds / 3600)
+  const studiedMinutes = Math.floor(seconds % 3600 / 60)
+  const studiedSeconds = seconds % 60
   const streak = currentCheckInStreak(progression)
   const earnedCount = milestones.filter(item => item.earned).length
 
@@ -43,13 +45,14 @@ function ProfileCardInner({ progression, onUpdateProfile }: ProfileCardProps) {
       </div>
       <div className="profile-totals">
         <div className="profile-study-total">
-          <span className="profile-study-heading"><UIIcon name="timer" size={17} />Total hours studied</span>
-          <strong>{studiedHours.toLocaleString()}<span className="study-time-unit">{studiedHours === 1 ? 'hour' : 'hours'}</span>{studiedMinutes}<span className="study-time-unit">min</span></strong>
-          <span>Lifetime total across completed focus sessions</span>
+          <span className="profile-study-heading"><UIIcon name="timer" size={17} />Total time studied</span>
+          <strong>{studiedHours.toLocaleString()}<span className="study-time-unit">{studiedHours === 1 ? 'hour' : 'hours'}</span>{studiedMinutes}<span className="study-time-unit">min</span>{studiedSeconds}<span className="study-time-unit">sec</span></strong>
+          <span>Time with your focus timer running, including unfinished sessions</span>
         </div>
         <div><UIIcon name="check" size={17} /><strong>{progression.taskClaims.length}</strong><span>Tasks completed</span></div>
         <div><UIIcon name="flame" size={17} /><strong>{streak} {streak === 1 ? 'day' : 'days'}</strong><span>Check-in streak · best {progression.bestStreak}</span></div>
       </div>
+      {showMilestones && <>
       <div className="profile-milestone-heading"><h3 className="section-heading"><UIIcon name="award" size={17} />Milestones</h3><span>{earnedCount} / {milestones.length}</span></div>
       <ul className="profile-milestones" aria-label="Study milestones">
         {milestones.map(item => <li key={item.id} className={item.earned ? 'earned' : ''}>
@@ -57,6 +60,7 @@ function ProfileCardInner({ progression, onUpdateProfile }: ProfileCardProps) {
           <div><h4>{item.title}</h4><p>{item.description}</p><span className="milestone-progress">{item.earned ? 'Earned' : `${Math.min(item.current, item.target)} / ${item.target}`}</span></div>
         </li>)}
       </ul>
+      </>}
       <details className="profile-disclosure">
         <summary><span>How to earn XP</span><UIIcon name="chevron" size={16} /></summary>
         <dl className="profile-xp-rules">
@@ -64,7 +68,7 @@ function ProfileCardInner({ progression, onUpdateProfile }: ProfileCardProps) {
           <div><dt>Finish a task</dt><dd>{XP_RULES.task} XP the first time you check it off. Reopening or restoring the same task keeps its original credit.</dd></div>
           <div><dt>Daily check-in</dt><dd>{XP_RULES.checkIn} XP, plus 1 for each extra consecutive day, up to {XP_RULES.checkIn + XP_RULES.streakMaxBonus} XP per day.</dd></div>
         </dl>
-        <p className="profile-note">The first level-up takes 100 XP. Each later level takes 50 more. Breaks and reset timers give no XP. Your earned levels and milestones stay with you when a streak ends.</p>
+        <p className="profile-note">The first level-up takes 100 XP. Each later level takes 50 more. Breaks and reset timers give no XP. Your earned levels{showMilestones ? ' and milestones' : ''} stay with you when a streak ends.</p>
       </details>
       <details className="profile-disclosure">
         <summary><span>Edit profile</span><UIIcon name="chevron" size={16} /></summary>

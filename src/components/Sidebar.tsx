@@ -1,15 +1,13 @@
 import { memo } from 'react'
-import type { Theme } from '../lib/theme'
 import type { Video } from '../types/playlist'
 import { VideoPicker } from './VideoPicker'
-import { VolumeControl } from './VolumeControl'
 import { MusicPanel } from './MusicPanel'
 import { AmbiencePanel } from './AmbiencePanel'
-import { ThemeSwitcher } from './ThemeSwitcher'
 import { HeartIcon } from './icons'
 import { UIIcon } from './UIIcon'
 import type { CatalogFilters } from '../lib/catalog'
 import { videoMetadata } from '../lib/catalog'
+import { VideoQueue, type VideoQueueProps } from './VideoQueue'
 
 const GITHUB_URL = 'https://github.com/jaguan2'
 
@@ -19,15 +17,11 @@ interface SidebarProps {
   videos: Video[]
   currentVideo: Video
   onSelectVideo: (id: string) => void
-  volume: number
-  onVolumeChange: (volume: number) => void
   playlistUrl: string
   favorites: string[]
   onToggleFavorite: (id: string) => void
-  theme: Theme
-  onSetTheme: (theme: Theme) => void
-  customColor: string
-  onSetCustomColor: (hex: string) => void
+  queue: VideoQueueProps
+  onQueue: (id: string) => void
 }
 
 function SidebarInner({
@@ -36,15 +30,11 @@ function SidebarInner({
   videos,
   currentVideo,
   onSelectVideo,
-  volume,
-  onVolumeChange,
   playlistUrl,
   favorites,
   onToggleFavorite,
-  theme,
-  onSetTheme,
-  customColor,
-  onSetCustomColor,
+  queue,
+  onQueue,
 }: SidebarProps) {
   const isFavorite = favorites.includes(currentVideo.id)
 
@@ -69,6 +59,7 @@ function SidebarInner({
       </header>
 
       <div className="flex min-w-0 flex-col gap-5 px-4 pb-4">
+            <VideoQueue {...queue} />
             <VideoPicker
               filters={filters}
               onFiltersChange={onFiltersChange}
@@ -76,6 +67,8 @@ function SidebarInner({
               selectedId={currentVideo.id}
               onSelect={onSelectVideo}
               favorites={favorites}
+              queuedVideos={queue.videos}
+              onQueue={onQueue}
             />
 
             <div className="flex items-center justify-between gap-2 rounded-xl2 bg-cream-100 px-3 py-2.5 dark:bg-ink-700">
@@ -133,8 +126,6 @@ function SidebarInner({
               </a>
             </div>
 
-            <VolumeControl volume={volume} onChange={onVolumeChange} />
-
             <hr className="border-cream-300/60 dark:border-ink-700" />
 
             <MusicPanel />
@@ -143,12 +134,6 @@ function SidebarInner({
 
             <footer className="mt-auto flex items-center justify-between pt-4 text-xs text-ink-700/70 dark:text-cream-300/60">
               <span>made for MOA</span>
-              <ThemeSwitcher
-                theme={theme}
-                onSetTheme={onSetTheme}
-                customColor={customColor}
-                onSetCustomColor={onSetCustomColor}
-              />
             </footer>
       </div>
     </section>
@@ -156,7 +141,7 @@ function SidebarInner({
 }
 
 // memo: the timer ticking in App re-renders the tree every second; the
-// sidebar's props only change on real interactions (video/theme/volume).
+// sidebar's props only change on catalog, queue, and video interactions.
 export const Sidebar = memo(SidebarInner)
 
 function GitHubIcon() {

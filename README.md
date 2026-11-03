@@ -1,7 +1,7 @@
 # study with soobin
 
 A cozy Pomodoro study app with TXT videos, a task checklist, music and ambience,
-and a local profile with XP, levels, milestones, and lifetime study hours.
+and a local profile with XP, levels, milestones, and lifetime study time.
 
 **Windows:** download [StudyWithSoobin.exe](StudyWithSoobin.exe) and run it.
 Videos and music need an internet connection. Your tasks, preferences, and

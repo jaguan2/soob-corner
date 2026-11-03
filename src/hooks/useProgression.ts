@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  editProfile, normalizeProgression, PROGRESSION_KEY, recordCheckIn,
+  editProfile, initializeStudyTime, normalizeProgression, PROGRESSION_KEY, recordCheckIn,
   rememberCompletedTasks, rewardFocusSession, rewardTaskCompletion, syncFocusHistory,
   type ProfileAvatar, type Progression,
 } from '../lib/progression'
@@ -36,24 +36,30 @@ function createSession() {
       // Older browsers still re-read immediately before each synchronous write.
       return Promise.resolve(operation())
     },
-    bootstrap: state => rememberCompletedTasks(syncFocusHistory(state, history), completedIds),
+    bootstrap: state => initializeStudyTime(rememberCompletedTasks(syncFocusHistory(state, history), completedIds)),
   })
 }
 
 export function useProgression(onNotice: (message: string) => void) {
   const [session] = useState(createSession)
   const [progression, setProgression] = useState(session.getSnapshot)
-  const commit = useCallback(async (update: ProgressionUpdate, activity?: string): Promise<boolean> => {
-    const result = await session.update(update, activity)
+  const saveWarningShown = useRef(false)
+  const reportSave = useCallback((result: Awaited<ReturnType<typeof session.update>>): boolean => {
     if (!result.saved) {
-      onNotice('Your progress could not be saved. It is kept for this session; check that browser storage is available.')
-    } else if (result.earned > 0) {
-      onNotice(result.leveledUp
+      if (!saveWarningShown.current) {
+        onNotice('Your progress could not be saved. It is kept for this session; check that browser storage is available.')
+        saveWarningShown.current = true
+      }
+    } else {
+      saveWarningShown.current = false
+      if (result.earned > 0) onNotice(result.leveledUp
         ? `Level ${result.level}! +${result.earned} XP · ${result.activity}`
         : `+${result.earned} XP · ${result.activity}`)
     }
     return result.saved
   }, [session, onNotice])
+  const commit = useCallback(async (update: ProgressionUpdate, activity?: string): Promise<boolean> =>
+    reportSave(await session.update(update, activity)), [session, reportSave])
 
   const recordStudy = useCallback((minutes: number) => {
     // Stats already include this block. Capture the intended high-water marks,
@@ -64,6 +70,11 @@ export function useProgression(onNotice: (message: string) => void) {
   const completeTask = useCallback((id: string) => {
     void commit(state => rewardTaskCompletion(state, id), 'Task complete')
   }, [commit])
+  const recordTime = useCallback((milliseconds: number) => {
+    if (Number.isFinite(milliseconds) && milliseconds > 0) {
+      void session.recordTime(milliseconds).then(reportSave)
+    }
+  }, [session, reportSave])
   const updateProfile = useCallback((name: string, avatar: ProfileAvatar) =>
     commit(state => editProfile(state, name, avatar)), [commit])
   const checkIn = useCallback(() => {
@@ -101,5 +112,5 @@ export function useProgression(onNotice: (message: string) => void) {
     }
   }, [session, commit, checkIn])
 
-  return { progression, recordStudy, completeTask, updateProfile }
+  return { progression, recordStudy, recordTime, completeTask, updateProfile }
 }

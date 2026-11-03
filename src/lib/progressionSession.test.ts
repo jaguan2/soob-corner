@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createProgressionSession, type ProgressionLock } from './progressionSession'
-import { editProfile, normalizeProgression, progressionLevel, recordCheckIn, rewardTaskCompletion, syncFocusHistory } from './progression'
+import { editProfile, normalizeProgression, progressionLevel, recordCheckIn, rewardTaskCompletion, syncFocusHistory, totalStudyMilliseconds } from './progression'
 
 function setup() {
   let stored = JSON.stringify(normalizeProgression(null))
@@ -30,6 +30,35 @@ function setup() {
 }
 
 describe('progression across independent sessions', () => {
+  it('merges elapsed time from two sessions and replays failed checkpoints once', async () => {
+    const shared = setup()
+    const a = shared.open(), b = shared.open()
+    await Promise.all([
+      a.recordTime(1000),
+      b.recordTime(2500),
+    ])
+    expect(totalStudyMilliseconds(shared.read())).toBe(3500)
+    shared.setWritable(false)
+    await a.recordTime(750)
+    shared.setWritable(true)
+    await b.recordTime(1000)
+    await a.update(state => editProfile(state, 'Recovered', 'leaf'))
+    expect(totalStudyMilliseconds(shared.read())).toBe(5250)
+    expect(progressionLevel(shared.read()).totalXP).toBe(0)
+  })
+  it('retains many failed elapsed checkpoints without duplication when writes recover', async () => {
+    const shared = setup()
+    const a = shared.open()
+    shared.setWritable(false)
+    for (let second = 0; second < 120; second++) await a.recordTime(1000)
+    expect(totalStudyMilliseconds(a.getSnapshot())).toBe(120_000)
+    expect(totalStudyMilliseconds(shared.read())).toBe(0)
+    shared.setWritable(true)
+    await a.recordTime(500)
+    expect(totalStudyMilliseconds(shared.read())).toBe(120_500)
+    await a.recordTime(1000)
+    expect(totalStudyMilliseconds(shared.read())).toBe(121_500)
+  })
   it('preserves earned XP and claims when a stale tab saves a profile', async () => {
     const shared = setup()
     const a = shared.open(), b = shared.open()

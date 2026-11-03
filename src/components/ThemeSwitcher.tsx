@@ -2,8 +2,8 @@ import type { Theme } from '../lib/theme'
 import { UIIcon, type UIIconName } from './UIIcon'
 
 const THEMES: { value: Theme; label: string; icon: UIIconName }[] = [
-  { value: 'light', label: 'Linen', icon: 'sun' },
-  { value: 'coffee', label: 'Coffee', icon: 'coffee' },
+  { value: 'light', label: 'Light', icon: 'sun' },
+  { value: 'coffee', label: 'Cafe', icon: 'coffee' },
   { value: 'dark', label: 'Dark', icon: 'moon' },
 ]
 
@@ -15,8 +15,7 @@ interface ThemeSwitcherProps {
   expanded?: boolean
 }
 
-/** The theme pill row: three presets plus the custom-colour swatch. Shared by
- *  the sidebar footer and the welcome screen. */
+/** Theme controls shared by the welcome and dock Settings views. */
 export function ThemeSwitcher({ theme, onSetTheme, customColor, onSetCustomColor, expanded = false }: ThemeSwitcherProps) {
   return (
     <div className={'theme-switcher' + (expanded ? ' expanded' : '')} role="group" aria-label="Color theme">
@@ -24,7 +23,7 @@ export function ThemeSwitcher({ theme, onSetTheme, customColor, onSetCustomColor
         <button
           key={t.value}
           onClick={() => onSetTheme(t.value)}
-          aria-label={t.value === 'dark' ? 'Dark theme' : `${t.value === 'light' ? 'Light' : 'Coffee'} theme`}
+          aria-label={`${t.label} theme`}
           aria-pressed={theme === t.value}
           title={t.label}
           className={'theme-option' + (theme === t.value ? ' selected' : '')}

@@ -3,7 +3,7 @@ import {
   checkInXP, currentCheckInStreak, editProfile, levelForXP, normalizeProgression,
   progressionLevel, progressionMilestones, recordCheckIn, rememberCompletedTasks,
   rewardFocusSession, rewardTaskCompletion, syncFocusHistory, totalFocusMinutes,
-  xpBeforeLevel, xpForNextLevel,
+  xpBeforeLevel, xpForNextLevel, addStudyTime, initializeStudyTime, totalStudyMilliseconds,
 } from './progression'
 
 const fresh = () => normalizeProgression(null)
@@ -26,6 +26,22 @@ describe('profile levels', () => {
 })
 
 describe('study credit', () => {
+  it('migrates old completed totals once and keeps actual elapsed time separate from XP', () => {
+    const legacy = syncFocusHistory(fresh(), { '2026-10-14': 25 })
+    expect(totalStudyMilliseconds(legacy)).toBe(25 * 60_000)
+    const migrated = initializeStudyTime(legacy)
+    expect(initializeStudyTime(migrated)).toBe(migrated)
+    const next = addStudyTime(migrated, 1250)
+    expect(totalStudyMilliseconds(next)).toBe(25 * 60_000 + 1250)
+    expect(progressionLevel(next).totalXP).toBe(25)
+    const moreCompleted = syncFocusHistory(next, { '2026-10-14': 50 })
+    expect(totalStudyMilliseconds(moreCompleted)).toBe(25 * 60_000 + 1250)
+    expect(totalStudyMilliseconds(normalizeProgression(JSON.parse(JSON.stringify(next))))).toBe(25 * 60_000 + 1250)
+  })
+  it.each([-1, NaN, Infinity, 'invalid'])('rejects malformed saved elapsed time %s', value => {
+    const legacy = normalizeProgression({ version: 1, focusDays: { '2026-10-14': 25 }, studyMilliseconds: value })
+    expect(totalStudyMilliseconds(initializeStudyTime(legacy))).toBe(25 * 60_000)
+  })
   it('backfills existing history only once and never loses credit on a stale or pruned read', () => {
     const state = syncFocusHistory(fresh(), { '2025-01-01': 60, '2026-10-14': 25 })
     expect(totalFocusMinutes(state)).toBe(85)

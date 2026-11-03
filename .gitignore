@@ -9,6 +9,7 @@ scripts/research-results.json
 build/
 *.spec
 __pycache__/
+.playwright-mcp/
 
 .env
 .env.local

@@ -18,14 +18,26 @@ an internet connection since the videos stream from YouTube.)
 ## Features
 
 - Start screen to pick your study-companion video (or hit 🎲 Surprise me) —
-  "Change video" in the top right takes you back to it any time
-- Looping YouTube video that always stays fully in frame (autoplay, muted
+  the back-arrow **Change video** button at the top left takes you back any time,
+  including in Zen mode
+- A saved **Up next** video queue on the start screen and in **Videos & sound**.
+  Choose **Add to queue** under any video, move entries up/down, remove them,
+  or clear the queue. **Play queue** starts the first entry; clicking a queued
+  title plays that entry immediately and removes only it from the queue.
+  Video endings and **Next video** consume queued videos in order, even when
+  filters hide them. Once empty, endings choose another filtered video and
+  Next follows filtered order. Queueing the current video repeats it once.
+  Adding or rearranging entries keeps playback running; remaining entries
+  are remembered on this device. Unavailable embeds are skipped automatically.
+- YouTube video that always stays fully in frame (autoplay, muted
   until you turn up the volume slider)
-- A responsive tools dock with Timer, Videos & sound, Tasks, Profile, and Social tabs.
+- A responsive tools dock with Timer, Videos & sound, Tasks, Profile, Social, and Settings tabs.
   It sits beside the video on wide windows and below it on narrow or short
   windows. Small windows scroll, and each section keeps its own space
 - Video controls sit below the video: pause/play, previous/next video,
-  skip back/forward 10 seconds, and a scrub bar with elapsed/total times.
+  skip back/forward 10 seconds, mute/unmute, video volume, and a scrub bar
+  with elapsed/total times. Use the speaker button (or **M**) to toggle mute;
+  adjusting the slider unmutes, and unmuting at zero restores an audible level.
   Caption options expand below the controls without covering the video.
   The music player has its own play/pause/seek/volume controls
 - Hide tools for more video space, or use Zen mode for a quiet view.
@@ -63,14 +75,19 @@ an internet connection since the videos stream from YouTube.)
 - 📊 Focus stats under the timer: minutes studied today, a configurable 1–3h
   daily goal with progress, and a 🔥 day streak, all kept on your device
 - Profile progression inspired by TaskNook: a saved name and avatar, levels,
-  XP toward the next level, a prominent **Total hours studied** lifetime counter
-  shown in hours and minutes, task totals, daily check-in streaks,
+  XP toward the next level, a prominent **Total time studied** lifetime counter
+  shown in hours, minutes, and seconds while the focus timer runs (including
+  unfinished sessions, excluding pauses and Pomodoro breaks), task totals, daily check-in streaks,
   and eight milestones. After choosing a video, open the **Profile** tools tab
   for these stats and **Edit profile** settings. Earn 1 XP per recorded focus minute,
   10 XP the first time you complete each task, and 10–20 XP for daily check-ins.
   The first level-up takes 100 XP, then 150, 200, and so on. Available study
   history counts; rechecking a task never awards it twice. Read the full
   [progression rules](LEVELS.md).
+- **Settings** groups appearance and profile display preferences. Open the dock's
+  Settings tab, or Settings at the top right of the start screen. Turn off
+  **Show milestones** to hide their cards in Profile; earned progress, levels,
+  XP, and study time remain saved. Preferences are remembered on this device.
 - ⌨️ Keyboard shortcuts: space play/pause · ←/→ skip 10s · F fullscreen ·
   M mute · T start/pause the timer · Z zen mode
 - 🧘 Zen mode (Z or the Zen button): tools and playback controls disappear; an Exit zen button stays accessible —
@@ -87,21 +104,22 @@ an internet connection since the videos stream from YouTube.)
   The same controls appear on the start screen and in-session picker
 - Filter by year/month using YouTube release dates or original live dates; sort by
   playlist order, newest, oldest, longest or shortest
-- Previous/next video controls follow the filtered order; video cards show titles,
+- Previous video follows filtered order; Next plays queued videos first, then
+  follows filtered order. Video cards show titles,
   durations, member names and original broadcast dates
 - Surprise me and automatic next-video selection follow your active filters
 - Paged thumbnail grid to switch videos mid-session
-- Favorites (❤) and four themes — light, ☕ coffee, dark, and 🎨 a custom
+- Favorites (❤) and four themes — Light, ☕ Cafe, Dark, and 🎨 Custom
   colour you pick yourself — all remembered between visits, along with your
   volumes, ambience mix, pomodoro settings, and last video
   (the start screen offers to continue where you left off)
 - TaskNook-inspired appearance: a soft linen light theme, neutral charcoal dark
   theme, muted coffee colors, frosted surfaces, and consistent stroke icons.
-  **Appearance** in the toolbar offers labeled palettes and a saved panel-opacity
+  **Settings → Appearance** offers labeled palettes and a saved panel-opacity
   slider (65–100%). Only the surfaces become translucent; text stays fully visible.
   The timer keeps its main controls visible and groups presets, Pomodoro setup,
   and daily goals under **Session settings**. Tools keep their existing placement.
-- Auto-advances to a random video when the current one ends; videos that
+- Auto-advances through your queue, then picks a random filtered video; videos that
   refuse to play embedded are skipped automatically
 - No backend, no API key, no login — everything runs client-side
 
@@ -112,7 +130,7 @@ the app derives panel backgrounds, accents, borders, and text from it.
 Surfaces stay subdued while the accent carries your chosen hue. A luminance
 solver preserves the linen theme's brightness at every palette stop, including
 at least 4.5:1 contrast for white text on primary buttons. Pick a grey for a
-neutral theme, or choose a colour for a restrained tint. The Appearance panel
+neutral theme, or choose a colour for a restrained tint. Settings → Appearance
 also accepts a six-digit hex code when a native colour picker is unavailable.
 
 ## Getting started

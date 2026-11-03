@@ -5,6 +5,7 @@ export const STUDY_TOOLS = [
   { id: 'tasks', label: 'Tasks', icon: 'tasks' },
   { id: 'profile', label: 'Profile', icon: 'user' },
   { id: 'social', label: 'Social', icon: 'social' },
+  { id: 'settings', label: 'Settings', icon: 'settings' },
 ] as const
 
 export type StudyToolId = typeof STUDY_TOOLS[number]['id']

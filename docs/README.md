@@ -6,7 +6,7 @@
 - [Repository layout](app-guide.md#project-structure): where application, desktop,
   configuration, maintenance, and generated files belong.
 - [Screenshots and feature walkthrough](screenshots.md): examples of the app's main screens.
-- [Profile progression](LEVELS.md): XP, levels, milestones, check-ins, and lifetime study hours.
+- [Profile progression](LEVELS.md): XP, levels, milestones, check-ins, and lifetime study time.
 - [TXT social accounts](social.md): the Social tab, account links, and verification sources.
 - [TXT video catalog](video-catalog.md): the generated, member-organized collection of video links.
 - [Appearance refresh](ui-refresh.md): the TaskNook-inspired design choices.

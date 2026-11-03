@@ -1,11 +1,10 @@
-import { memo, useMemo } from 'react'
-import type { Theme } from '../lib/theme'
+import { memo, useMemo, type ReactNode } from 'react'
 import type { Video } from '../types/playlist'
-import { ThemeSwitcher } from './ThemeSwitcher'
 import { VideoTile } from './VideoTile'
 import { CatalogFilters } from './CatalogFilters'
 import { filterVideos, type CatalogFilters as Filters } from '../lib/catalog'
 import { UIIcon } from './UIIcon'
+import { VideoQueue, type VideoQueueProps } from './VideoQueue'
 
 interface WelcomeScreenProps {
   runningTimer: string | null
@@ -15,12 +14,11 @@ interface WelcomeScreenProps {
   favorites: string[]
   /** The video from the previous session (if still playable), for one-click resume. */
   lastVideo: Video | null
-  theme: Theme
-  onSetTheme: (theme: Theme) => void
-  customColor: string
-  onSetCustomColor: (hex: string) => void
+  settings: ReactNode
   onSelect: (id: string) => void
   onSurprise: () => void
+  queue: VideoQueueProps
+  onQueue: (id: string) => void
 }
 
 function WelcomeScreenInner({
@@ -30,24 +28,21 @@ function WelcomeScreenInner({
   videos,
   favorites,
   lastVideo,
-  theme,
-  onSetTheme,
-  customColor,
-  onSetCustomColor,
+  settings,
   onSelect,
   onSurprise,
+  queue,
+  onQueue,
 }: WelcomeScreenProps) {
   const sorted = useMemo(() => filterVideos(videos, filters, favorites), [videos, filters, favorites])
 
   return (
     <div className="catalog-welcome min-h-screen w-full">
-      <div className="welcome-theme-row">
-        <ThemeSwitcher
-          theme={theme}
-          onSetTheme={onSetTheme}
-          customColor={customColor}
-          onSetCustomColor={onSetCustomColor}
-        />
+      <div className="welcome-settings-row">
+        <details className="welcome-settings">
+          <summary className="workspace-button"><UIIcon name="settings" size={17} />Settings</summary>
+          <div className="welcome-settings-content">{settings}</div>
+        </details>
       </div>
       <div className="mx-auto max-w-5xl px-4 pb-10 pt-4 sm:px-6">
         <header className="welcome-header text-center">
@@ -76,6 +71,7 @@ function WelcomeScreenInner({
           )}
         </header>
         {runningTimer && <p role="status" className="mt-4 rounded-xl bg-cream-100 px-4 py-2 text-center text-sm text-ink-800 dark:bg-ink-800 dark:text-cream-200">⏱ {runningTimer} · timer still running</p>}
+        <div className="mt-6"><VideoQueue {...queue} /></div>
         <div className="mt-8">
           <CatalogFilters videos={videos} value={filters} onChange={onFiltersChange} />
           <p className="mt-4 text-xs text-ink-700 dark:text-cream-300">{sorted.length} of {videos.length} videos</p>
@@ -93,7 +89,7 @@ function WelcomeScreenInner({
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4">
-          {sorted.map(video => <VideoTile key={video.id} video={video} favorite={favorites.includes(video.id)} onSelect={onSelect} />)}
+          {sorted.map(video => <VideoTile key={video.id} video={video} favorite={favorites.includes(video.id)} onSelect={onSelect} queued={queue.videos.some(item => item.id === video.id)} onQueue={onQueue} />)}
         </div>
       </div>
     </div>

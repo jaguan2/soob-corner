@@ -11,7 +11,7 @@ The October 14, 2026 refresh draws from the local TaskNook repository:
 - `frontend/src/components/SettingsPanel.jsx`: labeled palette choices and
   a hex-code alternative to the native color picker.
 
-StudyWithSoobin adapts these ideas into linen, coffee, dark, and custom
+StudyWithSoobin adapts these ideas into Light, Cafe, Dark, and Custom
 themes. The existing grid and tabbed dock retain their placement, matching the
 owner's preference. The video stays in its reserved stage, with controls and
 captions below it. No draggable or overlapping panels were added.
@@ -29,7 +29,12 @@ or above 5.13:1 contrast; white primary-button text measures 4.74:1 normally and
 6.27:1 on hover. These numeric samples supplement the Windows visual check;
 they are not a complete accessibility audit.
 
-The toolbar's Appearance disclosure changes themes and panel opacity. The
+The **Settings** dock tab groups appearance and profile display controls. The
+start screen also offers Settings in a native disclosure. Appearance controls
+live in this shared view, replacing the toolbar disclosure and scattered palette
+shortcuts. **Show milestones** hides or restores Profile milestone cards without
+changing earned progress. This preference is saved separately as
+`sws.preferences.showMilestones` and defaults to enabled for existing users. The
 opacity preference is saved as `sws.panelOpacity`; only background surfaces
 become translucent. Timer settings group duration presets, Pomodoro setup, and
 daily focus goals. Existing tasks, timer behavior, favorites, and playback

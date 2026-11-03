@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { adjacentVideo, EMPTY_FILTERS, filterVideos, type CatalogFilters } from '../lib/catalog'
 import { storageGet, storageGetJson, storageSet, storageSetJson } from '../lib/storage'
 import type { Video } from '../types/playlist'
+import { useVideoQueue } from './useVideoQueue'
 
 function pickRandom(pool: Video[], excludeId?: string): string | null {
   const candidates = excludeId ? pool.filter(video => video.id !== excludeId) : pool
@@ -25,6 +26,8 @@ export function useVideoCatalog(videos: Video[], onBlocked: () => void, onRepeat
   const [catalogFilters, setCatalogFilters] = useState<CatalogFilters>(EMPTY_FILTERS)
   const [blockedIds, setBlockedIds] = useState<string[]>([])
   const playable = useMemo(() => videos.filter(video => !blockedIds.includes(video.id)), [videos, blockedIds])
+  const { takeNext, ...queue } = useVideoQueue(playable)
+  const { removeQueuedVideo } = queue
   const currentVideo = useMemo(() => videos.find(video => video.id === videoId) ?? videos[0], [videos, videoId])
   const filteredVideos = useMemo(() => filterVideos(playable, catalogFilters, favorites), [playable, catalogFilters, favorites])
   const lastVideo = useMemo(() => playable.find(video => video.id === lastVideoId) ?? null, [playable, lastVideoId])
@@ -46,27 +49,37 @@ export function useVideoCatalog(videos: Video[], onBlocked: () => void, onRepeat
   const toggleFavorite = useCallback((id: string) => {
     setFavorites(previous => previous.includes(id) ? previous.filter(value => value !== id) : [...previous, id])
   }, [])
+  const selectVideo = useCallback((id: string) => {
+    if (!playable.some(video => video.id === id)) return
+    removeQueuedVideo(id)
+    if (id === videoId) onRepeat()
+    else setVideoId(id)
+  }, [playable, removeQueuedVideo, videoId, onRepeat])
   const handleUnplayable = useCallback(() => {
     if (!videoId || blockedIds.includes(videoId)) return
     setBlockedIds(previous => [...previous, videoId])
     onBlocked()
-    setVideoId(pickRandom(filteredVideos.filter(video => video.id !== videoId)))
-  }, [videoId, blockedIds, filteredVideos, onBlocked])
+    setVideoId(takeNext(videoId) ?? pickRandom(filteredVideos.filter(video => video.id !== videoId)))
+  }, [videoId, blockedIds, filteredVideos, onBlocked, takeNext])
   const handleEnded = useCallback(() => {
-    const next = pickRandom(filteredVideos, videoId ?? undefined)
+    const next = takeNext() ?? pickRandom(filteredVideos, videoId ?? undefined)
     if (next && next === videoId) onRepeat()
     else setVideoId(next)
-  }, [filteredVideos, videoId, onRepeat])
-  const handleSurprise = useCallback(() => { setVideoId(pickRandom(filteredVideos)) }, [filteredVideos])
+  }, [filteredVideos, videoId, onRepeat, takeNext])
+  const handleSurprise = useCallback(() => {
+    const next = pickRandom(filteredVideos)
+    if (next) selectVideo(next)
+  }, [filteredVideos, selectVideo])
   const handlePreviousVideo = useCallback(() => {
     setVideoId(previous => adjacentVideo(filteredVideos, previous, -1) ?? previous)
   }, [filteredVideos])
   const handleNextVideo = useCallback(() => {
-    setVideoId(previous => adjacentVideo(filteredVideos, previous, 1) ?? previous)
-  }, [filteredVideos])
+    const next = takeNext() ?? adjacentVideo(filteredVideos, videoId, 1)
+    if (next) selectVideo(next)
+  }, [filteredVideos, videoId, takeNext, selectVideo])
 
   return {
-    videoId, setVideoId, currentVideo, lastVideo, playable, filteredVideos,
+    videoId, setVideoId, selectVideo, currentVideo, lastVideo, playable, filteredVideos, ...queue,
     favorites, toggleFavorite, catalogFilters, setCatalogFilters,
     handleUnplayable, handleEnded, handleSurprise, handlePreviousVideo, handleNextVideo,
   }

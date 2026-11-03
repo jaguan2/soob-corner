@@ -13,9 +13,11 @@ interface VideoPickerProps {
   selectedId: string
   onSelect: (id: string) => void
   favorites: string[]
+  queuedVideos: Video[]
+  onQueue: (id: string) => void
 }
 
-export function VideoPicker({ videos, selectedId, onSelect, favorites, filters, onFiltersChange }: VideoPickerProps) {
+export function VideoPicker({ videos, selectedId, onSelect, favorites, filters, onFiltersChange, queuedVideos, onQueue }: VideoPickerProps) {
   const [page, setPage] = useState(0)
   const filtered = filterVideos(videos, filters, favorites)
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
@@ -59,7 +61,7 @@ export function VideoPicker({ videos, selectedId, onSelect, favorites, filters, 
       </div>
 
       <div className="mt-2 grid grid-cols-2 gap-2">
-        {visible.map(video => <VideoTile key={video.id} video={video} favorite={favorites.includes(video.id)} selected={video.id === selectedId} onSelect={onSelect} />)}
+        {visible.map(video => <VideoTile key={video.id} video={video} favorite={favorites.includes(video.id)} selected={video.id === selectedId} onSelect={onSelect} queued={queuedVideos.some(item => item.id === video.id)} onQueue={onQueue} />)}
       </div>
     </div>
   )

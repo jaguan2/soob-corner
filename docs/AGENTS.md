@@ -50,12 +50,28 @@ document. These tests do not verify live playback or interactive browser behavio
 
 `App.tsx` composes feature hooks and views. `useAppearance` owns saved theme,
 custom color, panel opacity, and root styles; the shared `Theme` type lives in
-`lib/theme.ts`, never in `App`. `useVideoCatalog` owns catalog filters, favorites,
+`lib/theme.ts`, never in `App`. `useVideoAudio` owns volume, mute, and audio gestures.
+`useVideoCatalog` owns catalog filters, favorites,
 selection, blocked videos, last-video persistence, and URL synchronization. It
+composes `useVideoQueue`, which validates and persists ordered catalog IDs in
+`sws.videoQueue`. Queue actions update a synchronous ref and a React snapshot;
+keep storage and playback effects out of state updaters. `VideoQueue` is shared
+by the welcome screen and Videos & sound. Explicit queue entries take priority
+over filters on video end and Next; previous navigation stays filter-based.
+Consumed, removed, or session-blocked entries leave the queue. A current-video
+entry is allowed for one intentional replay. Choosing a video card or queued
+title consumes only the chosen entry; returning to the welcome screen preserves
+the queue. `useVideoCatalog`
 receives the catalog and callbacks for failed embeds and replay; it does not
 create or control iframe lifecycles. `lib/workspace.ts` defines `STUDY_TOOLS` and
 derives `StudyToolId`; `StudyTools` renders tabs and all mounted panel views
 from a complete typed record provided by `App`. Add tools through that registry.
+`usePreferences` owns display preferences under `sws.preferences`, separately
+from progression. `showMilestones` defaults to true, accepts only a saved boolean,
+and controls the Profile milestone heading/cards. Hiding them must never clear
+earned progress, disable study tracking, or change XP rules. `SettingsCard`
+groups `AppearancePanel` and these preferences; the sixth dock tab and the
+welcome screen's native Settings disclosure reuse the same view.
 See `docs/architecture-review.md` for the review and next refactoring boundaries.
 
 **Data flow is one-directional and all client-side:**
@@ -106,8 +122,8 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
 - `App.tsx` loads `playlist.json` and connects `useVideoCatalog` (selection,
   filters, favorites) and `useAppearance` (theme and panel opacity). Selection
   starts at the welcome grid unless a valid `?v=` deep link selects a video.
-  App owns playback state such as `volume` and layout state such as
-  `dockCollapsed` and the active tools tab (`topPanel`). The main UI
+  `useVideoAudio` owns video volume/mute. App owns playback orchestration and layout
+  state such as `dockCollapsed` and the active tools tab (`topPanel`). The main UI
   uses a responsive CSS grid with a toolbar, reserved video stage, controls
   below the video, and a tools dock. At 1000px wide and 600px tall or larger,
   the dock sits on the right; otherwise it sits below and the page can scroll.
@@ -118,10 +134,16 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
     `seekTo`, and `getProgress` via `forwardRef`, and reports real playback
     state through `onPlayingChange`.
   - `VideoControls` stays in normal flow below the video. It provides
-    previous/next video, pause/play, +/-10s, and a shared `Scrubber` range input.
+    previous/next video, pause/play, +/-10s, inline `VolumeControl` (mute and
+    volume), and a shared `Scrubber` range input. Video audio controls live only
+    in this playback bar. `useVideoAudio` owns saved volume, startup mute, and
+    the shared speaker-button/M-shortcut action; unmuting at zero restores the
+    last audible level. Music and ambience keep their separate volume controls.
     Progress polls every 500ms in this component, keeping polling renders out
     of `App`. Captions expand inline. Controls do not drag or auto-hide.
-    The toolbar's Change video button returns to the welcome screen.
+    The toolbar's top-left Change video button uses a back arrow and returns to
+    the welcome screen. It remains available in Zen mode; returning clears Zen
+    while keeping the focus timer running.
   - **Subtitles** (the controls' `CC` button) drive YouTube's undocumented
     captions module, since `controls: 0` hides YouTube's own CC button. The
     playlist's videos carry 4–7 translation tracks each. Rules learned by
@@ -182,7 +204,7 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
   - `TimerCard` wraps `TimerPanel` in the Timer tab (presets, custom
     durations, Pomodoro cycles and focus stats).
   - `Sidebar` is the Videos & sound tab, containing `VideoPicker`,
-    `VolumeControl`, `MusicPanel`, `AmbiencePanel`, and theme controls.
+    `MusicPanel`, and `AmbiencePanel`. Theme controls live in Settings.
   - `TasksCard` is the Tasks tab, also reachable from the toolbar. Its quick-add
     form supports Enter; estimates and priority are optional refinements.
     Checkboxes move items into a collapsible Completed section; unchecking
@@ -226,7 +248,15 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
   a reward day. Name, avatar, XP, best streak and milestones remain local.
   `ProfileCard` lives only in the fourth dock tab, **Profile**. Keep profile
   settings and progression off the start screen and toolbar. No XP work runs
-  on timer ticks.
+  on elapsed-time checkpoints. **Total time studied** uses a separate actual-time
+  ledger (`studyMilliseconds`), initialized once after legacy completed-history
+  backfill. `useTimer` checkpoints wall time about once a second, capped at each
+  focus deadline, and flushes partial time before pause/reset/preset changes,
+  page hide, and unmount. Break segments are excluded. Completion XP and ordinary
+  daily focus stats retain completed-block semantics; never add their duration
+  to the elapsed-time ledger again. `useProgression.recordTime` saves through
+  the existing lock/queue with no reward notification. Failed elapsed deltas
+  coalesce to avoid an ever-growing per-second replay queue.
   `lib/progressionSession.ts` replays queued operations on freshly read state
   under a shared Web Lock, preserving cross-tab rewards and failed in-memory
   saves. Storage events refresh state without echo writes. Profile save callbacks
@@ -280,8 +310,11 @@ muted violet accent; coffee uses subdued warm browns; dark uses neutral charcoal
 surfaces, soft white/gray text, and a muted blue accent. Dark keyboard focus uses
 the lighter accent stop for visibility. Keep the light preset's RGB values synchronized
 with the luminance anchors in `lib/theme.ts` and `lib/theme.test.ts`.
-`UIIcon` supplies shared stroke icons. `AppearancePanel` expands inline beneath
-the toolbar and controls themes plus persisted `sws.panelOpacity` (65–100%,
+Display palette choices as **Light, Cafe, Dark, Custom**, in that order.
+The Cafe preset retains the internal `coffee` value and CSS class for saved-data
+compatibility; display names and persisted IDs are intentionally separate.
+`UIIcon` supplies shared stroke icons. `AppearancePanel` lives inside Settings
+and controls themes plus persisted `sws.panelOpacity` (65–100%,
 default 88). Opacity applies to surface backgrounds through `--panel-opacity`,
 never to text. Semantic surface/text tokens in `index.css` adapt to each theme.
 `TimerPanel` keeps the countdown and transport visible, with presets, Pomodoro
@@ -316,7 +349,8 @@ exit without opening a window — use it to verify a build headlessly.
 
 - Browser autoplay policy requires the background video to start muted; volume is
   applied after the player is ready, and unmuting only happens on an explicit user
-  gesture — the volume slider or the "Tap to unmute" chip. `App` tracks a `muted`
+  gesture — the playback bar's volume slider, speaker button, or M shortcut.
+  `useVideoAudio` tracks a `muted`
   flag for this, reset to true whenever the player is recreated (returning from
   the welcome screen), because each fresh player starts muted again regardless of
   the persisted volume.
