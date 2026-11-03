@@ -153,3 +153,90 @@ The rebuilt Windows executable contains all 61 frontend assets matching `dist/`
 and passed its headless startup self-test. `git diff --check` passed.
 
 Suggested commit message: `feat: add settings tab with appearance and milestone preferences`
+
+## Watch history and member stats — November 3, 2026
+
+Added a History dock tab and start-screen shortcut, with recent-video snapshots,
+search/member filters, replay/queue actions, and pagination. Profile derives
+distinct-video, total-play, and member counts from the same saved entries.
+Playback must actually start to count; pause/resume and failed loads add none.
+Shared videos count once overall and once per featured member. Tracking starts
+with this feature; legacy viewing totals are unavailable.
+
+Verification: **236 tests passed across 23 files**, lint and production build
+passed. Sixteen new model/session/player tests cover rewatches, member attribution,
+malformed history, retained metadata, clocks, overlapping tabs, failed saves,
+unreadable-state protection, lock recovery, stale player events, and deliberate
+same-video replay. The mounted-tools suite includes the new History tab.
+
+Production-browser checks with an isolated profile and a simulated YouTube
+player exercised confirmed starts, pause/resume, queue Next/end advancement,
+history search/member filters, replay, unique/member stats, relaunch persistence,
+welcome-screen access, and failed embeds. Workspace transitions reused one
+player, and the timer stayed running across tab changes. No page errors,
+document overflow, or clipped tab labels at 1440, 1000, 768, 375, and 320 pixels.
+Tabs wrap on narrow docks. Captures of [History](images/watch-history.jpg) and
+[member stats](images/watch-stats.jpg) show three real catalog selections and
+two rewatches. These tests do not verify live YouTube streaming.
+A separate 25-entry fixture passed pagination, filtering after expansion, and
+disabled actions for catalog entries that are no longer available. The rebuilt
+Windows executable contains all 61 frontend assets matching `dist/` and passed
+its headless startup self-test. `git diff --check` passed.
+
+Suggested commit message: `feat: add watch history and per-member viewing stats`
+
+## Visible timer presets and wheel adjustment — November 3, 2026
+
+Moved quick durations outside Session settings, keeping them available during
+Pomodoro. Added countdown-only wheel gestures in one-minute steps, using a
+non-passive native listener so adjustments prevent dock scrolling. Small trackpad
+movements accumulate; modifier, horizontal, outside, and editing gestures pass
+through. Fractional overshoot is discarded after a step to keep scaled mouse
+wheel input predictable, and changing presets clears partial movement.
+
+Verification: **247 tests passed across 24 files**, lint and production build
+passed. Eleven new wheel/integration cases cover delta modes, trackpad movement,
+scaled input, gesture resets and cleanup, multiple adjustments before rendering,
+idle/running limits, paused Pomodoro, phase completion, and actual-time accounting.
+
+Production-browser checks used actual mouse-wheel events and synthetic trackpad
+events with a simulated video player. Presets were visible outside the closed
+settings disclosure; adjustments kept running/Pomodoro sessions active and
+prevented dock scrolling. Editing, outside scrolling, and modifier gestures did
+not change time. Minimum/maximum duration, preset selection during Pomodoro,
+and actual study-time accounting passed. There were no page errors or clipped
+preset labels/document overflow at 1440, 1000, 768, 375, and 320 pixels. See the
+[timer screenshot](images/timer-controls.jpg).
+The Windows executable was rebuilt; all 61 bundled frontend assets match `dist/`,
+its headless startup self-test passed, and `git diff --check` passed.
+
+Suggested commit message: `feat: expose timer presets and add wheel adjustment`
+
+## Keyboard access and Escape navigation — November 3, 2026
+
+Added Esc return to the catalog with focus restoration, one-stop tool tabs with
+Left/Right/Home/End, spatial video-card navigation, button-group arrows, timer
+Up/Down, skip links, and shortcut preferences/help. Native input keys retain
+their behavior. Local editors/disclosures/captions dismiss before screen return;
+task/timer editors, captions, and the timer footer restore a useful focus target.
+The decorative background iframe is inert. Corrected labelled-region roles and
+visible-name mismatches in Change video, CC, and the timer footer.
+
+Verification: **255 tests passed across 25 files**, lint and production build
+passed. Eight new tests cover tab/card movement, responsive rows, inherited DOM
+rectangle properties, collection edges, roving tab selection, and preference
+migration. Production-browser checks passed catalog/queue focus, toolbar and
+tab arrows, timer keys, editor/caption dismissal, Esc from Zen, timer retention,
+missing-card fallback, native ranges, shortcut persistence, visible focus, and
+45 Tab transitions excluding hidden panels and the background iframe. Mobile
+card navigation and document width passed at 375 and 320 pixels.
+
+Temporary axe-core 4.14.0 scans reported zero violations for the selected WCAG
+A/AA rules in the Dark catalog, Timer, and Settings views and Light Settings.
+Contrast checks remained incomplete. These checks use a simulated player and
+do not certify full WCAG conformance; see [scope and references](accessibility.md).
+The Windows executable was rebuilt, its 61 frontend assets match `dist/`, and
+its headless startup self-test passed. Documentation and keyboard screenshots
+were refreshed; `git diff --check` passed.
+
+Suggested commit message: `feat: improve keyboard navigation and accessibility controls`

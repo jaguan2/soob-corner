@@ -28,6 +28,8 @@ export interface TimerApi {
   setDurationSeconds: (seconds: number) => void
   /** Add/remove time mid-session (e.g. ±60s) without stopping the clock. */
   nudge: (deltaSeconds: number) => void
+  /** Adjust the countdown, keeping an active session running and Pomodoro intact. */
+  adjustTime: (deltaSeconds: number) => void
   startPomodoro: (config: PomodoroConfig) => void
   stopPomodoro: () => void
   /** During a pomodoro break: jump straight into the next focus round. */
@@ -234,6 +236,19 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
     }
   }, [flushFocusTime])
 
+  const adjustTime = useCallback((deltaSeconds: number) => {
+    if (!Number.isFinite(deltaSeconds) || deltaSeconds === 0) return
+    const current = endAtRef.current === null ? secondsLeftRef.current
+      : Math.max(1, Math.ceil((endAtRef.current - Date.now()) / 1000))
+    const active = isRunning || (pomodoroRef.current !== null && !pomodoroRef.current.completed)
+    const next = Math.min(MAX_SECONDS, Math.max(active ? 1 : MIN_SECONDS, current + deltaSeconds))
+    if (next === current) return
+    if (active) nudge(next - current)
+    else setDurationSeconds(next)
+    // Multiple wheel events can arrive before React renders the next snapshot.
+    secondsLeftRef.current = next
+  }, [isRunning, nudge, setDurationSeconds])
+
   const skipBreak = useCallback(() => {
     const p = pomodoroRef.current
     if (!p || p.completed || p.phase !== 'break') return
@@ -286,6 +301,7 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
     reset,
     setDurationSeconds,
     nudge,
+    adjustTime,
     startPomodoro,
     stopPomodoro,
     skipBreak,

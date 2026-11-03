@@ -4,15 +4,18 @@ import {
   totalStudyMilliseconds, XP_RULES, type ProfileAvatar, type Progression,
 } from '../lib/progression'
 import { UIIcon } from './UIIcon'
+import { WatchStats } from './WatchStats'
+import type { WatchStats as VideoWatchStats } from '../lib/watchHistory'
 
 interface ProfileCardProps {
   progression: Progression
   onUpdateProfile: (name: string, avatar: ProfileAvatar) => Promise<boolean>
   showMilestones: boolean
+  watchStats?: VideoWatchStats
 }
 const AVATAR_LABELS: Record<ProfileAvatar, string> = { leaf: 'Little leaf', book: 'Open book', moon: 'Night owl', coffee: 'Coffee break' }
 
-function ProfileCardInner({ progression, onUpdateProfile, showMilestones }: ProfileCardProps) {
+function ProfileCardInner({ progression, onUpdateProfile, showMilestones, watchStats }: ProfileCardProps) {
   const level = useMemo(() => progressionLevel(progression), [progression])
   const milestones = useMemo(() => progressionMilestones(progression), [progression])
   const [nameDraft, setNameDraft] = useState(progression.name)
@@ -52,6 +55,7 @@ function ProfileCardInner({ progression, onUpdateProfile, showMilestones }: Prof
         <div><UIIcon name="check" size={17} /><strong>{progression.taskClaims.length}</strong><span>Tasks completed</span></div>
         <div><UIIcon name="flame" size={17} /><strong>{streak} {streak === 1 ? 'day' : 'days'}</strong><span>Check-in streak · best {progression.bestStreak}</span></div>
       </div>
+      {watchStats && <WatchStats stats={watchStats} />}
       {showMilestones && <>
       <div className="profile-milestone-heading"><h3 className="section-heading"><UIIcon name="award" size={17} />Milestones</h3><span>{earnedCount} / {milestones.length}</span></div>
       <ul className="profile-milestones" aria-label="Study milestones">

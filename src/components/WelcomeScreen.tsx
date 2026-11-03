@@ -1,4 +1,5 @@
-import { memo, useMemo, type ReactNode } from 'react'
+import { memo, useId, useMemo, useRef, useState, type ReactNode } from 'react'
+import { handleVideoArrows } from '../lib/keyboardNavigation'
 import type { Video } from '../types/playlist'
 import { VideoTile } from './VideoTile'
 import { CatalogFilters } from './CatalogFilters'
@@ -15,6 +16,7 @@ interface WelcomeScreenProps {
   /** The video from the previous session (if still playable), for one-click resume. */
   lastVideo: Video | null
   settings: ReactNode
+  history: ReactNode
   onSelect: (id: string) => void
   onSurprise: () => void
   queue: VideoQueueProps
@@ -29,25 +31,39 @@ function WelcomeScreenInner({
   favorites,
   lastVideo,
   settings,
+  history,
   onSelect,
   onSurprise,
   queue,
   onQueue,
 }: WelcomeScreenProps) {
   const sorted = useMemo(() => filterVideos(videos, filters, favorites), [videos, filters, favorites])
+  const [openTool, setOpenTool] = useState<'settings' | 'history' | null>(null)
+  const settingsButton = useRef<HTMLButtonElement>(null)
+  const historyButton = useRef<HTMLButtonElement>(null)
+  const videoHelpId = useId()
 
   return (
-    <div className="catalog-welcome min-h-screen w-full">
+    <div className="catalog-welcome min-h-screen w-full" onKeyDown={event => {
+      if (event.key !== 'Escape' || event.defaultPrevented || !openTool) return
+      event.preventDefault()
+      const disclosure = event.target instanceof HTMLElement ? event.target.closest<HTMLDetailsElement>('details[open]') : null
+      if (disclosure) { disclosure.open = false; disclosure.querySelector('summary')?.focus(); return }
+      setOpenTool(null)
+      const trigger = openTool === 'settings' ? settingsButton : historyButton
+      trigger.current?.focus()
+    }}>
+      <a href="#video-catalog" className="skip-link">Skip to video choices</a>
       <div className="welcome-settings-row">
-        <details className="welcome-settings">
-          <summary className="workspace-button"><UIIcon name="settings" size={17} />Settings</summary>
-          <div className="welcome-settings-content">{settings}</div>
-        </details>
+        <button ref={historyButton} className="workspace-button" aria-expanded={openTool === 'history'} aria-controls="welcome-history" onClick={() => setOpenTool(value => value === 'history' ? null : 'history')}><UIIcon name="history" size={17} />Watch history</button>
+        <button ref={settingsButton} className="workspace-button" aria-expanded={openTool === 'settings'} aria-controls="welcome-settings" onClick={() => setOpenTool(value => value === 'settings' ? null : 'settings')}><UIIcon name="settings" size={17} />Settings</button>
       </div>
+      <div className="welcome-tool-content" id="welcome-history" hidden={openTool !== 'history'}>{history}</div>
+      <div className="welcome-tool-content welcome-settings-content" id="welcome-settings" hidden={openTool !== 'settings'}>{settings}</div>
       <div className="mx-auto max-w-5xl px-4 pb-10 pt-4 sm:px-6">
         <header className="welcome-header text-center">
           <span className="welcome-mark"><UIIcon name="leaf" size={25} /></span>
-          <h1 className="text-3xl font-semibold text-ink-900 dark:text-cream-100">
+          <h1 tabIndex={-1} className="text-3xl font-semibold text-ink-900 dark:text-cream-100">
             study with soobin
           </h1>
           <p className="mt-2 text-sm text-ink-700 dark:text-cream-300">
@@ -88,9 +104,10 @@ function WelcomeScreenInner({
           </p>
         )}
 
-        <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4">
+        <p id={videoHelpId} className="sr-only">Use arrow keys to move between videos. Enter or Space plays the focused video or activates its queue button. Home and End jump to the first and last video.</p>
+        <ul id="video-catalog" tabIndex={-1} aria-label="Study videos" aria-describedby={videoHelpId} onKeyDown={handleVideoArrows} className="mt-4 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4">
           {sorted.map(video => <VideoTile key={video.id} video={video} favorite={favorites.includes(video.id)} onSelect={onSelect} queued={queue.videos.some(item => item.id === video.id)} onQueue={onQueue} />)}
-        </div>
+        </ul>
       </div>
     </div>
   )

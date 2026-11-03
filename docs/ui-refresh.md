@@ -30,14 +30,16 @@ or above 5.13:1 contrast; white primary-button text measures 4.74:1 normally and
 they are not a complete accessibility audit.
 
 The **Settings** dock tab groups appearance and profile display controls. The
-start screen also offers Settings in a native disclosure. Appearance controls
+start screen also offers an inline Settings panel. Appearance controls
 live in this shared view, replacing the toolbar disclosure and scattered palette
 shortcuts. **Show milestones** hides or restores Profile milestone cards without
 changing earned progress. This preference is saved separately as
 `sws.preferences.showMilestones` and defaults to enabled for existing users. The
 opacity preference is saved as `sws.panelOpacity`; only background surfaces
-become translucent. Timer settings group duration presets, Pomodoro setup, and
-daily focus goals. Existing tasks, timer behavior, favorites, and playback
+become translucent. Timer duration presets stay visible above Session settings,
+which groups Pomodoro setup and daily focus goals. Hovering over the countdown
+allows mouse-wheel adjustments in one-minute steps, with a hint beside the time.
+Existing tasks, focus accounting, favorites, and playback
 preferences keep their data formats.
 
 The custom-theme solver retains per-stop luminance rather than using fixed

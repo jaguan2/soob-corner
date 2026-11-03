@@ -6,6 +6,10 @@ and one of four study avatars. The card shows your level, total XP, progress to
 the next level, total time studied, completed-task total, check-in streak,
 best streak, and eight milestones.
 
+The **Videos watched** section also shows distinct videos, plays including
+rewatches, and counts by member from your [local watch history](watch-history.md).
+These viewing stats are independent of XP and focus-timer study time.
+
 Milestone cards are optional: open **Settings → Profile** and turn off **Show
 milestones** to hide them. This display preference saves on your device separately
 from progression. Study time, XP, and milestone eligibility continue to accumulate;

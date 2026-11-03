@@ -31,7 +31,8 @@ an internet connection since the videos stream from YouTube.)
   are remembered on this device. Unavailable embeds are skipped automatically.
 - YouTube video that always stays fully in frame (autoplay, muted
   until you turn up the volume slider)
-- A responsive tools dock with Timer, Videos & sound, Tasks, Profile, Social, and Settings tabs.
+- A responsive tools dock with Timer, Videos & sound, History, Tasks, Profile,
+  Social, and Settings tabs. Tabs wrap on narrow docks to keep every label readable.
   It sits beside the video on wide windows and below it on narrow or short
   windows. Small windows scroll, and each section keeps its own space
 - Video controls sit below the video: pause/play, previous/next video,
@@ -49,8 +50,12 @@ an internet connection since the videos stream from YouTube.)
 - 💬 Subtitles: the `CC` button lists whatever translations a video carries
   (most have English, Japanese, Chinese and more). Your language is remembered
   and turned back on automatically for every video that has it
-- Focus timer: 15 min / 30 min / 1 hour presets, or click the time and type
-  any duration ("45", "25:30", "1:30:00")
+- Focus timer: visible 15 min / 30 min / 1 hour presets and Custom, above
+  **Session settings**. Click the countdown to type any duration ("45", "25:30",
+  "1:30:00"), or hover over it and scroll up/down to add/remove time in one-minute
+  steps. Running timers keep running; Pomodoro adjustments keep the current round.
+  Choosing a preset switches to a single focus session. Scrolling elsewhere
+  works normally, and small trackpad movements accumulate into a step.
 - 🍅 Pomodoro mode: set your focus length, break length, and number of
   rounds — the timer cycles through them automatically
 - 🔔 A soft chime (and a system notification, if you allow it) marks the end
@@ -88,10 +93,23 @@ an internet connection since the videos stream from YouTube.)
   Settings tab, or Settings at the top right of the start screen. Turn off
   **Show milestones** to hide their cards in Profile; earned progress, levels,
   XP, and study time remain saved. Preferences are remembered on this device.
-- ⌨️ Keyboard shortcuts: space play/pause · ←/→ skip 10s · F fullscreen ·
-  M mute · T start/pause the timer · Z zen mode
+- **History** saves recently played videos with dates and play counts. Search,
+  filter by member, play again, or add to your queue; the start screen has a
+  **Watch history** shortcut too. Profile shows distinct videos watched, plays
+  including rewatches, and a count for each TXT member. Group videos count for
+  every featured member and once overall. Playback must start to count; pausing
+  does not add another play. Tracking starts with this update. See the
+  [watch history guide](watch-history.md).
+- ⌨️ Keyboard access: Tab moves between controls; Left/Right switches tools and
+  moves through button groups, and arrows move between video cards. Focus the
+  countdown and use Up/Down to adjust minutes. Esc closes the current editor or
+  disclosure first, then returns to video selection with focus restored.
+  Background shortcuts: Space play/pause · ←/→ skip 10s outside other controls ·
+  F fullscreen · M mute · T start/pause the timer · Z Zen. Turn off Space/F/M/T/Z
+  in **Settings → Accessibility → Single-key shortcuts**. Native button keys
+  remain available. See the [keyboard access guide](accessibility.md).
 - 🧘 Zen mode (Z or the Zen button): tools and playback controls disappear; an Exit zen button stays accessible —
-  Z or Esc brings it all back
+  Z brings the tools back; Esc returns to video selection while the timer continues
 - Videos save your position when switching or leaving as well as periodically,
   and pick up there next time. The URL
   carries `?v=` so you can share exactly what you're watching
@@ -117,8 +135,8 @@ an internet connection since the videos stream from YouTube.)
   theme, muted coffee colors, frosted surfaces, and consistent stroke icons.
   **Settings → Appearance** offers labeled palettes and a saved panel-opacity
   slider (65–100%). Only the surfaces become translucent; text stays fully visible.
-  The timer keeps its main controls visible and groups presets, Pomodoro setup,
-  and daily goals under **Session settings**. Tools keep their existing placement.
+  The timer keeps its main controls and duration presets visible. Pomodoro setup
+  and daily goals stay under **Session settings**. Tools keep their existing placement.
 - Auto-advances through your queue, then picks a random filtered video; videos that
   refuse to play embedded are skipped automatically
 - No backend, no API key, no login — everything runs client-side

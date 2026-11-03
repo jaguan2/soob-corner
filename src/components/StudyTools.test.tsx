@@ -23,6 +23,7 @@ function Harness({ hidden = false, running = false }: { hidden?: boolean; runnin
     timerLabel="24:15" timerRunning={running} panels={{
       timer: <StatefulPanel id="timer" />,
       sidebar: <StatefulPanel id="sidebar" />,
+      history: <StatefulPanel id="history" />,
       tasks: <StatefulPanel id="tasks" />,
       profile: <StatefulPanel id="profile" />,
       social: <StatefulPanel id="social" />,
@@ -37,6 +38,28 @@ afterEach(() => {
 })
 
 describe('study tools navigation', () => {
+  it('keeps one tab stop and uses Left/Right/Home/End to activate and focus tabs', () => {
+    act(() => { root = create(<Harness />) })
+    const buttons = STUDY_TOOLS.map(() => ({ focus: vi.fn() }))
+    const press = (source: StudyToolId, key: string) => {
+      const preventDefault = vi.fn()
+      act(() => root!.root.findByProps({ id: `tab-${source}` }).props.onKeyDown({ key, preventDefault,
+        currentTarget: { parentElement: { querySelectorAll: () => buttons } } }))
+      return preventDefault
+    }
+    expect(press('timer', 'ArrowLeft')).toHaveBeenCalledOnce()
+    expect(buttons[buttons.length - 1].focus).toHaveBeenCalledOnce()
+    expect(root!.root.findByProps({ id: 'tab-settings' }).props.tabIndex).toBe(0)
+    press('settings', 'ArrowRight')
+    expect(root!.root.findByProps({ id: 'tab-timer' }).props['aria-selected']).toBe(true)
+    press('timer', 'End')
+    press('settings', 'Home')
+    expect(root!.root.findAllByProps({ role: 'tab' }).filter(tab => tab.props.tabIndex === 0)).toHaveLength(1)
+    expect(press('timer', 'ArrowDown')).not.toHaveBeenCalled()
+    expect(mounted).toHaveBeenCalledTimes(STUDY_TOOLS.length)
+    expect(unmounted).not.toHaveBeenCalled()
+  })
+
   it('retains drafts and mounted panels through tab changes and hiding the entire dock', () => {
     act(() => { root = create(<Harness />) })
     expect(mounted).toHaveBeenCalledTimes(STUDY_TOOLS.length)
@@ -88,17 +111,17 @@ describe('study tools navigation', () => {
 
   it('keeps the timer reachable from other tabs and hides its footer on the timer tab', () => {
     act(() => { root = create(<Harness />) })
-    expect(root!.root.findAllByProps({ 'aria-label': 'Open timer' })).toHaveLength(0)
+    expect(root!.root.findAllByProps({ title: 'Open timer' })).toHaveLength(0)
     act(() => { root!.root.findByProps({ id: 'tab-profile' }).props.onClick() })
-    let footer = root!.root.findByProps({ 'aria-label': 'Open timer' })
+    let footer = root!.root.findByProps({ title: 'Open timer' })
     expect(footer.findAllByType('span').map(span => span.children.join(''))).toEqual(['24:15', 'Open timer'])
 
     act(() => { root!.update(<Harness running />) })
-    footer = root!.root.findByProps({ 'aria-label': 'Open timer' })
+    footer = root!.root.findByProps({ title: 'Open timer' })
     expect(footer.findAllByType('span').map(span => span.children.join(''))).toEqual(['24:15', 'Running'])
     act(() => { footer.props.onClick() })
     expect(root!.root.findByProps({ id: 'tab-timer' }).props['aria-selected']).toBe(true)
     expect(root!.root.findByProps({ id: 'tool-timer' }).props.hidden).toBe(false)
-    expect(root!.root.findAllByProps({ 'aria-label': 'Open timer' })).toHaveLength(0)
+    expect(root!.root.findAllByProps({ title: 'Open timer' })).toHaveLength(0)
   })
 })

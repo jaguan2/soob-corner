@@ -12,10 +12,14 @@ import { SocialCard } from './components/SocialCard'
 import { TimerCard } from './components/TimerCard'
 import { WelcomeScreen } from './components/WelcomeScreen'
 import { SettingsCard } from './components/SettingsCard'
+import { WatchHistoryCard } from './components/WatchHistoryCard'
 import { ProfileCard } from './components/ProfileCard'
 import { UIIcon } from './components/UIIcon'
 import { useAppearance } from './hooks/useAppearance'
 import { usePreferences } from './hooks/usePreferences'
+import { useVideoScreenFocus } from './hooks/useVideoScreenFocus'
+import { handleButtonArrows } from './lib/keyboardNavigation'
+import { useWatchHistory } from './hooks/useWatchHistory'
 import { useVideoCatalog } from './hooks/useVideoCatalog'
 import { useVideoAudio } from './hooks/useVideoAudio'
 import { StudyTools } from './components/StudyTools'
@@ -40,11 +44,12 @@ function toggleFullscreen() {
 
 export default function App() {
   const { theme, setTheme, customColor, setCustomColor, panelOpacity, setPanelOpacity } = useAppearance()
-  const { preferences, setShowMilestones } = usePreferences()
+  const { preferences, setShowMilestones, setSingleKeyShortcuts } = usePreferences()
   const settings = useMemo(() => <SettingsCard theme={theme} onSetTheme={setTheme} customColor={customColor}
     onSetCustomColor={setCustomColor} opacity={panelOpacity} onSetOpacity={setPanelOpacity}
-    showMilestones={preferences.showMilestones} onSetShowMilestones={setShowMilestones} />,
-  [theme, setTheme, customColor, setCustomColor, panelOpacity, setPanelOpacity, preferences.showMilestones, setShowMilestones])
+    showMilestones={preferences.showMilestones} onSetShowMilestones={setShowMilestones}
+    singleKeyShortcuts={preferences.singleKeyShortcuts} onSetSingleKeyShortcuts={setSingleKeyShortcuts} />,
+  [theme, setTheme, customColor, setCustomColor, panelOpacity, setPanelOpacity, preferences.showMilestones, setShowMilestones, preferences.singleKeyShortcuts, setSingleKeyShortcuts])
   const [captionLang, setCaptionLang] = useState<string | null>(loadCaptionLang)
   const [notice, setNotice] = useState<string | null>(null)
   const [videoPlaying, setVideoPlaying] = useState(true)
@@ -61,6 +66,7 @@ export default function App() {
     noticeTimer.current = window.setTimeout(() => setNotice(null), ms)
   }, [])
   useEffect(() => () => window.clearTimeout(noticeTimer.current), [])
+  const { history, stats: watchStats, onVideoStarted } = useWatchHistory(playlist.videos, showNotice)
   const { progression, recordStudy, recordTime, completeTask, updateProfile } = useProgression(showNotice)
   const timer = useTimer(25, recordStudy, recordTime)
   const setTaskDuration = timer.setDurationSeconds
@@ -74,8 +80,12 @@ export default function App() {
     favorites, toggleFavorite, catalogFilters, setCatalogFilters,
     handleUnplayable, handleEnded, handleSurprise, handlePreviousVideo, handleNextVideo,
   } = useVideoCatalog(playlist.videos, onBlocked, repeatCurrentVideo)
+  const backButton = useVideoScreenFocus(videoId)
+  const returnToCatalog = useCallback(() => { setVideoId(null); setZen(false) }, [setVideoId])
   const queue = useMemo(() => ({ videos: queuedVideos, onPlay: selectVideo, onRemove: removeQueuedVideo, onMove: moveQueuedVideo, onClear: clearQueue }), [queuedVideos, selectVideo, removeQueuedVideo, moveQueuedVideo, clearQueue])
   const { volume, muted, changeVolume, toggleMute } = useVideoAudio(videoId)
+  const historyView = useMemo(() => <WatchHistoryCard history={history} playable={playable} queuedVideos={queuedVideos}
+    onPlay={selectVideo} onQueue={queueVideo} />, [history, playable, queuedVideos, selectVideo, queueVideo])
 
   // WebView can retain the document's small-layout scroll offset when the
   // window expands, clipping the toolbar and leaving empty space below.
@@ -128,6 +138,7 @@ export default function App() {
       setTaskDuration(seconds)
       setDockCollapsed(false)
       setTopPanel('timer')
+      document.getElementById('tab-timer')?.focus()
       showNotice(`Timer set to ${Math.round(seconds / 60)} minutes — press Start when you’re ready`, 4000)
     },
     [setTaskDuration, showNotice],
@@ -153,16 +164,30 @@ export default function App() {
   useEffect(() => {
     if (videoId === null) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey) return
+      if (e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return
       const target = e.target as HTMLElement
       if (!(target instanceof HTMLElement)) return
+      if (e.key === 'Escape') {
+        // Local editors can prevent this event. Native disclosures close before
+        // navigation, retaining a useful focus target in the current screen.
+        const disclosure = target.closest<HTMLDetailsElement>('details[open]')
+        e.preventDefault()
+        if (disclosure) {
+          disclosure.open = false
+          disclosure.querySelector('summary')?.focus()
+        } else if (document.fullscreenElement) void document.exitFullscreen()
+        else returnToCatalog()
+        return
+      }
       // Typing fields own every key.
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) {
         return
       }
+      if (!preferences.singleKeyShortcuts && [' ', 'f', 'm', 't', 'z'].includes(e.key.toLowerCase())) return
       // Buttons/links own only their activation keys — a focused Start button
       // (focus lingers after any click) shouldn't swallow F/M/T/Z.
-      if (['BUTTON', 'A', 'SUMMARY'].includes(target.tagName) && (e.key === ' ' || e.key === 'Enter')) {
+      if (target.closest('button, a, summary, [role="tab"]') &&
+          (e.key === ' ' || e.key === 'Enter' || e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End')) {
         return
       }
       switch (e.key) {
@@ -195,14 +220,11 @@ export default function App() {
             return !z
           })
           break
-        case 'Escape':
-          setZen(false)
-          break
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [videoId, showNotice, toggleMute])
+  }, [videoId, showNotice, toggleMute, preferences.singleKeyShortcuts, returnToCatalog])
 
   if (videoId === null) {
     return (
@@ -214,6 +236,7 @@ export default function App() {
           favorites={favorites}
           lastVideo={lastVideo}
           settings={settings}
+          history={historyView}
           onSelect={selectVideo}
           queue={queue}
           onQueue={queueVideo}
@@ -227,9 +250,11 @@ export default function App() {
 
   return (
     <div className={'study-workspace' + (dockCollapsed ? ' tools-hidden' : '') + (zen ? ' is-zen' : '')}>
-      <header className="workspace-toolbar">
-        <button onClick={() => { setVideoId(null); setZen(false) }}
-          aria-label="Back to video selection" title="Back to video selection"
+      <a href="#playback-controls" className="skip-link">Skip to video controls</a>
+      <a href="#workspace-tools" className="skip-link" onClick={() => { setDockCollapsed(false); setZen(false) }}>Skip to study tools</a>
+      <header className="workspace-toolbar" onKeyDown={handleButtonArrows}>
+        <button ref={backButton} onClick={returnToCatalog}
+          aria-label="Change video: back to video selection" aria-keyshortcuts="Escape" title="Back to video selection (Esc)"
           className="workspace-button workspace-back"><UIIcon name="arrowLeft" />Change video</button>
         <div className="workspace-heading">
           <p className="workspace-brand"><span className="brand-mark"><UIIcon name="leaf" size={20} /></span>study with soobin</p>
@@ -246,8 +271,8 @@ export default function App() {
       </header>
       {notice && <div role="status" className="workspace-notice">{notice}</div>}
       <main className="workspace-main">
-        <div className="video-stage" aria-label="Study video">
-          <VideoBackground ref={videoRef} videoId={videoId} volume={volume} muted={muted} isPlaying={videoPlaying} captionLang={captionLang} onEnded={handleEnded} onPlayingChange={setVideoPlaying} onUnplayable={handleUnplayable} onApiUnavailable={handleApiUnavailable} />
+        <div className="video-stage" role="group" aria-label="Study video">
+          <VideoBackground ref={videoRef} videoId={videoId} volume={volume} muted={muted} isPlaying={videoPlaying} captionLang={captionLang} onEnded={handleEnded} onPlayingChange={setVideoPlaying} onVideoStarted={onVideoStarted} onUnplayable={handleUnplayable} onApiUnavailable={handleApiUnavailable} />
         </div>
         <div hidden={zen}>
           <VideoControls videoId={videoId} onPreviousVideo={handlePreviousVideo} onNextVideo={handleNextVideo} canPrevious={filteredVideos.some(v => v.id !== videoId)} canNext={queuedVideos.length > 0 || filteredVideos.some(v => v.id !== videoId)} player={videoRef} isPlaying={videoPlaying} onTogglePlay={handleTogglePlay} volume={volume} muted={muted} onToggleMute={toggleMute} onVolumeChange={changeVolume} captionLang={captionLang} onSetCaptionLang={chooseCaptionLang} />
@@ -258,7 +283,8 @@ export default function App() {
           timer: <TimerCard timer={timer} pauseOnBreak={pauseOnBreak} onSetPauseOnBreak={handleSetPauseOnBreak} />,
           sidebar: <Sidebar filters={catalogFilters} onFiltersChange={setCatalogFilters} videos={playable} currentVideo={currentVideo} onSelectVideo={selectVideo} queue={queue} onQueue={queueVideo} playlistUrl={playlist.sourceUrl} favorites={favorites} onToggleFavorite={toggleFavorite} />,
           tasks: <TasksCard onUseDuration={loadTaskDuration} onTaskCompleted={completeTask} />,
-          profile: <ProfileCard progression={progression} onUpdateProfile={updateProfile} showMilestones={preferences.showMilestones} />,
+          history: historyView,
+          profile: <ProfileCard progression={progression} onUpdateProfile={updateProfile} showMilestones={preferences.showMilestones} watchStats={watchStats} />,
           social: <SocialCard />,
           settings,
         }} />

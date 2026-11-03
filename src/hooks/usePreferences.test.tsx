@@ -14,7 +14,8 @@ function Harness() {
   api = usePreferences()
   return <>
     <SettingsCard theme="dark" onSetTheme={noop} customColor="#8AA5C8" onSetCustomColor={noop}
-      opacity={88} onSetOpacity={noop} showMilestones={api.preferences.showMilestones} onSetShowMilestones={api.setShowMilestones} />
+      opacity={88} onSetOpacity={noop} showMilestones={api.preferences.showMilestones} onSetShowMilestones={api.setShowMilestones}
+      singleKeyShortcuts={api.preferences.singleKeyShortcuts} onSetSingleKeyShortcuts={api.setSingleKeyShortcuts} />
     <ProfileCard progression={progression} onUpdateProfile={async () => true} showMilestones={api.preferences.showMilestones} />
   </>
 }
@@ -40,10 +41,10 @@ describe('saved profile display preferences', () => {
     const milestones = () => root!.root.findAllByProps({ 'aria-label': 'Study milestones' })
     expect(milestones()).toHaveLength(1)
     expect(milestones()[0].findAllByProps({ className: 'earned' }).length).toBeGreaterThan(0)
-    act(() => root!.root.findByProps({ role: 'switch' }).props.onChange({ target: { checked: false } }))
+    act(() => root!.root.findByProps({ 'aria-label': 'Show milestones' }).props.onChange({ target: { checked: false } }))
     expect(milestones()).toHaveLength(0)
     expect(root!.root.findByProps({ role: 'progressbar' }).props['aria-valuenow']).toBe(10)
-    expect(JSON.parse(values.get('sws.preferences')!)).toEqual({ showMilestones: false })
+    expect(JSON.parse(values.get('sws.preferences')!)).toEqual({ showMilestones: false, singleKeyShortcuts: true })
     expect(values.get('sws.progression')).toBe(saved)
     act(() => root!.unmount())
     mount()
@@ -67,5 +68,17 @@ describe('saved profile display preferences', () => {
     act(() => api.setShowMilestones(false))
     expect(api.preferences.showMilestones).toBe(false)
     expect(root!.root.findAllByProps({ 'aria-label': 'Study milestones' })).toHaveLength(0)
+  })
+
+  it('migrates older preferences and persists disabling shortcuts without changing milestone visibility', () => {
+    values.set('sws.preferences', JSON.stringify({ showMilestones: false }))
+    mount()
+    expect(api.preferences).toEqual({ showMilestones: false, singleKeyShortcuts: true })
+    act(() => api.setSingleKeyShortcuts(false))
+    expect(api.preferences).toEqual({ showMilestones: false, singleKeyShortcuts: false })
+    act(() => root!.unmount())
+    mount()
+    expect(api.preferences.singleKeyShortcuts).toBe(false)
+    expect(api.preferences.showMilestones).toBe(false)
   })
 })

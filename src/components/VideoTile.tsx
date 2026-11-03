@@ -14,9 +14,10 @@ interface Props {
 
 export function VideoTile({ video, favorite, selected, onSelect, queued, onQueue }: Props) {
   return (
-    <div className="catalog-video min-w-0">
+    <li className="catalog-video min-w-0" data-video-card>
       <button
         onClick={() => onSelect(video.id)}
+        data-video-id={video.id} data-video-action="play"
         aria-pressed={selected}
         title={`${video.title}\n${videoMetadata(video)}${video.broadcastDate ? `\nOriginal live: ${video.broadcastDate}` : ''}`}
         className="catalog-video-play group w-full min-w-0 text-left"
@@ -31,9 +32,9 @@ export function VideoTile({ video, favorite, selected, onSelect, queued, onQueue
         <p className="catalog-video-meta mt-1 text-[11px]">{videoMetadata(video)}</p>
         {video.broadcastDate && <p className="catalog-video-meta mt-0.5 text-[11px]">Original live: {video.broadcastDate}</p>}
       </button>
-      <button onClick={() => onQueue(video.id)} disabled={queued} aria-label={`${queued ? 'Queued' : 'Add to queue'}: ${video.title}`} className="catalog-queue-button">
+      <button data-video-id={video.id} data-video-action="queue" onClick={() => { if (!queued) onQueue(video.id) }} aria-disabled={queued} aria-label={`${queued ? 'Queued' : 'Add to queue'}: ${video.title}`} className="catalog-queue-button">
         <UIIcon name={queued ? 'check' : 'plus'} size={13} />{queued ? 'Queued' : 'Add to queue'}
       </button>
-    </div>
+    </li>
   )
 }

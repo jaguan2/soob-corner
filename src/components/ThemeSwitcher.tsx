@@ -1,3 +1,4 @@
+import { handleButtonArrows } from '../lib/keyboardNavigation'
 import type { Theme } from '../lib/theme'
 import { UIIcon, type UIIconName } from './UIIcon'
 
@@ -18,7 +19,7 @@ interface ThemeSwitcherProps {
 /** Theme controls shared by the welcome and dock Settings views. */
 export function ThemeSwitcher({ theme, onSetTheme, customColor, onSetCustomColor, expanded = false }: ThemeSwitcherProps) {
   return (
-    <div className={'theme-switcher' + (expanded ? ' expanded' : '')} role="group" aria-label="Color theme">
+    <div className={'theme-switcher' + (expanded ? ' expanded' : '')} role="group" aria-label="Color theme" onKeyDown={handleButtonArrows}>
       {THEMES.map((t) => (
         <button
           key={t.value}

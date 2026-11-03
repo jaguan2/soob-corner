@@ -23,9 +23,35 @@ This capture uses an isolated browser profile with three catalog videos queued.
 
 ![Saved video queue and Add to queue controls](images/video-queue.jpg)
 
+### Watch history and viewing stats — November 3, 2026
+
+History shows recent videos, member/search filters, replay and queue actions.
+Profile separates distinct videos from total plays and counts shared videos for
+each featured member. These captures use an isolated demo profile with three
+videos and two rewatches; player events were simulated for repeatable checks.
+
+![Watch history tab](images/watch-history.jpg)
+
+![Profile viewing stats by member](images/watch-stats.jpg)
+
+### Timer controls — November 3, 2026
+
+Quick durations remain visible with Session settings closed. The countdown hints
+at click-to-type and mouse-wheel adjustment. This isolated demo profile uses a
+30-minute duration and the Dark theme.
+
+![Timer presets and mouse-wheel hint](images/timer-controls.jpg)
+
+### Keyboard access — November 3, 2026
+
+Settings provides keyboard help and a saved shortcut switch. The Timer capture
+also demonstrates the visible keyboard focus outline on the countdown.
+
+![Accessibility settings and keyboard controls](images/keyboard-controls.jpg)
+
 ### Settings — November 3, 2026
 
-The sixth tools tab now groups palettes, panel opacity, and optional milestone
+The Settings tools tab groups palettes, panel opacity, and optional milestone
 cards. The same settings are accessible before choosing a video. This capture
 uses an isolated demo profile; the running timer remains available in the footer.
 

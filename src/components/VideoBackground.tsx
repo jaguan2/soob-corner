@@ -39,6 +39,8 @@ interface VideoBackgroundProps {
   onEnded: () => void
   /** Keeps the caller's play/pause state in sync with the real player state. */
   onPlayingChange: (playing: boolean) => void
+  /** Once per started selection or explicit replay, never for pause/resume. */
+  onVideoStarted?: (id: string) => void
   /** Fired when YouTube refuses to play the video in an embed (copyright /
    *  embed restrictions — error codes 2, 100, 101, 150). */
   onUnplayable: () => void
@@ -49,7 +51,7 @@ interface VideoBackgroundProps {
 
 const VideoBackgroundInner = forwardRef<VideoBackgroundHandle, VideoBackgroundProps>(
   function VideoBackground(
-    { videoId, volume, muted, isPlaying, captionLang, onEnded, onPlayingChange, onUnplayable, onApiUnavailable },
+    { videoId, volume, muted, isPlaying, captionLang, onEnded, onPlayingChange, onVideoStarted, onUnplayable, onApiUnavailable },
     ref,
   ) {
     const containerRef = useRef<HTMLDivElement>(null)
@@ -71,6 +73,9 @@ const VideoBackgroundInner = forwardRef<VideoBackgroundHandle, VideoBackgroundPr
     onEndedRef.current = onEnded
     const onPlayingChangeRef = useRef(onPlayingChange)
     onPlayingChangeRef.current = onPlayingChange
+    const onVideoStartedRef = useRef(onVideoStarted)
+    onVideoStartedRef.current = onVideoStarted
+    const startedForRef = useRef<string | null>(null)
     const onUnplayableRef = useRef(onUnplayable)
     onUnplayableRef.current = onUnplayable
     const onApiUnavailableRef = useRef(onApiUnavailable)
@@ -144,6 +149,7 @@ const VideoBackgroundInner = forwardRef<VideoBackgroundHandle, VideoBackgroundPr
         if (!readyRef.current) return
         try {
           savePosition(videoIdRef.current, 0, 0)
+          startedForRef.current = null
           playerRef.current?.seekTo(0, true)
           playerRef.current?.playVideo()
         } catch { /* player not ready */ }
@@ -250,6 +256,10 @@ const VideoBackgroundInner = forwardRef<VideoBackgroundHandle, VideoBackgroundPr
                   savePosition(videoIdRef.current, 0, 0)
                   onEndedRef.current()
                 } else if (event.data === YT.PlayerState.PLAYING) {
+                  if (requestedIdRef.current === videoIdRef.current && startedForRef.current !== videoIdRef.current) {
+                    startedForRef.current = videoIdRef.current
+                    onVideoStartedRef.current?.(videoIdRef.current)
+                  }
                   onPlayingChangeRef.current(true)
                   // Continue where you left off: applied once per video, on
                   // its first PLAYING (pause/resume fires PLAYING again).
@@ -324,6 +334,7 @@ const VideoBackgroundInner = forwardRef<VideoBackgroundHandle, VideoBackgroundPr
       rememberPosition()
       window.clearTimeout(captionRetryRef.current)
       resumedForRef.current = null
+      startedForRef.current = null
       requestedIdRef.current = videoId
       playerRef.current?.loadVideoById(videoId)
     }, [videoId, rememberPosition, retryApi])
@@ -347,7 +358,7 @@ const VideoBackgroundInner = forwardRef<VideoBackgroundHandle, VideoBackgroundPr
     }, [isPlaying])
 
     return (
-      <div className="yt-bg" aria-hidden="true">
+      <div className="yt-bg" aria-hidden="true" ref={node => { if (node) node.inert = true }}>
         <div className="yt-frame-box">
           <div ref={containerRef} />
         </div>

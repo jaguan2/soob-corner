@@ -3,6 +3,7 @@ import { storageGetJson, storageSetJson } from '../lib/storage'
 
 interface Preferences {
   showMilestones: boolean
+  singleKeyShortcuts: boolean
 }
 
 function loadPreferences(): Preferences {
@@ -10,6 +11,8 @@ function loadPreferences(): Preferences {
   return {
     showMilestones: raw !== null && typeof raw === 'object' &&
       'showMilestones' in raw && typeof raw.showMilestones === 'boolean' ? raw.showMilestones : true,
+    singleKeyShortcuts: raw !== null && typeof raw === 'object' &&
+      'singleKeyShortcuts' in raw && typeof raw.singleKeyShortcuts === 'boolean' ? raw.singleKeyShortcuts : true,
   }
 }
 
@@ -20,5 +23,8 @@ export function usePreferences() {
   const setShowMilestones = useCallback((showMilestones: boolean) => {
     setPreferences(previous => ({ ...previous, showMilestones }))
   }, [])
-  return { preferences, setShowMilestones }
+  const setSingleKeyShortcuts = useCallback((singleKeyShortcuts: boolean) => {
+    setPreferences(previous => ({ ...previous, singleKeyShortcuts }))
+  }, [])
+  return { preferences, setShowMilestones, setSingleKeyShortcuts }
 }

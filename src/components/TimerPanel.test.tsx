@@ -8,7 +8,7 @@ afterEach(() => vi.unstubAllGlobals())
 const noop = () => {}
 const timer: TimerApi = {
   label: '25:00', isRunning: false, durationSeconds: 1500, pomodoro: null,
-  toggle: noop, pause: noop, reset: noop, setDurationSeconds: noop, nudge: noop,
+  toggle: noop, pause: noop, reset: noop, setDurationSeconds: noop, nudge: noop, adjustTime: noop,
   startPomodoro: noop, stopPomodoro: noop, skipBreak: noop,
 }
 

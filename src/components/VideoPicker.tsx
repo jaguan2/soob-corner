@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
+import { handleVideoArrows } from '../lib/keyboardNavigation'
 import type { Video } from '../types/playlist'
 import { VideoTile } from './VideoTile'
 import { CatalogFilters } from './CatalogFilters'
@@ -19,6 +20,7 @@ interface VideoPickerProps {
 
 export function VideoPicker({ videos, selectedId, onSelect, favorites, filters, onFiltersChange, queuedVideos, onQueue }: VideoPickerProps) {
   const [page, setPage] = useState(0)
+  const helpId = useId()
   const filtered = filterVideos(videos, filters, favorites)
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   // the list can shrink at runtime (embed-blocked videos get filtered out)
@@ -60,9 +62,10 @@ export function VideoPicker({ videos, selectedId, onSelect, favorites, filters, 
         {filtered.length === 0 && <p className="mt-2 text-xs text-ink-700 dark:text-cream-300">No videos match. Try changing or clearing the filters.</p>}
       </div>
 
-      <div className="mt-2 grid grid-cols-2 gap-2">
+      <p id={helpId} className="sr-only">Use arrow keys to move between videos. Enter or Space plays the focused video or activates its queue button.</p>
+      <ul aria-label="Study videos" aria-describedby={helpId} onKeyDown={handleVideoArrows} className="mt-2 grid grid-cols-2 gap-2">
         {visible.map(video => <VideoTile key={video.id} video={video} favorite={favorites.includes(video.id)} selected={video.id === selectedId} onSelect={onSelect} queued={queuedVideos.some(item => item.id === video.id)} onQueue={onQueue} />)}
-      </div>
+      </ul>
     </div>
   )
 }

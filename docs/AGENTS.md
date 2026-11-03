@@ -70,8 +70,34 @@ from a complete typed record provided by `App`. Add tools through that registry.
 from progression. `showMilestones` defaults to true, accepts only a saved boolean,
 and controls the Profile milestone heading/cards. Hiding them must never clear
 earned progress, disable study tracking, or change XP rules. `SettingsCard`
-groups `AppearancePanel` and these preferences; the sixth dock tab and the
-welcome screen's native Settings disclosure reuse the same view.
+groups `AppearancePanel` and these preferences; the Settings dock tab and the
+welcome screen's inline Settings panel reuse the same view.
+The `singleKeyShortcuts` boolean in `sws.preferences` defaults to true for older
+saved preferences. It disables only global Space/F/M/T/Z actions; native button
+activation, Esc, and arrow navigation must remain available. `keyboardNavigation.ts`
+owns shared tab/card/button movement. Tabs have one active Tab stop, Left/Right
+wrapping, Home/End, and linked focusable panels; Up/Down retain native scrolling.
+Video cards remain semantic lists with optional spatial arrow navigation; do not
+add ARIA grid roles without implementing that pattern. Keep the card data attributes
+used for navigation/focus restoration, and retain focus on aria-disabled Queued
+buttons while guarding their click actions. `useVideoScreenFocus` focuses Change
+video on screen entry and the matching card/heading on return, never on automatic
+video changes. Local Escape handlers consume their event and restore their trigger
+before global Escape returns to the catalog. Global handlers respect prevented
+events, composition, form controls, and button navigation. The decorative video
+wrapper is inert; do not make interactive music/Spotify frames inert. See
+`docs/accessibility.md` for controls and the limited audit scope.
+`useWatchHistory` owns local `sws.watchHistory` through `watchHistorySession.ts`.
+The session re-reads under a Web Lock, retains failed starts for retry, and never
+overwrites unreadable history. `lib/watchHistory.ts` validates snapshots and
+derives distinct-video, play, and per-member totals. `VideoBackground` reports
+the first confirmed PLAYING per selection/replay through `onVideoStarted`;
+pause/resume and stale events must not add plays. App connects this callback to
+the history hook. `WatchHistoryCard` is shared by History and the welcome screen;
+`WatchStats` renders the same history's totals inside Profile. Group videos
+count once overall and once for each featured member. Tracking starts with this
+feature; do not fabricate history from saved positions or the last selection.
+See `docs/watch-history.md` for definitions and persistence rules.
 See `docs/architecture-review.md` for the review and next refactoring boundaries.
 
 **Data flow is one-directional and all client-side:**
@@ -143,7 +169,8 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
     of `App`. Captions expand inline. Controls do not drag or auto-hide.
     The toolbar's top-left Change video button uses a back arrow and returns to
     the welcome screen. It remains available in Zen mode; returning clears Zen
-    while keeping the focus timer running.
+    while keeping the focus timer running. Esc uses the same return action after
+    focused editors/disclosures have handled their own dismissal.
   - **Subtitles** (the controls' `CC` button) drive YouTube's undocumented
     captions module, since `controls: 0` hides YouTube's own CC button. The
     playlist's videos carry 4–7 translation tracks each. Rules learned by
@@ -223,7 +250,7 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
     ignored. Toolbar buttons wrap, notices occupy their own row, and controls
     wrap on narrow screens. Do not reintroduce independently positioned panels
     that can cover each other or the video.
-  - `SocialCard` is the fifth dock tab. `data/social.ts` holds the group Instagram,
+  - `SocialCard` is the Social dock tab. `data/social.ts` holds the group Instagram,
     official/shared-member X accounts, and the five member Instagram URLs.
     Cards use browser links (`target="_blank"`, `rel="noopener noreferrer"`);
     there are no social embed scripts, post scraping, or API credentials.
@@ -246,7 +273,7 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
   LOCAL date on open/return/gesture; idle midnight crossings never count.
   Calendar arithmetic is independent of DST and a backward clock cannot reopen
   a reward day. Name, avatar, XP, best streak and milestones remain local.
-  `ProfileCard` lives only in the fourth dock tab, **Profile**. Keep profile
+  `ProfileCard` lives only in the **Profile** dock tab. Keep profile
   settings and progression off the start screen and toolbar. No XP work runs
   on elapsed-time checkpoints. **Total time studied** uses a separate actual-time
   ledger (`studyMilliseconds`), initialized once after legacy completed-history
@@ -317,8 +344,18 @@ compatibility; display names and persisted IDs are intentionally separate.
 and controls themes plus persisted `sws.panelOpacity` (65–100%,
 default 88). Opacity applies to surface backgrounds through `--panel-opacity`,
 never to text. Semantic surface/text tokens in `index.css` adapt to each theme.
-`TimerPanel` keeps the countdown and transport visible, with presets, Pomodoro
-configuration and daily goals in a native **Session settings** disclosure.
+`TimerPanel` keeps the countdown, transport, and quick duration presets outside
+the native **Session settings** disclosure; only Pomodoro configuration and daily
+goals belong inside it. Presets stay available during Pomodoro and selecting one
+switches to a single focus duration. `useTimerWheel` attaches a non-passive wheel
+listener only to the countdown button, disabled while typing. It normalizes
+pixel/line/page movement into one-minute adjustments, accumulates small trackpad
+deltas, and clears movement on direction/gap/preset changes. Modifier and
+horizontal gestures pass through. `useTimer.adjustTime` keeps running sessions
+and active Pomodoro phases intact, clamps remaining time to 1 second–12 hours
+for active sessions, and updates idle single-session durations within the existing
+10-second–12-hour limits. Reuse its elapsed-time-safe nudge/set-duration paths;
+scrolling must never invent study time or trigger a phase change outside a tick.
 Preserve the managed dock placement; the user's UI preference is to improve
 appearance without introducing draggable panels. Native `<summary>` elements
 must own their activation keys so the global Space shortcut doesn't also play

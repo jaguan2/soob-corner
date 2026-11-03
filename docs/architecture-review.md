@@ -16,6 +16,12 @@ shortcut remains bound by `App` and calls the same hook action.
 | `src/hooks/useVideoAudio.ts` | Saved volume, startup mute, and audio gestures | Share consistent behavior between the playback bar and M shortcut |
 | `src/hooks/useAppearance.ts` | Validate saved appearance, apply root styles, persist selections | Share one owner across welcome and dock Settings views |
 | `src/hooks/usePreferences.ts` | Validate and save optional display preferences | Keep choices such as milestone visibility separate from earned progression |
+| `src/hooks/useTimerWheel.ts` | Local wheel capture, input normalization, gesture accumulation and cleanup | Keep DOM input handling separate from the timer state machine's bounded `adjustTime` action |
+| `src/lib/keyboardNavigation.ts` | Tab destinations, responsive card movement, and native button group enhancements | Share keyboard behavior while retaining native controls and list semantics |
+| `src/hooks/useVideoScreenFocus.ts` | Focus targets when switching between catalog and workspace | Restore context without moving focus during automatic video changes |
+| `src/hooks/useWatchHistory.ts` | Connect confirmed playback to saved history and live stats | Keep viewing data separate from focus time and XP |
+| `src/lib/watchHistorySession.ts` | Serialize history writes and retain failed starts for retry | Preserve overlapping tabs and prevent unreadable-state overwrites |
+| `src/lib/watchHistory.ts` | Normalize per-video snapshots and derive viewing totals | History and profile counts use one source of truth |
 | `src/components/SettingsCard.tsx` | Group appearance and profile display controls | Reuse the same settings view before and during study sessions |
 | `src/lib/theme.ts` | Palette derivation and shared `Theme` type | Components depend on the domain rather than importing from `App` |
 | `src/hooks/useVideoCatalog.ts` | Selection, filters, favorites, blocked videos, last selection, URL | Test navigation with an injected catalog without creating a player |
@@ -24,7 +30,8 @@ shortcut remains bound by `App` and calls the same hook action.
 
 Adding a tool means adding metadata to `STUDY_TOOLS` and providing its view in
 the `App` panels record. TypeScript reports a missing view, and the tab grid
-adapts to the registry length. Stable IDs preserve panel identity across renders.
+wraps on narrow docks and fits available width on larger docks. Stable IDs
+preserve panel identity across renders.
 
 The catalog hook has no knowledge of iframe creation. It calls `onRepeat` when
 the only matching video should replay, and `onBlocked` when a failed embed is
