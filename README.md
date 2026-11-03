@@ -13,6 +13,8 @@ All project documentation lives in [docs](docs/README.md):
 - [Screenshots and feature walkthrough](docs/screenshots.md)
 - [Profile levels and XP rules](docs/LEVELS.md)
 - [TXT video catalog](docs/video-catalog.md)
+- [Catalog discovery and startup updates](docs/CATALOG_UPDATES.md)
+- [Shared agent skills and setup](docs/AGENT_SKILLS.md)
 
 For development, run `npm install` and `npm run dev`.
 

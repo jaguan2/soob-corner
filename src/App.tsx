@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import playlistData from './data/playlist.json'
-import type { Playlist } from './types/playlist'
+import { usePlaylist } from './hooks/usePlaylist'
 import { useBreakNudge } from './hooks/useBreakNudge'
 import { useTimer } from './hooks/useTimer'
 import { useProgression } from './hooks/useProgression'
@@ -26,8 +25,6 @@ import { StudyTools } from './components/StudyTools'
 import type { StudyToolId } from './lib/workspace'
 import { storageGet, storageRemove, storageSet } from './lib/storage'
 
-const playlist = playlistData as Playlist
-
 /** Preferred subtitle language, re-applied to every video that has it. */
 function loadCaptionLang(): string | null {
   const stored = storageGet('sws.captionLang')
@@ -43,6 +40,7 @@ function toggleFullscreen() {
 }
 
 export default function App() {
+  const { playlist, isChecking } = usePlaylist()
   const { theme, setTheme, customColor, setCustomColor, panelOpacity, setPanelOpacity } = useAppearance()
   const { preferences, setShowMilestones, setSingleKeyShortcuts } = usePreferences()
   const settings = useMemo(() => <SettingsCard theme={theme} onSetTheme={setTheme} customColor={customColor}
@@ -66,7 +64,6 @@ export default function App() {
     noticeTimer.current = window.setTimeout(() => setNotice(null), ms)
   }, [])
   useEffect(() => () => window.clearTimeout(noticeTimer.current), [])
-  const { history, stats: watchStats, onVideoStarted } = useWatchHistory(playlist.videos, showNotice)
   const { progression, recordStudy, recordTime, completeTask, updateProfile } = useProgression(showNotice)
   const timer = useTimer(25, recordStudy, recordTime)
   const setTaskDuration = timer.setDurationSeconds
@@ -79,7 +76,10 @@ export default function App() {
     queuedVideos, queueVideo, removeQueuedVideo, moveQueuedVideo, clearQueue,
     favorites, toggleFavorite, catalogFilters, setCatalogFilters,
     handleUnplayable, handleEnded, handleSurprise, handlePreviousVideo, handleNextVideo,
-  } = useVideoCatalog(playlist.videos, onBlocked, repeatCurrentVideo)
+  } = useVideoCatalog(playlist.videos, onBlocked, repeatCurrentVideo, isChecking)
+  const historyVideos = useMemo(() => videoId && !playlist.videos.some(video => video.id === videoId)
+    ? [...playlist.videos, currentVideo] : playlist.videos, [playlist.videos, currentVideo, videoId])
+  const { history, stats: watchStats, onVideoStarted } = useWatchHistory(historyVideos, showNotice)
   const backButton = useVideoScreenFocus(videoId)
   const returnToCatalog = useCallback(() => { setVideoId(null); setZen(false) }, [setVideoId])
   const queue = useMemo(() => ({ videos: queuedVideos, onPlay: selectVideo, onRemove: removeQueuedVideo, onMove: moveQueuedVideo, onClear: clearQueue }), [queuedVideos, selectVideo, removeQueuedVideo, moveQueuedVideo, clearQueue])

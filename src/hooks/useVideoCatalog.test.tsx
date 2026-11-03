@@ -15,8 +15,8 @@ let values: Map<string, string>
 let location: URL
 const blocked = vi.fn()
 const repeat = vi.fn()
-function Harness({ catalog = videos }: { catalog?: Video[] }) {
-  api = useVideoCatalog(catalog, blocked, repeat)
+function Harness({ catalog = videos, isChecking = false }: { catalog?: Video[]; isChecking?: boolean }) {
+  api = useVideoCatalog(catalog, blocked, repeat, isChecking)
   return null
 }
 function mount(url = 'https://study.example/?keep=yes#catalog', catalog = videos) {
@@ -43,6 +43,58 @@ afterEach(() => {
 })
 
 describe('catalog selection and persistence', () => {
+  it('preserves a pending deep link until the downloaded catalog can resolve it', () => {
+    location = new URL('https://study.example/?keep=yes&v=three#catalog')
+    act(() => { root = create(<Harness catalog={videos.slice(0, 2)} isChecking />) })
+    expect(api.videoId).toBeNull()
+    expect(location.search).toContain('v=three')
+    act(() => root!.update(<Harness catalog={videos} />))
+    expect(api.videoId).toBe('three')
+    expect(location.href).toBe('https://study.example/?keep=yes&v=three#catalog')
+  })
+
+  it('does not override a user selection when a delayed catalog arrives', () => {
+    location = new URL('https://study.example/?v=three')
+    act(() => { root = create(<Harness catalog={videos.slice(0, 2)} isChecking />) })
+    act(() => api.selectVideo('two'))
+    act(() => root!.update(<Harness catalog={videos} />))
+    expect(api.videoId).toBe('two')
+    expect(location.search).toBe('?v=two')
+  })
+
+  it('cleans an unresolved link after checking finishes and respects explicit cancellation', () => {
+    location = new URL('https://study.example/?keep=yes&v=unknown')
+    act(() => { root = create(<Harness isChecking />) })
+    expect(location.search).toContain('v=unknown')
+    act(() => root!.update(<Harness />))
+    expect(location.search).toBe('?keep=yes')
+    act(() => root!.unmount())
+    location = new URL('https://study.example/?v=three')
+    act(() => { root = create(<Harness catalog={videos.slice(0, 2)} isChecking />) })
+    act(() => api.setVideoId(null))
+    act(() => root!.update(<Harness catalog={videos} />))
+    expect(api.videoId).toBeNull()
+    expect(location.search).toBe('')
+  })
+
+  it('retains a removed active video and filters/favorites while pruning queued unavailable entries', () => {
+    mount('https://study.example/?v=two')
+    act(() => {
+      api.queueVideo('three'); api.queueVideo('one')
+      api.toggleFavorite('one')
+      api.setCatalogFilters({ ...EMPTY_FILTERS, member: 'soobin' })
+    })
+    act(() => root!.update(<Harness catalog={[videos[0]]} />))
+    expect(api.videoId).toBe('two')
+    expect(api.currentVideo).toEqual(videos[1])
+    expect(api.queuedVideos.map(video => video.id)).toEqual(['one'])
+    expect(api.favorites).toEqual(['one'])
+    expect(api.catalogFilters.member).toBe('soobin')
+    act(() => api.handleNextVideo())
+    expect(api.videoId).toBe('one')
+    expect(api.currentVideo).toEqual(videos[0])
+  })
+
   it('validates deep links and preserves other URL state when returning to welcome', () => {
     mount('https://study.example/?keep=yes&v=two#catalog')
     expect(api.videoId).toBe('two')

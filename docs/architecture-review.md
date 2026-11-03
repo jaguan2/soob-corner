@@ -76,3 +76,13 @@ after runtime changes. These checks do not verify live third-party playback.
 Progression already distinguishes unreadable storage from absent data and
 replays pending writes under a lock. Retain those guarantees when adding
 persistence helpers; a generic saved-state hook must not replace them.
+
+## Catalog integration after the main/dev merge
+
+The November 3 merge keeps `usePlaylist` responsible for downloading and caching
+validated catalogs, separate from `useVideoCatalog` selection/URL/queue ownership.
+Pending deep links resolve when loading finishes; explicit selection or return
+cancels them. Active metadata survives catalog removal, and App includes that
+snapshot when recording a delayed first playback in watch history. Remote updates
+do not recreate the player or reset the timer. Unavailable queued entries are
+pruned by the existing queue owner.

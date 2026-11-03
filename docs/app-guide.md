@@ -172,7 +172,13 @@ npm run lint       # eslint
 
 ## Refreshing the playlist
 
-The video list lives in `src/data/playlist.json`, a static snapshot of the
+The app checks the published catalog on startup and caches validated newer
+snapshots, with cached/bundled fallback when offline. Downloads preserve active
+playback, filters, favorites, and timer state. See [catalog updates](CATALOG_UPDATES.md)
+for reviewed discovery and publication. No YouTube Data API key is needed.
+
+
+The bundled video list lives in `src/data/playlist.json`, a checked-in snapshot of the
 original Study w/ Soobin playlist plus curated TXT vlogs and live archives for
 **Soobin, Yeonjun, Beomgyu, Taehyun and Hueningkai**. Browse the full,
 member-organized [link catalog](video-catalog.md) for titles, durations,

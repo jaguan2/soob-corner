@@ -240,3 +240,52 @@ its headless startup self-test passed. Documentation and keyboard screenshots
 were refreshed; `git diff --check` passed.
 
 Suggested commit message: `feat: improve keyboard navigation and accessibility controls`
+
+## Main/dev merge resolution — November 3, 2026
+
+Combined `dev` at `6813be2` with `origin/main` at `700df25`. Conflicts were in
+root AGENTS/CLAUDE/README, `src/App.tsx`, and the generated Windows executable.
+Root files remain concise entry points into `docs/`; main's discovery and shared
+toolkit requirements are retained in the canonical guide, with current paths.
+The main catalog loader, cache validation, curation helpers, tests, and agent
+adapters remain present. The shared toolkit was not installed in this environment;
+verification used the project-local engineering/review/verification guidance.
+
+App now composes `usePlaylist` with the existing catalog, queue, history, timer,
+audio, and accessibility hooks. Pending links resolve against downloaded data;
+explicit user selection/return takes precedence. Catalog removal preserves the
+active video and its metadata, including a delayed first-play history record,
+while unavailable queued entries leave the queue. No generated catalog data was
+changed as part of this merge.
+
+Verification: **267 tests passed across 27 files**, lint and production build
+passed. Four new hook regressions cover pending links, user selection/cancellation,
+invalid links, active metadata retention, and queue pruning. Main's remote catalog
+and curation suites are included in the Vitest run; the curation tests also passed
+as a focused Vitest run. A direct Node test-runner attempt was unsuitable for the
+Vitest-based curation suite and was replaced by the documented npm test command.
+
+Production preview used strict port **4196** and isolated browser contexts.
+Routed catalog responses and a simulated player verified new-only deep links,
+offline cached restart, retained playback/metadata/filter/favorite/timer state,
+queue pruning, watch-history attribution for a removed current entry, manual
+selection precedence, and one healthy player across video changes. The catalog
+smoke recipe restored **254 of 254 videos** after an empty search; screenshots
+and discovery evidence are under ignored `build/skill-verification/`.
+
+Required discovery checked the latest **15 entries from each of four public
+channel feeds** on November 3. Unreviewed candidates include TXT official vlog
+`llxqGauQkQU` and archive uploads `2uBq5VFl0V4`, `rgG0eMG6Ax0`, and `LIey7QYEMCs`.
+Durations and eligibility were not verified, and feed coverage is limited; the
+full results are in `build/skill-verification/merge-discovery.json`. No candidates
+were published or added to the generated catalog.
+
+Suggested commit message: `Merge main into dev and resolve catalog integration conflicts`
+
+The executable was rebuilt from the combined source; all 61 embedded frontend
+assets match `dist/`. Source startup reported `webview import OK`; the windowed
+binary exited successfully from its headless startup path (no console diagnostic
+is available from that build). Both checks used unused ports and disposable
+application-data directories. Results are in
+`build/skill-verification/merge-desktop-results.json`. These checks do not prove
+native window interaction or live YouTube playback.

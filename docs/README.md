@@ -31,3 +31,8 @@ Screenshot assets are stored in [images](images/). The short README and agent
 entry files remain at the repository root for GitHub and tool discovery.
 `requirements-desktop.txt` stays at the root because it is an executable pip
 dependency manifest, rather than a project document.
+
+## Catalog and agent workflows
+
+- [Catalog discovery and updates](CATALOG_UPDATES.md): reviewed public-source discovery and startup catalog downloads.
+- [Shared agent skills](AGENT_SKILLS.md): project adapters, the pinned toolkit, and setup.
