@@ -117,8 +117,8 @@ wrapping, Home/End, and linked focusable panels; Up/Down retain native scrolling
 Video cards remain semantic lists with optional spatial arrow navigation; do not
 add ARIA grid roles without implementing that pattern. Keep the card data attributes
 used for navigation/focus restoration, and retain focus on aria-disabled Queued
-buttons while guarding their click actions. `useVideoScreenFocus` focuses Change
-video on screen entry and the matching card/heading on return, never on automatic
+buttons while guarding their click actions. `useVideoScreenFocus` focuses the back
+arrow on screen entry and the matching card/heading on return, never on automatic
 video changes. Local Escape handlers consume their event and restore their trigger
 before global Escape returns to the catalog. Global handlers respect prevented
 events, composition, form controls, and button navigation. The decorative video
@@ -197,6 +197,9 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
   uses a responsive CSS grid with a toolbar, reserved video stage, controls
   below the video, and a tools dock. At 1000px wide and 600px tall or larger,
   the dock sits on the right; otherwise it sits below and the page can scroll.
+  Narrow/short layouts let the dock grow with content and use page scrolling;
+  only the desktop layout bounds and scrolls `.tool-body`. Do not restore a small
+  fixed-height dock that clips the timer transport behind a nested scroller.
   - `VideoBackground` is a muted-autoplay YouTube IFrame Player (`controls: 0`,
     `pointer-events: none`). `.yt-bg` / `.yt-frame-box` letterbox the 16:9
     iframe inside its reserved stage, preserving the whole video. The player
@@ -211,7 +214,7 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
     last audible level. Music and ambience keep their separate volume controls.
     Progress polls every 500ms in this component, keeping polling renders out
     of `App`. Captions expand inline. Controls do not drag or auto-hide.
-    The toolbar's top-left Change video button uses a back arrow and returns to
+    The toolbar's top-left icon-only back arrow returns to
     the welcome screen. It remains available in Zen mode; returning clears Zen
     while keeping the focus timer running. Esc uses the same return action after
     focused editors/disclosures have handled their own dismissal.
@@ -287,13 +290,17 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
     `lib/taskPlanning.ts` owns the pure movement and restoration logic.
     The original saved checklist schema is still migrated, and task data,
     ordering and the active id persist through guarded storage effects.
-  - **Managed layout:** tools share one dock with a scrollable body. Inactive
+  - **Managed layout:** tools share one dock with a scrollable body on desktop. Inactive
     tabs and hidden tools use `hidden`, keeping their components mounted so
     audio, timer and task state survive tab switches. A timer footer remains
     available on the other tabs. Old saved floating positions and sizes are
     ignored. Toolbar buttons wrap, notices occupy their own row, and controls
     wrap on narrow screens. Do not reintroduce independently positioned panels
     that can cover each other or the video.
+    The welcome screen also exposes the same timer's Start/Pause control. Keep
+    its countdown outside live status announcements, and keep the control mounted
+    when pausing so focus is preserved. A completed Pomodoro restarts through the
+    shared timer toggle, resetting to round 1 without repeating completion credit.
   - `SocialCard` is the Social dock tab. `data/social.ts` holds the group Instagram,
     official/shared-member X accounts, and the five member Instagram URLs.
     Cards use browser links (`target="_blank"`, `rel="noopener noreferrer"`);

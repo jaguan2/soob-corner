@@ -18,6 +18,7 @@
 
 - [Structure and scalability review](architecture-review.md): module boundaries,
   regression coverage, and prioritized next refactors.
+- [Recent code and UI/UX review](recent-changes-review.md): findings, fixes, and verification for the latest changes.
 - [Agent instructions](AGENTS.md): current architecture and maintenance rules.
 - [Earlier Claude guide](CLAUDE.md): retained reference; use the current agent instructions above.
 

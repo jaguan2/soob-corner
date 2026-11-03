@@ -5,10 +5,13 @@ import { VideoTile } from './VideoTile'
 import { CatalogFilters } from './CatalogFilters'
 import { filterVideos, type CatalogFilters as Filters } from '../lib/catalog'
 import { UIIcon } from './UIIcon'
+import { PauseIcon, PlayIcon } from './icons'
 import { VideoQueue, type VideoQueueProps } from './VideoQueue'
 
 interface WelcomeScreenProps {
-  runningTimer: string | null
+  timerLabel: string
+  timerRunning: boolean
+  onToggleTimer: () => void
   filters: Filters
   onFiltersChange: (value: Filters) => void
   videos: Video[]
@@ -24,7 +27,9 @@ interface WelcomeScreenProps {
 }
 
 function WelcomeScreenInner({
-  runningTimer,
+  timerLabel,
+  timerRunning,
+  onToggleTimer,
   filters,
   onFiltersChange,
   videos,
@@ -86,7 +91,16 @@ function WelcomeScreenInner({
             </button>
           )}
         </header>
-        {runningTimer && <p role="status" className="mt-4 rounded-xl bg-cream-100 px-4 py-2 text-center text-sm text-ink-800 dark:bg-ink-800 dark:text-cream-200">⏱ {runningTimer} · timer still running</p>}
+        <div className="welcome-timer" role="group" aria-label="Focus timer">
+          <UIIcon name="timer" size={20} />
+          <div className="welcome-timer-summary">
+            <span className="welcome-timer-time" role="timer" aria-live="off" aria-label="Time remaining">{timerLabel}</span>
+            <span className="welcome-timer-status" role="status">{timerRunning ? 'Timer running' : 'Timer paused'}</span>
+          </div>
+          <button onClick={onToggleTimer} aria-label={timerRunning ? 'Pause timer' : 'Start timer'} className="primary-button">
+            {timerRunning ? <PauseIcon size={16} /> : <PlayIcon size={16} />}{timerRunning ? 'Pause' : 'Start'}
+          </button>
+        </div>
         <div className="mt-6"><VideoQueue {...queue} /></div>
         <div className="mt-8">
           <CatalogFilters videos={videos} value={filters} onChange={onFiltersChange} />
@@ -113,6 +127,5 @@ function WelcomeScreenInner({
   )
 }
 
-// memo: the timer keeps ticking in App while the welcome screen is shown
-// (after "Change video"); nothing here depends on it.
+// Keep the catalog calculation stable while the welcome countdown updates.
 export const WelcomeScreen = memo(WelcomeScreenInner)

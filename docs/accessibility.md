@@ -27,10 +27,19 @@ Escape, and arrow navigation.
 
 Keyboard users encounter skip links before the rest of each screen. The catalog
 link jumps to video choices; workspace links jump to playback controls or study
-tools. Opening a video focuses Change video. Returning focuses its catalog card,
+tools. Opening a video focuses the back arrow, labelled Back to video selection.
+Returning focuses its catalog card,
 or the catalog heading if filters exclude that card. Automatic video changes
 do not move focus. Queue buttons retain focus after adding a video, exposing the
 Queued state without preventing continued keyboard browsing.
+
+Leaving the timer duration editor with Tab or a pointer preserves the destination
+control. Enter/Escape returns focus to the countdown. Removing a queued item
+focuses the next removal control, or the previous one at the end; removing the
+last item or clearing the queue focuses its heading. Automatic playback does not
+trigger this removal focus behavior. Welcome timer Start/Pause keeps its focus
+when its label changes. Its countdown has live announcements disabled; a separate
+status announces running/paused changes.
 
 ## Implementation and verification
 

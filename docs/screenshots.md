@@ -14,6 +14,18 @@ documentation. Capture the running app, including real playback when available.
 
 ## Current dark-mode screenshots
 
+### Mobile timer and welcome controls — November 3, 2026
+
+The narrow-screen dock grows with its content so Start and quick durations use
+normal page scrolling. This crop shows the full dock at a 375px viewport with a
+15-minute preset. The welcome screen keeps Start/Pause available before choosing
+a video and after returning from one. Both captures use an isolated demo profile;
+the background player was mocked and is outside these crops.
+
+![Mobile dock with timer transport and presets](images/mobile-timer.jpg)
+
+![Welcome timer with a pause action](images/welcome-timer.jpg)
+
 ### Video queue — November 3, 2026
 
 The start screen's **Up next** list saves your selected videos in order. Use

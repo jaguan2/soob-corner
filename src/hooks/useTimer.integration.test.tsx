@@ -195,6 +195,29 @@ describe('elapsed focus time and profile persistence', () => {
     expect(elapsed()).toBe(120_000)
   })
 
+  it('starts a fresh cycle when toggling a completed Pomodoro without repeating its credit', async () => {
+    await mount()
+    await act(async () => { timer.startPomodoro({ focusMinutes: 1, breakMinutes: 1, rounds: 1 }) })
+    await advance(60_000)
+    expect(timer.pomodoro?.completed).toBe(true)
+    expect(timer.label).toBe('00:00')
+    expect(elapsed()).toBe(60_000)
+    expect(progressionLevel(profile.progression).totalXP).toBe(11)
+
+    await act(async () => { timer.toggle() })
+    expect(timer.pomodoro).toMatchObject({ completed: false, phase: 'focus', round: 1, rounds: 1 })
+    expect(timer.label).toBe('01:00')
+    await advance(5000)
+    expect(timer.isRunning).toBe(true)
+    expect(timer.label).toBe('00:55')
+    expect(elapsed()).toBe(65_000)
+    expect(progressionLevel(profile.progression).totalXP).toBe(11)
+    await advance(55_000)
+    expect(timer.pomodoro?.completed).toBe(true)
+    expect(elapsed()).toBe(120_000)
+    expect(progressionLevel(profile.progression).totalXP).toBe(12)
+  })
+
   it('flushes actual time before switching an already-running timer to Pomodoro or a new preset', async () => {
     await mount()
     await act(async () => { timer.toggle() })

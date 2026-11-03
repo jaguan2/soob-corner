@@ -195,11 +195,6 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
     stopClock()
     setIsRunning(false)
   }, [stopClock])
-  const toggle = useCallback(() => {
-    if (isRunning) pause()
-    else { ensureNotifyPermission(); setIsRunning(true) }
-  }, [isRunning, pause])
-
   const reset = useCallback(() => {
     stopClock()
     setIsRunning(false)
@@ -210,6 +205,15 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
       setSecondsLeft(durationSeconds)
     }
   }, [durationSeconds, pomodoro, stopClock])
+
+  const toggle = useCallback(() => {
+    if (isRunning) pause()
+    else {
+      if (pomodoro?.completed) reset()
+      ensureNotifyPermission()
+      setIsRunning(true)
+    }
+  }, [isRunning, pause, pomodoro?.completed, reset])
 
   const setDurationSeconds = useCallback((seconds: number) => {
     stopClock()

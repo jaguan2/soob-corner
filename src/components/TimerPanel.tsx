@@ -32,10 +32,12 @@ export function TimerPanel({ timer, pauseOnBreak, onSetPauseOnBreak }: TimerPane
   const [editing, setEditing] = useState(false)
   const countdownRef = useRef<HTMLButtonElement>(null)
   const cancelledEdit = useRef(false)
-  const wasEditing = useRef(false)
+  const restoreCountdownFocus = useRef(false)
   useEffect(() => {
-    if (wasEditing.current && !editing) countdownRef.current?.focus()
-    wasEditing.current = editing
+    if (!editing && restoreCountdownFocus.current) {
+      restoreCountdownFocus.current = false
+      countdownRef.current?.focus()
+    }
   }, [editing])
   const wheelHintId = useId()
   useTimerWheel(countdownRef, timer.adjustTime, !editing, timer.durationSeconds)
@@ -70,9 +72,12 @@ export function TimerPanel({ timer, pauseOnBreak, onSetPauseOnBreak }: TimerPane
         <p className="focus-eyebrow">{pomo?.completed ? 'Session complete' : pomo?.phase === 'break' ? 'Take a breath' : 'Time to focus'}</p>
         {editing ? <input autoFocus value={draft} onChange={event => setDraft(event.target.value)} onBlur={commit}
           onKeyDown={event => {
-            if (event.key === 'Enter') commit()
+            if (event.key === 'Enter') {
+              event.preventDefault(); restoreCountdownFocus.current = true; commit()
+            }
             if (event.key === 'Escape') {
-              event.preventDefault(); event.stopPropagation(); cancelledEdit.current = true; setEditing(false)
+              event.preventDefault(); event.stopPropagation(); cancelledEdit.current = true
+              restoreCountdownFocus.current = true; setEditing(false)
             }
           }} placeholder="25 or 25:00" aria-label="Custom timer duration" className="focus-time focus-time-input" />
           : <button ref={countdownRef} onClick={startEdit} onKeyDown={event => {
@@ -80,7 +85,7 @@ export function TimerPanel({ timer, pauseOnBreak, onSetPauseOnBreak }: TimerPane
             event.preventDefault()
             timer.adjustTime(event.key === 'ArrowUp' ? 60 : -60)
           }} title="Click to type; scroll or use Up/Down to adjust minutes" aria-keyshortcuts="ArrowUp ArrowDown" aria-describedby={wheelHintId} aria-label={`Timer ${timer.label}. Click to change duration`} className="focus-time">{timer.label}</button>}
-        {!editing && <p id={wheelHintId} className="focus-wheel-hint">Click to type · Scroll or ↑/↓ to adjust by 1 min</p>}
+        <p id={wheelHintId} className="focus-wheel-hint" style={{ visibility: editing ? 'hidden' : undefined }} aria-hidden={editing || undefined}>Click to type · Scroll or ↑/↓ to adjust by 1 min</p>
         <p className="focus-caption">{pomo && !pomo.completed ? `${pomo.phase === 'focus' ? 'Focus' : 'Break'} · round ${pomo.round} of ${pomo.rounds}` : 'A little focus goes a long way.'}</p>
         {pomo && !pomo.completed && <div className="focus-rounds" aria-hidden="true">
           {Array.from({ length: pomo.rounds }, (_, index) => <span key={index} className={index < pomo.round ? 'complete' : ''} />)}

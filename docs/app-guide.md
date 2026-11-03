@@ -18,8 +18,10 @@ an internet connection since the videos stream from YouTube.)
 ## Features
 
 - Start screen to pick your study-companion video (or hit 🎲 Surprise me) —
-  the back-arrow **Change video** button at the top left takes you back any time,
+  the **back arrow** at the top left takes you back any time,
   including in Zen mode
+- A compact timer on the start screen lets you start, pause or resume without
+  choosing a video. Returning from a video keeps the same countdown.
 - A saved **Up next** video queue on the start screen and in **Videos & sound**.
   Choose **Add to queue** under any video, move entries up/down, remove them,
   or clear the queue. **Play queue** starts the first entry; clicking a queued

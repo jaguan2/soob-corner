@@ -254,7 +254,7 @@ body {
 .player-controls .captions-active:hover { background: rgb(var(--clay-600)); }
 .player-progress { display: flex; min-width: 0; flex: 1 1 150px; align-items: center; gap: 8px; }
 .caption-options { display: flex; flex-wrap: wrap; gap: 6px; max-width: 720px; margin: 10px auto 0; max-height: 160px; overflow-y: auto; }
-.workspace-dock { container: study-tools / inline-size; grid-area: dock; display: flex; flex-direction: column; min-width: 0; min-height: 0; height: clamp(288px, 45dvh, 512px); margin-top: 16px; border-radius: 20px; overflow: hidden; }
+.workspace-dock { container: study-tools / inline-size; grid-area: dock; display: flex; flex-direction: column; min-width: 0; min-height: 0; margin-top: 16px; border-radius: 20px; overflow: hidden; }
 .tool-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 10px 8px; gap: 2px; flex-shrink: 0; border-bottom: 1px solid rgb(var(--surface-border) / 0.07); }
 @container study-tools (min-width: 520px) {
   .tool-tabs { grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); }
@@ -266,7 +266,7 @@ body {
 .tool-tab.selected { background: rgb(var(--clay-400) / 0.14); color: rgb(var(--surface-text)); }
 /* Contain positioned accessibility labels and colour inputs in this scroller;
    otherwise their offscreen positions extend the document's scroll height. */
-.tool-body { position: relative; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+.tool-body { position: relative; flex: 1; min-height: 0; }
 .dock-timer { flex-shrink: 0; border-top: 1px solid rgb(var(--surface-border) / 0.07); padding: 12px 18px; font-size: 12px; font-variant-numeric: tabular-nums; }
 .dock-timer button { display: flex; align-items: center; gap: 8px; width: 100%; }
 .timer-status { margin-left: auto; color: rgb(var(--secondary-text)); font-size: 11px; }
@@ -305,6 +305,7 @@ body {
   }
   .video-stage { flex: 1; aspect-ratio: auto; }
   .workspace-dock { height: auto; margin-top: 0; }
+  .tool-body { overflow-y: auto; overflow-x: hidden; }
   .tools-hidden, .is-zen { grid-template-areas: 'toolbar' 'notice' 'main'; grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
@@ -368,6 +369,10 @@ body {
 .welcome-header { padding-top: 12px; }
 .welcome-header h1 { margin-top: 14px; letter-spacing: -0.04em; }
 .welcome-header > p { line-height: 1.7; }
+.welcome-timer { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; padding: 14px 16px; border: 1px solid rgb(var(--surface-border) / 0.1); border-radius: 13px; color: rgb(var(--surface-text)); background: rgb(var(--surface) / var(--panel-opacity)); }
+.welcome-timer-summary { display: flex; flex: 1; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
+.welcome-timer-time { font-size: 22px; font-variant-numeric: tabular-nums; }
+.welcome-timer-status { font-size: 12px; color: rgb(var(--secondary-text)); }
 .welcome-mark { display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 18px; background: rgb(var(--clay-400) / 0.13); color: rgb(var(--clay-600)); }
 .dark .welcome-mark { color: rgb(var(--clay-400)); }
 .welcome-surprise { margin-top: 20px; }
