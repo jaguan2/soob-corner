@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { handleButtonArrows } from '../lib/keyboardNavigation'
 import { parseTimeInput, type TimerApi } from '../hooks/useTimer'
 import { formatFocusMinutes, getFocusGoal, getStreakDays, getTodayMinutes, saveFocusGoal } from '../lib/stats'
 import { storageGetJson, storageSetJson } from '../lib/storage'
 import { PauseIcon, PlayIcon } from './icons'
 import { UIIcon } from './UIIcon'
+import { useTimerWheel } from '../hooks/useTimerWheel'
 
 const PRESETS = [
   { label: '15 min', seconds: 15 * 60 },
@@ -12,7 +14,9 @@ const PRESETS = [
 ]
 
 function loadPomodoroConfig(): { focus: number; break: number; rounds: number } {
-  const stored = storageGetJson<{ focus?: unknown; break?: unknown; rounds?: unknown }>('sws.pomodoro', {})
+  const raw = storageGetJson<unknown>('sws.pomodoro', {})
+  const stored = raw && typeof raw === 'object' && !Array.isArray(raw)
+    ? raw as { focus?: unknown; break?: unknown; rounds?: unknown } : {}
   const num = (value: unknown, fallback: number, max: number) =>
     typeof value === 'number' && Number.isFinite(value) && value >= 1 && value <= max ? Math.round(value) : fallback
   return { focus: num(stored.focus, 25, 180), break: num(stored.break, 5, 60), rounds: num(stored.rounds, 4, 12) }
@@ -26,6 +30,17 @@ interface TimerPanelProps {
 
 export function TimerPanel({ timer, pauseOnBreak, onSetPauseOnBreak }: TimerPanelProps) {
   const [editing, setEditing] = useState(false)
+  const countdownRef = useRef<HTMLButtonElement>(null)
+  const cancelledEdit = useRef(false)
+  const restoreCountdownFocus = useRef(false)
+  useEffect(() => {
+    if (!editing && restoreCountdownFocus.current) {
+      restoreCountdownFocus.current = false
+      countdownRef.current?.focus()
+    }
+  }, [editing])
+  const wheelHintId = useId()
+  useTimerWheel(countdownRef, timer.adjustTime, !editing, timer.durationSeconds)
   const [draft, setDraft] = useState('')
   const [showPomodoroForm, setShowPomodoroForm] = useState(false)
   const [initialConfig] = useState(loadPomodoroConfig)
@@ -39,11 +54,13 @@ export function TimerPanel({ timer, pauseOnBreak, onSetPauseOnBreak }: TimerPane
   const goalProgress = Math.min(100, (todayMinutes / focusGoal) * 100)
 
   const startEdit = () => {
+    cancelledEdit.current = false
     timer.pause()
     setDraft(timer.label)
     setEditing(true)
   }
   const commit = () => {
+    if (cancelledEdit.current) { setEditing(false); return }
     const seconds = parseTimeInput(draft)
     if (seconds !== null) timer.setDurationSeconds(seconds)
     setEditing(false)
@@ -55,10 +72,20 @@ export function TimerPanel({ timer, pauseOnBreak, onSetPauseOnBreak }: TimerPane
         <p className="focus-eyebrow">{pomo?.completed ? 'Session complete' : pomo?.phase === 'break' ? 'Take a breath' : 'Time to focus'}</p>
         {editing ? <input autoFocus value={draft} onChange={event => setDraft(event.target.value)} onBlur={commit}
           onKeyDown={event => {
-            if (event.key === 'Enter') commit()
-            if (event.key === 'Escape') setEditing(false)
+            if (event.key === 'Enter') {
+              event.preventDefault(); restoreCountdownFocus.current = true; commit()
+            }
+            if (event.key === 'Escape') {
+              event.preventDefault(); event.stopPropagation(); cancelledEdit.current = true
+              restoreCountdownFocus.current = true; setEditing(false)
+            }
           }} placeholder="25 or 25:00" aria-label="Custom timer duration" className="focus-time focus-time-input" />
-          : <button onClick={startEdit} title="Click to type a custom time" aria-label={`Timer ${timer.label}. Click to change duration`} className="focus-time">{timer.label}</button>}
+          : <button ref={countdownRef} onClick={startEdit} onKeyDown={event => {
+            if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) return
+            event.preventDefault()
+            timer.adjustTime(event.key === 'ArrowUp' ? 60 : -60)
+          }} title="Click to type; scroll or use Up/Down to adjust minutes" aria-keyshortcuts="ArrowUp ArrowDown" aria-describedby={wheelHintId} aria-label={`Timer ${timer.label}. Click to change duration`} className="focus-time">{timer.label}</button>}
+        <p id={wheelHintId} className="focus-wheel-hint" style={{ visibility: editing ? 'hidden' : undefined }} aria-hidden={editing || undefined}>Click to type · Scroll or ↑/↓ to adjust by 1 min</p>
         <p className="focus-caption">{pomo && !pomo.completed ? `${pomo.phase === 'focus' ? 'Focus' : 'Break'} · round ${pomo.round} of ${pomo.rounds}` : 'A little focus goes a long way.'}</p>
         {pomo && !pomo.completed && <div className="focus-rounds" aria-hidden="true">
           {Array.from({ length: pomo.rounds }, (_, index) => <span key={index} className={index < pomo.round ? 'complete' : ''} />)}
@@ -79,15 +106,18 @@ export function TimerPanel({ timer, pauseOnBreak, onSetPauseOnBreak }: TimerPane
         </div>}
       </div>
 
+      <div className="focus-presets">
+        <p className="surface-label">Quick durations</p>
+        <div className="timer-presets" role="group" aria-label="Timer presets" onKeyDown={handleButtonArrows}>
+          {PRESETS.map(preset => <button key={preset.label} onClick={() => timer.setDurationSeconds(preset.seconds)} aria-pressed={!pomo && timer.durationSeconds === preset.seconds}>{preset.label}</button>)}
+          <button onClick={startEdit}>Custom</button>
+        </div>
+      </div>
+
       <details className="timer-settings">
         <summary><span><UIIcon name="timer" size={16} />Session settings</span><UIIcon name="chevron" size={16} /></summary>
         <div className="timer-settings-body">
           {!pomo && <>
-            <p className="surface-label">Choose a duration</p>
-            <div className="timer-presets">
-              {PRESETS.map(preset => <button key={preset.label} onClick={() => timer.setDurationSeconds(preset.seconds)} aria-pressed={timer.durationSeconds === preset.seconds}>{preset.label}</button>)}
-              <button onClick={startEdit}>Custom</button>
-            </div>
             <button onClick={() => setShowPomodoroForm(value => !value)} aria-expanded={showPomodoroForm} aria-controls="pomodoro-settings" className="pomodoro-toggle"><span>Pomodoro rounds</span><UIIcon name="chevron" size={15} /></button>
             {showPomodoroForm && <div id="pomodoro-settings" className="pomodoro-settings">
               <div className="pomodoro-fields">
@@ -106,7 +136,7 @@ export function TimerPanel({ timer, pauseOnBreak, onSetPauseOnBreak }: TimerPane
           {pomo && <p className="focus-caption">{pomo.focusMinutes} min focus · {pomo.breakMinutes} min break · {pomo.rounds} rounds</p>}
           <div className="focus-goal-settings">
             <p className="surface-label">Daily focus goal</p>
-            <div className="timer-presets">
+            <div className="timer-presets" onKeyDown={handleButtonArrows}>
               {[60, 120, 180].map(minutes => <button key={minutes} onClick={() => { setFocusGoal(minutes); saveFocusGoal(minutes) }} aria-pressed={focusGoal === minutes}>{minutes / 60} hour{minutes > 60 ? 's' : ''}</button>)}
             </div>
           </div>

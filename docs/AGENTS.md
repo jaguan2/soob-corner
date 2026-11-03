@@ -1,0 +1,463 @@
+# AGENTS.md
+
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+
+The full project documentation lives in `docs/`, and screenshots live in
+`docs/images/`. Root `README.md`, `AGENTS.md`, and `CLAUDE.md` are short entry
+files pointing here. Code paths in this document refer to the repository root.
+Keep `requirements-desktop.txt` at the root for pip and the packaging script.
+
+**Repository layout:** `src/` contains the web app and colocated tests;
+`desktop/` contains the native launcher; `config/` holds Tailwind/PostCSS;
+`scripts/` holds packaging and catalog maintenance; `public/` holds web assets.
+Vite points to `config/` for PostCSS, whose Tailwind path is resolved relative to
+its own file. Keep editor-discovered Vite, TypeScript, and ESLint entry points
+at the root. PyInstaller specifications and work files belong in ignored `build/`.
+The old floating-panel drag/resize helpers and their motion dependency were
+removed; video resume positions in `lib/positions.ts` are still active.
+
+## Required TXT discovery check for every coding task
+
+At the start of every coding task, scan for newly uploaded Soobin and TXT
+vlogs, VLIVE archives and Weverse live archives for all five members. Do this
+even when the requested code change is unrelated to the catalog. Check the
+trusted channels in `scripts/catalog-sources.json` and compare candidates with
+the current catalog; distinguish upload dates from original broadcast dates.
+
+- Check recent uploads on the trusted channels through public YouTube
+  feeds/pages, targeted web searches, or `scripts/research-catalog.mjs`.
+  No YouTube API key is required. Do not claim a complete scan from a limited feed.
+- Reuse a successful scan within the same coding task instead of repeating it
+  after every edit/test. A new coding task requires a fresh check.
+- Report when/how the check ran, any eligible or uncertain candidates, and
+  coverage limits. If network or browser access prevents a check,
+  state the blocker honestly and continue the requested coding work.
+- Review findings against the existing member, duration, multipart and duplicate
+  rules before proposing additions. Keep unrelated catalog changes separate;
+  never hand-edit generated snapshots, guess members/broadcast dates, or publish
+  findings automatically. Use the documented curation/refresh workflow for
+  reviewed additions. See [catalog updates](CATALOG_UPDATES.md).
+
+## Agent engineering workflow
+
+For substantive feature, bug-fix or refactor work, read
+[the engineering skill](../.agents/skills/soobin-engineering/SKILL.md).
+Trace/reproduce the behavior, implement, apply
+[structural self-review](../.agents/skills/soobin-thermonuclear-review/SKILL.md)
+to the actual diff, fix supported issues within the requested scope, then
+[verify](../.agents/skills/soobin-verify/SKILL.md). Review design changes again;
+failed checks return to investigation. Reuse valid evidence for unchanged code
+and skip this loop for documentation-only or trivial cosmetic changes.
+Standalone review requests remain report-only. These project adapters use the separately installed shared toolkit;
+the tested toolkit revision and setup commands are documented
+in [the skill guide](AGENT_SKILLS.md). Repository/user rules take precedence
+over upstream model-provider, delegation, rebasing and commit examples.
+
+## What this is
+
+A LifeAt-style Pomodoro study app whose video background is drawn from the
+"Study w/ Soobin" YouTube playlist (TXT member Soobin's vlogs/VLIVEs). React
++ Vite + TypeScript + Tailwind, client-side only, no backend.
+
+## Commands
+
+```
+npm install            # install deps
+npm run dev             # start Vite dev server (http://localhost:5173, or next free port)
+npm run build            # tsc --noEmit type-check, then vite build to dist/
+npm run preview           # serve the production build locally
+npm run lint             # eslint .
+npm test                 # vitest run (logic, saved timer state, YouTube API recovery)
+npm run fetch-playlist    # refresh src/data/playlist.json from the live YouTube playlist
+
+python desktop/launcher.py # native window (needs dist/ + desktop pip dependencies)
+scripts/build-exe.bat       # package into StudyWithSoobin.exe at the repo root
+```
+
+Type-checking (`tsc --noEmit`, run as part of `npm run build`) is the main
+correctness gate, plus a small Vitest suite (`npm test`) over the pure logic:
+`lib/musicLink`, the timer's parse/format helpers, and the theme luminance solver.
+A single `tsconfig.json` covers both `src/` and `vite.config.ts` — there is
+deliberately no tsconfig.app/node split.
+Stability regressions also exercise malformed saved timer settings through a
+React server render and YouTube API recovery with fake timers and a mocked
+document. These tests do not verify live playback or interactive browser behavior.
+
+## Architecture
+
+`App.tsx` composes feature hooks and views. `useAppearance` owns saved theme,
+custom color, panel opacity, and root styles; the shared `Theme` type lives in
+`lib/theme.ts`, never in `App`. `useVideoAudio` owns volume, mute, and audio gestures.
+`useVideoCatalog` owns catalog filters, favorites,
+selection, blocked videos, last-video persistence, and URL synchronization. It
+composes `useVideoQueue`, which validates and persists ordered catalog IDs in
+`sws.videoQueue`. Queue actions update a synchronous ref and a React snapshot;
+keep storage and playback effects out of state updaters. `VideoQueue` is shared
+by the welcome screen and Videos & sound. Explicit queue entries take priority
+over filters on video end and Next; previous navigation stays filter-based.
+Consumed, removed, or session-blocked entries leave the queue. A current-video
+entry is allowed for one intentional replay. Choosing a video card or queued
+title consumes only the chosen entry; returning to the welcome screen preserves
+the queue. `useVideoCatalog`
+receives the catalog and callbacks for failed embeds and replay; it does not
+create or control iframe lifecycles. `lib/workspace.ts` defines `STUDY_TOOLS` and
+derives `StudyToolId`; `StudyTools` renders tabs and all mounted panel views
+from a complete typed record provided by `App`. Add tools through that registry.
+`usePreferences` owns display preferences under `sws.preferences`, separately
+from progression. `showMilestones` defaults to true, accepts only a saved boolean,
+and controls the Profile milestone heading/cards. Hiding them must never clear
+earned progress, disable study tracking, or change XP rules. `SettingsCard`
+groups `AppearancePanel` and these preferences; the Settings dock tab and the
+welcome screen's inline Settings panel reuse the same view.
+The `singleKeyShortcuts` boolean in `sws.preferences` defaults to true for older
+saved preferences. It disables only global Space/F/M/T/Z actions; native button
+activation, Esc, and arrow navigation must remain available. `keyboardNavigation.ts`
+owns shared tab/card/button movement. Tabs have one active Tab stop, Left/Right
+wrapping, Home/End, and linked focusable panels; Up/Down retain native scrolling.
+Video cards remain semantic lists with optional spatial arrow navigation; do not
+add ARIA grid roles without implementing that pattern. Keep the card data attributes
+used for navigation/focus restoration, and retain focus on aria-disabled Queued
+buttons while guarding their click actions. `useVideoScreenFocus` focuses the back
+arrow on screen entry and the matching card/heading on return, never on automatic
+video changes. Local Escape handlers consume their event and restore their trigger
+before global Escape returns to the catalog. Global handlers respect prevented
+events, composition, form controls, and button navigation. The decorative video
+wrapper is inert; do not make interactive music/Spotify frames inert. See
+`docs/accessibility.md` for controls and the limited audit scope.
+`useWatchHistory` owns local `sws.watchHistory` through `watchHistorySession.ts`.
+The session re-reads under a Web Lock, retains failed starts for retry, and never
+overwrites unreadable history. `lib/watchHistory.ts` validates snapshots and
+derives distinct-video, play, and per-member totals. `VideoBackground` reports
+the first confirmed PLAYING per selection/replay through `onVideoStarted`;
+pause/resume and stale events must not add plays. App connects this callback to
+the history hook. `WatchHistoryCard` is shared by History and the welcome screen;
+`WatchStats` renders the same history's totals inside Profile. Group videos
+count once overall and once for each featured member. Tracking starts with this
+feature; do not fabricate history from saved positions or the last selection.
+See `docs/watch-history.md` for definitions and persistence rules.
+See `docs/architecture-review.md` for the review and next refactoring boundaries.
+
+**Data flow is one-directional and all client-side:**
+
+- `src/data/playlist.json` is the checked-in baseline of the YouTube playlist
+  (video id, title, duration, thumbnail URL), generated by
+  `scripts/fetch-playlist.mjs`. `usePlaylist` checks the published catalog once on
+  startup, validates and caches newer snapshots, and falls back to cached/bundled
+  data when offline. It fetches public JSON, never the YouTube Data API, and needs
+  no API key. See [catalog updates](CATALOG_UPDATES.md).
+- `scripts/fetch-playlist.mjs` uses `youtubei.js` (an unofficial InnerTube client) to
+  scrape the playlist server-side (Node only) and overwrite `playlist.json`. Run this
+  manually whenever the source playlist changes; re-run and diff the JSON rather than
+  editing it by hand. The extraction logic (pulling `content_id` /
+  `metadata.title` / thumbnail overlay badge out of YouTube's `LockupView` item shape)
+  is brittle by nature — YouTube's internal page schema can change and break the
+  field lookups without notice. The same `LockupView` shape backs `getChannel().
+  getVideos()`, if you ever need to enumerate a channel to find more videos.
+- **`playlist.json` is playlist + curated TXT extras for all five members.**
+  `scripts/extra-videos.json` stores ids, `members`, and optional `kind` /
+  `broadcastDate` overrides. Refresh resolves titles, duration, channel and
+  `publishedAt` from YouTube and regenerates `docs/video-catalog.md` as a
+  member-organized link list. Do not hand-edit the generated snapshot.
+  Prefer TXT official, Moa's Diary and V Live; TomorrowByEdits supplies newer
+  Weverse archives. New curated vlogs are 10+ minutes and lives 20+ minutes.
+  Shared lives carry every explicitly named participant. Exclude ambiguous
+  participants and multipart clips. `scripts/catalog-metadata.mjs` detects
+  alternate uploads using original date + participants + near-equal duration,
+  preserving separate broadcasts of different lengths on the same date.
+  Publication dates and original live dates are different: date filters default
+  to `publishedAt`; Original live uses `broadcastDate` for live archives and
+  `publishedAt` for vlogs, excluding undated lives when filtering dates. Never derive
+  original broadcast dates from upload dates. TomorrowByEdits numeric titles
+  use month/day/year; established older archives use day/month/year.
+  The refresh follows playlist continuations, preserves order, retains previous
+  verified metadata on individual lookup failures and aborts on widespread
+  failures. Research candidates with `scripts/research-catalog.mjs`, review the
+  ignored research JSON, then run `scripts/curate-research.mjs` and inspect its
+  diff before refreshing.
+  `useVideoCatalog` owns shared search/member/type/solo/favorites/date/sort state;
+  `lib/catalog.ts` applies it to both video pickers, random selection and
+  ordered previous/next controls. `VideoTile` supplies readable video cards. Changing filters
+  does not interrupt current playback. Clearing them restores the full catalog.
+  `CatalogFilters` uses a search field, scrollable member chips, video-type chips,
+  and an inline expandable Filters panel. Dates/solo/favorites stay visible as
+  removable refinements when the panel closes. Sorting stays available outside
+  the panel. Its CSS container queries adapt to the dock width, not the viewport.
+  Light/dark discovery controls use neutral colours; coffee/custom retain their
+  palette. `VideoTile` uses thumbnail-led cards without surrounding borders.
+- `App.tsx` loads the validated catalog with `usePlaylist` and connects `useVideoCatalog` (selection,
+  filters, favorites) and `useAppearance` (theme and panel opacity). Selection
+  starts at the welcome grid unless a valid `?v=` deep link selects a video.
+  `useVideoCatalog` retains pending links until the startup check finishes and
+  cancels them on explicit selection/return. Downloaded catalog changes preserve
+  active playback and its metadata even when the active entry is removed; queued
+  unavailable entries are pruned. App includes the active metadata snapshot when
+  passing videos to `useWatchHistory`, so a delayed first PLAYING still records.
+  `useVideoAudio` owns video volume/mute. App owns playback orchestration and layout
+  state such as `dockCollapsed` and the active tools tab (`topPanel`). The main UI
+  uses a responsive CSS grid with a toolbar, reserved video stage, controls
+  below the video, and a tools dock. At 1000px wide and 600px tall or larger,
+  the dock sits on the right; otherwise it sits below and the page can scroll.
+  Narrow/short layouts let the dock grow with content and use page scrolling;
+  only the desktop layout bounds and scrolls `.tool-body`. Do not restore a small
+  fixed-height dock that clips the timer transport behind a nested scroller.
+  - `VideoBackground` is a muted-autoplay YouTube IFrame Player (`controls: 0`,
+    `pointer-events: none`). `.yt-bg` / `.yt-frame-box` letterbox the 16:9
+    iframe inside its reserved stage, preserving the whole video. The player
+    is created once; video swaps use `loadVideoById`. It exposes `seekBy`,
+    `seekTo`, and `getProgress` via `forwardRef`, and reports real playback
+    state through `onPlayingChange`.
+  - `VideoControls` stays in normal flow below the video. It provides
+    previous/next video, pause/play, +/-10s, inline `VolumeControl` (mute and
+    volume), and a shared `Scrubber` range input. Video audio controls live only
+    in this playback bar. `useVideoAudio` owns saved volume, startup mute, and
+    the shared speaker-button/M-shortcut action; unmuting at zero restores the
+    last audible level. Music and ambience keep their separate volume controls.
+    Progress polls every 500ms in this component, keeping polling renders out
+    of `App`. Captions expand inline. Controls do not drag or auto-hide.
+    The toolbar's top-left icon-only back arrow returns to
+    the welcome screen. It remains available in Zen mode; returning clears Zen
+    while keeping the focus timer running. Esc uses the same return action after
+    focused editors/disclosures have handled their own dismissal.
+  - **Subtitles** (the controls' `CC` button) drive YouTube's undocumented
+    captions module, since `controls: 0` hides YouTube's own CC button. The
+    playlist's videos carry 4–7 translation tracks each. Rules learned by
+    testing against real videos — the docs and `getOption` both mislead here:
+    - on = `loadModule('captions')` then `setOption('captions','track',t)`;
+      off = `setOption('captions','track',{})`. **`unloadModule('captions')`
+      does not hide rendered captions** — don't reach for it.
+    - `getOption('captions','track')` is not a reliable read-back (it reports
+      `{}` for a track that is in fact showing). The only trustworthy check is
+      a screenshot; the iframe is cross-origin, so the DOM tells you nothing.
+    - The tracklist doesn't exist until playback starts and is rebuilt on
+      every `loadVideoById`, so `VideoBackground.applyCaptions()` re-applies
+      the stored language on each `PLAYING` and retries while the module spins
+      up.
+    - YouTube captions render near the bottom of the iframe. The control
+      row is outside the video stage, so no caption lift or overlay is needed.
+  - **Video quality is not controllable** — don't add a quality selector.
+    `setPlaybackQuality()` and `loadVideoById({suggestedQuality})` are both
+    ignored (verified on a 1920x1080 player: every call stayed at `hd1080`).
+    `getAvailableQualityLevels()` still returns a list, which makes the API
+    look alive; it isn't. The player picks quality from bandwidth and player
+    size, and since the video is letterboxed within the reserved stage it already
+    resolves to `hd1080` on its own.
+    `MusicPanel`'s YouTube stations use the same IFrame API via
+    `YouTubeMusicPlayer` (play/pause/±10s/seek/volume); Spotify stations keep
+    the official embed, which has its own controls.
+  - **Built-in music stations rot, by design of YouTube.** They're 24/7
+    livestreams: when one restarts it returns under a *new* video id and the
+    old id becomes an archive with embedding disabled (error 150). Two of the
+    three original stations died this way. Note that `oEmbed` still reports
+    such an id as fine — the only way to know is to load it in a real player
+    and wait for `PLAYING` vs `onError`. `YouTubeMusicPlayer` handles
+    `onError` and explains the failure instead of showing a black box.
+    Livestreams also report a `getDuration()` of weeks (their DVR window), so
+    the player checks the undocumented `getVideoData().isLive` and renders a
+    `LiveBadge` in place of a meaningless seek bar. Long *mix videos* (a fixed
+    video id, not a stream) don't rot this way — prefer them where possible.
+  - **YouTube playlists** are supported as stations (`Station.isPlaylist`).
+    They load through `playerVars.listType/list` rather than `videoId`, and
+    swap the ±10s buttons for next/prev (`nextVideo`/`previousVideo`) plus an
+    "index/count · title" line, since a 40-track list is unusable without
+    knowing what's playing. `resolveMusicLink` prefers a real playlist over a
+    video id in the same URL, but deliberately ignores `list=RD…` (an
+    auto-generated radio mix seeded from that very video — what
+    `&start_radio=1` links are) and `WL`/`LL` (private). For those the video
+    itself is what was meant.
+  - **Spotify stations only ever play 30-second previews** unless the viewer
+    is logged into Spotify in that same browser — the widget shows a
+    "Preview" badge. Nothing in the embed API changes this, so don't try; it's
+    also why Spotify keeps its official embed instead of a custom player.
+    `MusicPanel` says so under the embed, or the cut-off reads as a bug. This
+    is the reason a Spotify station never simply *replaces* an equivalent
+    YouTube one: `secret cafe r&b` (a mix video, full audio for everyone) and
+    `meloenvy vol.13` (the same artist's album, with a skippable tracklist)
+    both ship, because neither trade-off is right for every listener.
+    Playlist/album/artist/show embeds get 352px (Spotify's own oEmbed height)
+    so the tracklist is usable; a lone track/episode stays at 152px.
+  - `TimerCard` wraps `TimerPanel` in the Timer tab (presets, custom
+    durations, Pomodoro cycles and focus stats).
+  - `Sidebar` is the Videos & sound tab, containing `VideoPicker`,
+    `MusicPanel`, and `AmbiencePanel`. Theme controls live in Settings.
+  - `TasksCard` is the Tasks tab, also reachable from the toolbar. Its quick-add
+    form supports Enter; estimates and priority are optional refinements.
+    Checkboxes move items into a collapsible Completed section; unchecking
+    reopens them. Inline editors change name/estimate/priority. My order exposes
+    up/down controls for unfinished work; other modes sort automatically.
+    Focus explicitly loads an estimate into the timer. Deletion and Clear
+    completed offer Undo, which restores removed ids without reverting later
+    additions, edits, check-offs or ordering of surviving tasks.
+    `lib/taskPlanning.ts` owns the pure movement and restoration logic.
+    The original saved checklist schema is still migrated, and task data,
+    ordering and the active id persist through guarded storage effects.
+  - **Managed layout:** tools share one dock with a scrollable body on desktop. Inactive
+    tabs and hidden tools use `hidden`, keeping their components mounted so
+    audio, timer and task state survive tab switches. A timer footer remains
+    available on the other tabs. Old saved floating positions and sizes are
+    ignored. Toolbar buttons wrap, notices occupy their own row, and controls
+    wrap on narrow screens. Do not reintroduce independently positioned panels
+    that can cover each other or the video.
+    The welcome screen also exposes the same timer's Start/Pause control. Keep
+    its countdown outside live status announcements, and keep the control mounted
+    when pausing so focus is preserved. A completed Pomodoro restarts through the
+    shared timer toggle, resetting to round 1 without repeating completion credit.
+  - `SocialCard` is the Social dock tab. `data/social.ts` holds the group Instagram,
+    official/shared-member X accounts, and the five member Instagram URLs.
+    Cards use browser links (`target="_blank"`, `rel="noopener noreferrer"`);
+    there are no social embed scripts, post scraping, or API credentials.
+    Check official sources before changing handles; see `docs/social.md`.
+- `useTimer` is a self-contained countdown state machine; it does not know about
+  video state. Its pomodoro extension auto-advances focus → break → focus… and
+  stops after the configured number of rounds. Setting any preset/custom duration
+  exits pomodoro mode.
+- **Local profile progression:** `lib/progression.ts` owns pure eligibility,
+  validation, milestones and TaskNook's level curve (100 XP, then 150, 200...).
+  `useProgression` owns the persisted `sws.progression` marker at App level.
+  Available `sws.stats` history backfills 1 XP/minute; the profile retains per-day
+  high-water marks so pruning the 400-day stats log never removes lifetime XP
+  or prevents new sessions from earning credit. `useTimer` calls its optional
+  focus-completion callback immediately after writing ordinary stats, only for
+  completed focus blocks. `TasksCard` reports completion actions; each task id
+  earns 10 XP once, with claims retained through reopening/deletion/Undo.
+  Already completed startup snapshots establish claims without retroactive
+  bonus XP. Check-ins earn 10 XP + consecutive-day bonus capped at 20, once per
+  LOCAL date on open/return/gesture; idle midnight crossings never count.
+  Calendar arithmetic is independent of DST and a backward clock cannot reopen
+  a reward day. Name, avatar, XP, best streak and milestones remain local.
+  `ProfileCard` lives only in the **Profile** dock tab. Keep profile
+  settings and progression off the start screen and toolbar. No XP work runs
+  on elapsed-time checkpoints. **Total time studied** uses a separate actual-time
+  ledger (`studyMilliseconds`), initialized once after legacy completed-history
+  backfill. `useTimer` checkpoints wall time about once a second, capped at each
+  focus deadline, and flushes partial time before pause/reset/preset changes,
+  page hide, and unmount. Break segments are excluded. Completion XP and ordinary
+  daily focus stats retain completed-block semantics; never add their duration
+  to the elapsed-time ledger again. `useProgression.recordTime` saves through
+  the existing lock/queue with no reward notification. Failed elapsed deltas
+  coalesce to avoid an ever-growing per-second replay queue.
+  `lib/progressionSession.ts` replays queued operations on freshly read state
+  under a shared Web Lock, preserving cross-tab rewards and failed in-memory
+  saves. Storage events refresh state without echo writes. Profile save callbacks
+  return promises, and the form waits for success. Initial completed-task seeding
+  applies only when migrating an absent/invalid profile. Focus actions capture
+  high-water targets so retries and remote backfills cannot double-credit a block.
+  Failed reads prevent overwriting unseen progress. Keep writes out of React updaters.
+  See `docs/LEVELS.md` for the public rules and maintenance boundaries.
+- `lib/musicLink.ts` (YouTube/Spotify URL → station descriptor) and
+  `lib/ambience.ts` (the 7-channel procedural sound mixer, no audio files) are
+  ports of TaskNook's `frontend/src/lib/{musicLink,youtube,spotify,audio}.js` —
+  if a parsing/audio bug is fixed in one repo, mirror it in the other. Two
+  deliberate divergences from TaskNook's audio.js: snow/storm keep this app's
+  softer presets (rain adopted TaskNook's darker bed because the droplet plinks
+  carry the identity now), and the LFO depth is capped below each preset's base
+  gain so modulation can't push a channel's gain negative — that cap is a fix
+  worth mirroring *to* TaskNook. The engine's output is measurable without
+  ears: patch `AudioNode.prototype.connect` in a page to tap whatever reaches
+  `ctx.destination` with an `AnalyserNode`, then compare RMS and the share of
+  energy above 2kHz.
+- The YouTube IFrame API's `window.YT` global is loaded lazily and once via
+  `loadYouTubeIframeApi()` in `hooks/useYouTubeIframeApi.ts` — safe to call from
+  multiple components, guards against injecting the `<script>` tag twice.
+  Failed or timed-out loads remove the script and clear the promise cache;
+  listeners and the ready callback are cleaned up so a later call can retry.
+- `src/types/youtube.d.ts` hand-rolls minimal ambient types for the `YT` namespace
+  (just the members this app uses) instead of pulling in `@types/youtube`.
+
+**Styling:** Tailwind with a small custom palette (`cream` / `clay` / `ink`). The palette
+values are CSS variables (`src/index.css`), not hex literals in `config/tailwind.config.js` —
+that's what makes the **coffee theme** work: `:root.coffee` swaps the variable values
+(palette borrowed from the personal-portfolio repo) without any per-component classes.
+Dark mode is separate and class-based (`dark:` variants, `.dark` on `<html>`). Theme
+selection (`light`/`coffee`/`dark`/`custom`) lives in `useAppearance` and persists to
+localStorage.
+
+The **custom theme** (`lib/theme.ts`) derives all ten palette variables from one
+user-picked colour and applies them as **inline styles on `:root`**, which is what
+lets them win over the stylesheet's `:root` / `:root.coffee` rules. Two consequences:
+- Leaving the custom theme *must* call `clearCustomTheme()`, or the inline vars keep
+  overriding whichever preset was selected. `useAppearance`'s theme effect does this.
+- Only hue and saturation come from the picked colour. Lightness is solved per stop
+  (bisection) so each variable keeps the **relative luminance** of the light preset's
+  matching colour. Do not "simplify" this back to a fixed HSL lightness ladder: HSL
+  lightness isn't brightness, so a fixed ladder makes yellow/cyan accents wash out to
+  near-white (white-on-accent measured 1.17:1 before this was fixed). The luminance
+  anchors keep contrast identical to the light preset for every hue.
+
+**Appearance (TaskNook-inspired):** the light preset is neutral linen with a
+muted violet accent; coffee uses subdued warm browns; dark uses neutral charcoal
+surfaces, soft white/gray text, and a muted blue accent. Dark keyboard focus uses
+the lighter accent stop for visibility. Keep the light preset's RGB values synchronized
+with the luminance anchors in `lib/theme.ts` and `lib/theme.test.ts`.
+Display palette choices as **Light, Cafe, Dark, Custom**, in that order.
+The Cafe preset retains the internal `coffee` value and CSS class for saved-data
+compatibility; display names and persisted IDs are intentionally separate.
+`UIIcon` supplies shared stroke icons. `AppearancePanel` lives inside Settings
+and controls themes plus persisted `sws.panelOpacity` (65–100%,
+default 88). Opacity applies to surface backgrounds through `--panel-opacity`,
+never to text. Semantic surface/text tokens in `index.css` adapt to each theme.
+`TimerPanel` keeps the countdown, transport, and quick duration presets outside
+the native **Session settings** disclosure; only Pomodoro configuration and daily
+goals belong inside it. Presets stay available during Pomodoro and selecting one
+switches to a single focus duration. `useTimerWheel` attaches a non-passive wheel
+listener only to the countdown button, disabled while typing. It normalizes
+pixel/line/page movement into one-minute adjustments, accumulates small trackpad
+deltas, and clears movement on direction/gap/preset changes. Modifier and
+horizontal gestures pass through. `useTimer.adjustTime` keeps running sessions
+and active Pomodoro phases intact, clamps remaining time to 1 second–12 hours
+for active sessions, and updates idle single-session durations within the existing
+10-second–12-hour limits. Reuse its elapsed-time-safe nudge/set-duration paths;
+scrolling must never invent study time or trigger a phase change outside a tick.
+Preserve the managed dock placement; the user's UI preference is to improve
+appearance without introducing draggable panels. Native `<summary>` elements
+must own their activation keys so the global Space shortcut doesn't also play
+or pause the video.
+
+**Desktop app:** `desktop/launcher.py` serves the built `dist/` with a stdlib
+`http.server` on a stable local port and opens it in a native window with `pywebview`
+(WebView2 on Windows). There's no backend — the "server" is only a static file host,
+so unlike TaskNook there's no Flask/waitress and no `--hidden-import` flags needed.
+Two persistence rules carried over from TaskNook (both are localStorage-related —
+favorites and theme live there):
+1. `webview.start()` must get `private_mode=False` + an explicit `storage_path`
+   (under `%LOCALAPPDATA%\StudyWithSoobin\`) or all localStorage is wiped on close.
+2. The port must be stable across launches (`DEFAULT_PORT = 39218`; random fallback
+   only if taken) because localStorage is scoped by origin = host **and** port.
+PyInstaller packaging (`scripts/build-exe.bat`) outputs **`StudyWithSoobin.exe` to the repo
+root** (`--distpath .`) — the exe is deliberately committed so GitHub visitors can
+download and run it without building anything; rebuild and re-commit it when the app
+changes. `dist/` is the Vite build that gets bundled *into* the exe via `--add-data`,
+not the exe output dir.
+The build script sets its working directory to the repository root, writes
+specifications to `build/`, and uses an absolute `dist/` source for `--add-data`
+because PyInstaller resolves relative data sources against the spec directory.
+`SWS_SELFTEST=1` makes the exe/script boot the server, print a diagnostic line, and
+exit without opening a window — use it to verify a build headlessly.
+
+## Known constraints
+
+- Browser autoplay policy requires the background video to start muted; volume is
+  applied after the player is ready, and unmuting only happens on an explicit user
+  gesture — the playback bar's volume slider, speaker button, or M shortcut.
+  `useVideoAudio` tracks a `muted`
+  flag for this, reset to true whenever the player is recreated (returning from
+  the welcome screen), because each fresh player starts muted again regardless of
+  the persisted volume.
+- `VideoBackground` flushes resume positions on switching, unmounting, pagehide
+  and visibility changes, and guards against stale video ids on player events.
+  Controls wait for player readiness; pre-ready volume/mute/pause changes are
+  applied onReady. YouTube errors 2/100/101/150 blocklist videos; player errors
+  such as 5/153 show retry guidance without deleting catalog entries.
+- Some playlist videos report `embeddable=true` in metadata but still refuse to play
+  in an embed at runtime ("Watch on YouTube" — copyright-restricted VLIVE re-uploads).
+  This is unknowable ahead of time, so `App.tsx` handles the IFrame player's `onError`:
+  the video is added to a session-scoped `blockedIds` list, removed from the grids,
+  and playback skips to another video with a notice in the layout.
+- Failed background-player API initialization retries when another video is
+  selected or the browser fires `online`. A healthy player still swaps videos
+  through `loadVideoById`; do not recreate it on every selection. Mounted-player
+  tests cover retry, pending-selection changes, normal swaps, and unmount cleanup.
+- Spotify embeds never autoplay (user must click play inside the widget); YouTube
+  music embeds autoplay muted-or-with-sound at the browser's discretion.
+- `scripts/fetch-playlist.mjs` runs against YouTube's internal (undocumented) page
+  data via `youtubei.js`. It is not the official Data API — expect it to need field-path
+  fixes if YouTube changes its page structure.

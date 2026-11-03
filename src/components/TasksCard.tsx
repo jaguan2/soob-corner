@@ -50,6 +50,11 @@ function TasksCardInner({ onUseDuration, onTaskCompleted }: TasksCardProps) {
     return tasks.some(task => task.id === saved && !task.done) ? saved : null
   })
   const [editingId, setEditingId] = useState<string | null>(null)
+  const previousEditor = useRef<string | null>(null)
+  useEffect(() => {
+    if (previousEditor.current && !editingId) document.getElementById(`task-edit-${previousEditor.current}`)?.focus()
+    previousEditor.current = editingId
+  }, [editingId])
   const [editDraft, setEditDraft] = useState<TaskDraft>({ text: '', duration: '25', priority: 'medium' })
   const [editError, setEditError] = useState('')
   const [removal, setRemoval] = useState<Removal | null>(null)
@@ -114,7 +119,7 @@ function TasksCardInner({ onUseDuration, onTaskCompleted }: TasksCardProps) {
     const active = activeId === task.id && !task.done
     return <li key={task.id} className={'checklist-task group' + (task.done ? ' is-done' : '') + (active ? ' is-active' : '')}>
       {editingId === task.id ? <form className="task-editor" onSubmit={event => { event.preventDefault(); saveEdit(task) }}
-        onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); setEditingId(null) } }}>
+        onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); setEditingId(null) } }}>
         <label className="task-field"><span>Task name</span><input autoFocus aria-label="Edit task name" value={editDraft.text} maxLength={200} required
           onChange={event => { setEditDraft({ ...editDraft, text: event.target.value }); setEditError('') }} /></label>
         <TaskOptions duration={editDraft.duration} priority={editDraft.priority}
@@ -128,7 +133,7 @@ function TasksCardInner({ onUseDuration, onTaskCompleted }: TasksCardProps) {
             aria-label={`Mark ${task.text} ${task.done ? 'not done' : 'done'}`} className="task-checkbox" />
           <span className="task-name">{task.text}</span>
           <div className="task-row-actions">
-            <button onClick={() => beginEdit(task)} aria-label={`Edit ${task.text}`} title="Edit task" className="task-delete hover-reveal"><UIIcon name="edit" size={15} /></button>
+            <button id={`task-edit-${task.id}`} onClick={() => beginEdit(task)} aria-label={`Edit ${task.text}`} title="Edit task" className="task-delete hover-reveal"><UIIcon name="edit" size={15} /></button>
             <button onClick={() => removeTasks([task.id])} aria-label={`Delete ${task.text}`} title="Delete task" className="task-delete hover-reveal"><UIIcon name="close" size={15} /></button>
           </div>
         </div>

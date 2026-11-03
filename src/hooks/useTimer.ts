@@ -28,6 +28,8 @@ export interface TimerApi {
   setDurationSeconds: (seconds: number) => void
   /** Add/remove time mid-session (e.g. ±60s) without stopping the clock. */
   nudge: (deltaSeconds: number) => void
+  /** Adjust the countdown, keeping an active session running and Pomodoro intact. */
+  adjustTime: (deltaSeconds: number) => void
   startPomodoro: (config: PomodoroConfig) => void
   stopPomodoro: () => void
   /** During a pomodoro break: jump straight into the next focus round. */
@@ -60,7 +62,8 @@ export function parseTimeInput(raw: string): number | null {
   return Math.min(Math.max(seconds, MIN_SECONDS), MAX_SECONDS)
 }
 
-export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number) => void): TimerApi {
+export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number) => void,
+  onFocusElapsed?: (milliseconds: number) => void): TimerApi {
   const [durationSeconds, setDuration] = useState(initialMinutes * 60)
   const [secondsLeft, setSecondsLeft] = useState(durationSeconds)
   const [isRunning, setIsRunning] = useState(false)
@@ -79,6 +82,34 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
   durationRef.current = durationSeconds
   const onFocusCompleteRef = useRef(onFocusComplete)
   onFocusCompleteRef.current = onFocusComplete
+  const onFocusElapsedRef = useRef(onFocusElapsed)
+  onFocusElapsedRef.current = onFocusElapsed
+  const focusClockRef = useRef<{ at: number; focus: boolean } | null>(null)
+  const pendingFocusMs = useRef(0)
+  // Use wall time rather than duration minus remaining: nudges, resets, and
+  // configured block lengths must not invent study time. Cap throttled ticks
+  // at the current deadline so time after a finished block is not credited.
+  const flushFocusTime = useCallback((force = false) => {
+    const clock = focusClockRef.current
+    const deadline = endAtRef.current
+    if (clock && deadline !== null) {
+      const until = Math.min(Date.now(), deadline)
+      if (until > clock.at) {
+        if (clock.focus) pendingFocusMs.current += until - clock.at
+        clock.at = until
+      }
+    }
+    if (pendingFocusMs.current > 0 && (force || pendingFocusMs.current >= 1000)) {
+      const elapsed = pendingFocusMs.current
+      pendingFocusMs.current = 0
+      onFocusElapsedRef.current?.(elapsed)
+    }
+  }, [])
+  const stopClock = useCallback(() => {
+    flushFocusTime(true)
+    endAtRef.current = null
+    focusClockRef.current = null
+  }, [flushFocusTime])
   const recordCompletedFocus = useCallback((minutes: number) => {
     recordFocusMinutes(minutes)
     onFocusCompleteRef.current?.(minutes)
@@ -94,10 +125,14 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
       base = durationRef.current
       setSecondsLeft(base)
     }
-    endAtRef.current = Date.now() + base * 1000
+    const startedAt = Date.now()
+    endAtRef.current = startedAt + base * 1000
+    focusClockRef.current = { at: startedAt, focus: !pomodoroRef.current ||
+      (pomodoroRef.current.phase === 'focus' && !pomodoroRef.current.completed) }
     const tick = () => {
       if (endAtRef.current === null) return
       const remaining = Math.max(0, Math.ceil((endAtRef.current - Date.now()) / 1000))
+      flushFocusTime(remaining <= 0)
       setSecondsLeft(remaining)
       if (remaining <= 0) {
         // Disarm before cueing: setIsRunning(false) only stops the interval
@@ -121,12 +156,15 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
       if (!document.hidden) tick()
     }
     document.addEventListener('visibilitychange', onVisible)
+    const onPageHide = () => flushFocusTime(true)
+    window.addEventListener('pagehide', onPageHide)
     return () => {
+      stopClock()
       window.clearInterval(id)
       document.removeEventListener('visibilitychange', onVisible)
-      endAtRef.current = null
+      window.removeEventListener('pagehide', onPageHide)
     }
-  }, [isRunning, recordCompletedFocus])
+  }, [isRunning, recordCompletedFocus, flushFocusTime, stopClock])
 
   // Pomodoro phase advancement: when a focus/break block hits zero, roll into
   // the next block (or finish after the last focus round).
@@ -153,15 +191,12 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
     }
   }, [secondsLeft, pomodoro, recordCompletedFocus])
 
-  const toggle = useCallback(() => {
-    setIsRunning((r) => {
-      if (!r) ensureNotifyPermission()
-      return !r
-    })
-  }, [])
-  const pause = useCallback(() => setIsRunning(false), [])
-
+  const pause = useCallback(() => {
+    stopClock()
+    setIsRunning(false)
+  }, [stopClock])
   const reset = useCallback(() => {
+    stopClock()
     setIsRunning(false)
     if (pomodoro) {
       setPomodoro({ ...pomodoro, phase: 'focus', round: 1, completed: false })
@@ -169,15 +204,25 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
     } else {
       setSecondsLeft(durationSeconds)
     }
-  }, [durationSeconds, pomodoro])
+  }, [durationSeconds, pomodoro, stopClock])
+
+  const toggle = useCallback(() => {
+    if (isRunning) pause()
+    else {
+      if (pomodoro?.completed) reset()
+      ensureNotifyPermission()
+      setIsRunning(true)
+    }
+  }, [isRunning, pause, pomodoro?.completed, reset])
 
   const setDurationSeconds = useCallback((seconds: number) => {
+    stopClock()
     const clamped = Math.min(Math.max(seconds, MIN_SECONDS), MAX_SECONDS)
     setPomodoro(null)
     setDuration(clamped)
     setSecondsLeft(clamped)
     setIsRunning(false)
-  }, [])
+  }, [stopClock])
 
   // The deadline is the source of truth while running, so a nudge adjusts it
   // directly; the display refreshes from it. Over-subtracting clamps to one
@@ -186,25 +231,45 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
   // nudge writing 0 directly would advance the phase against a stale
   // deadline and cascade through the remaining blocks.
   const nudge = useCallback((deltaSeconds: number) => {
+    flushFocusTime(true)
     if (endAtRef.current !== null) {
       endAtRef.current = Math.max(Date.now() + 1000, endAtRef.current + deltaSeconds * 1000)
       setSecondsLeft(Math.max(1, Math.ceil((endAtRef.current - Date.now()) / 1000)))
     } else {
       setSecondsLeft((prev) => Math.max(1, prev + deltaSeconds))
     }
-  }, [])
+  }, [flushFocusTime])
+
+  const adjustTime = useCallback((deltaSeconds: number) => {
+    if (!Number.isFinite(deltaSeconds) || deltaSeconds === 0) return
+    const current = endAtRef.current === null ? secondsLeftRef.current
+      : Math.max(1, Math.ceil((endAtRef.current - Date.now()) / 1000))
+    const active = isRunning || (pomodoroRef.current !== null && !pomodoroRef.current.completed)
+    const next = Math.min(MAX_SECONDS, Math.max(active ? 1 : MIN_SECONDS, current + deltaSeconds))
+    if (next === current) return
+    if (active) nudge(next - current)
+    else setDurationSeconds(next)
+    // Multiple wheel events can arrive before React renders the next snapshot.
+    secondsLeftRef.current = next
+  }, [isRunning, nudge, setDurationSeconds])
 
   const skipBreak = useCallback(() => {
     const p = pomodoroRef.current
     if (!p || p.completed || p.phase !== 'break') return
+    flushFocusTime(true)
     setPomodoro({ ...p, phase: 'focus', round: p.round + 1 })
     setSecondsLeft(p.focusMinutes * 60)
     // Already running → the isRunning effect won't re-arm, so re-arm here.
-    if (endAtRef.current !== null) endAtRef.current = Date.now() + p.focusMinutes * 60_000
+    if (endAtRef.current !== null) {
+      const now = Date.now()
+      endAtRef.current = now + p.focusMinutes * 60_000
+      focusClockRef.current = { at: now, focus: true }
+    }
     setIsRunning(true)
-  }, [])
+  }, [flushFocusTime])
 
   const startPomodoro = useCallback((config: PomodoroConfig) => {
+    flushFocusTime(true)
     const focusMinutes = Math.min(Math.max(Math.round(config.focusMinutes), 1), 180)
     const breakMinutes = Math.min(Math.max(Math.round(config.breakMinutes), 1), 60)
     const rounds = Math.min(Math.max(Math.round(config.rounds), 1), 12)
@@ -215,15 +280,20 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
     // the arming effect won't re-run — the old deadline would survive and the
     // first focus round would inherit its remainder. Re-arm here (same reason
     // as skipBreak).
-    if (endAtRef.current !== null) endAtRef.current = Date.now() + focusMinutes * 60_000
+    if (endAtRef.current !== null) {
+      const now = Date.now()
+      endAtRef.current = now + focusMinutes * 60_000
+      focusClockRef.current = { at: now, focus: true }
+    }
     setIsRunning(true)
-  }, [])
+  }, [flushFocusTime])
 
   const stopPomodoro = useCallback(() => {
+    stopClock()
     setPomodoro(null)
     setIsRunning(false)
     setSecondsLeft(durationSeconds)
-  }, [durationSeconds])
+  }, [durationSeconds, stopClock])
 
   return {
     label: formatTime(secondsLeft),
@@ -235,6 +305,7 @@ export function useTimer(initialMinutes = 25, onFocusComplete?: (minutes: number
     reset,
     setDurationSeconds,
     nudge,
+    adjustTime,
     startPomodoro,
     stopPomodoro,
     skipBreak,

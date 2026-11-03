@@ -1,4 +1,4 @@
-import { localDayKey, type DayLog } from './stats'
+import { calendarDayNumber as dayNumber, localDayKey, type DayLog } from './stats'
 
 export const PROGRESSION_KEY = 'sws.progression'
 export const XP_RULES = { studyMinute: 1, task: 10, checkIn: 10, streakMaxBonus: 10 } as const
@@ -14,6 +14,8 @@ export interface Progression {
   avatar: ProfileAvatar
   /** Per-day high-water marks retain lifetime study credit after stats prune old days. */
   focusDays: DayLog
+  /** Actual elapsed focus time; null until legacy completed history is backfilled. */
+  studyMilliseconds: number | null
   bonusXP: number
   /** Lifetime claims survive task reopening, deletion and Undo. */
   taskClaims: string[]
@@ -22,12 +24,6 @@ export interface Progression {
   bestStreak: number
 }
 
-function dayNumber(value: unknown): number | null {
-  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null
-  const date = new Date(`${value}T12:00:00Z`)
-  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value
-    ? Math.floor(date.getTime() / 86_400_000) : null
-}
 function normalizeDays(value: unknown): DayLog {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
   const days: DayLog = {}
@@ -47,6 +43,8 @@ export function normalizeProgression(value: unknown): Progression {
     name: typeof source.name === 'string' ? source.name.trim().slice(0, 32) : '',
     avatar: PROFILE_AVATARS.includes(source.avatar!) ? source.avatar! : 'leaf',
     focusDays: normalizeDays(source.focusDays),
+    studyMilliseconds: typeof source.studyMilliseconds === 'number' && Number.isFinite(source.studyMilliseconds)
+      && source.studyMilliseconds >= 0 ? whole(source.studyMilliseconds, MAX_XP * 60_000) : null,
     bonusXP: whole(source.bonusXP),
     taskClaims: Array.isArray(source.taskClaims) ? [...new Set(source.taskClaims.filter(validTaskId))] : [],
     lastCheckIn, checkInStreak,
@@ -70,6 +68,22 @@ export function levelForXP(value: number) {
 }
 export function totalFocusMinutes(state: Progression): number {
   return Math.min(MAX_XP, Object.values(state.focusDays).reduce((sum, minutes) => sum + minutes, 0))
+}
+
+export function totalStudyMilliseconds(state: Progression): number {
+  return state.studyMilliseconds ?? totalFocusMinutes(state) * 60_000
+}
+
+/** Initialize once after history backfill, without overwriting new elapsed-time data. */
+export function initializeStudyTime(state: Progression): Progression {
+  return state.studyMilliseconds === null ? { ...state, studyMilliseconds: totalStudyMilliseconds(state) } : state
+}
+
+/** Separate from completion XP: pauses/resets retain elapsed time without rewarding a block. */
+export function addStudyTime(state: Progression, milliseconds: number): Progression {
+  if (!Number.isFinite(milliseconds) || milliseconds <= 0) return state
+  return { ...state, studyMilliseconds: Math.min(MAX_XP * 60_000,
+    totalStudyMilliseconds(state) + Math.floor(milliseconds)) }
 }
 export function progressionLevel(state: Progression) {
   return levelForXP(totalFocusMinutes(state) * XP_RULES.studyMinute + state.bonusXP)

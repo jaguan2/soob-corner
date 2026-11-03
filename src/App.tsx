@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { Video } from './types/playlist'
 import { usePlaylist } from './hooks/usePlaylist'
 import { useBreakNudge } from './hooks/useBreakNudge'
 import { useTimer } from './hooks/useTimer'
@@ -8,55 +7,28 @@ import { VideoBackground, type VideoBackgroundHandle } from './components/VideoB
 import { VideoControls } from './components/VideoControls'
 import { Sidebar } from './components/Sidebar'
 import { TasksCard } from './components/TasksCard'
+import { SocialCard } from './components/SocialCard'
 import { TimerCard } from './components/TimerCard'
 import { WelcomeScreen } from './components/WelcomeScreen'
-import { AppearancePanel } from './components/AppearancePanel'
-import { ProfileCard, ProfileLevelButton } from './components/ProfileCard'
+import { SettingsCard } from './components/SettingsCard'
+import { WatchHistoryCard } from './components/WatchHistoryCard'
+import { ProfileCard } from './components/ProfileCard'
 import { UIIcon } from './components/UIIcon'
-import { applyCustomTheme, clearCustomTheme, DEFAULT_CUSTOM_COLOR } from './lib/theme'
-import { storageGet, storageGetJson, storageRemove, storageSet, storageSetJson } from './lib/storage'
-import { adjacentVideo, EMPTY_FILTERS, filterVideos, type CatalogFilters } from './lib/catalog'
-
-export type Theme = 'light' | 'coffee' | 'dark' | 'custom'
-
-function pickRandom(pool: Video[], excludeId?: string): string | null {
-  const candidates = excludeId ? pool.filter((v) => v.id !== excludeId) : pool
-  if (candidates.length === 0) return pool[0]?.id ?? null
-  return candidates[Math.floor(Math.random() * candidates.length)].id
-}
-
-function loadFavorites(): string[] {
-  const raw = storageGetJson<unknown>('sws.favorites', [])
-  return Array.isArray(raw) ? raw.filter((id): id is string => typeof id === 'string') : []
-}
-
-function loadTheme(): Theme {
-  const stored = storageGet('sws.theme')
-  return stored === 'dark' || stored === 'coffee' || stored === 'custom' ? stored : 'light'
-}
-
-function loadCustomColor(): string {
-  const stored = storageGet('sws.customColor')
-  return stored && /^#[0-9a-f]{6}$/i.test(stored) ? stored : DEFAULT_CUSTOM_COLOR
-}
+import { useAppearance } from './hooks/useAppearance'
+import { usePreferences } from './hooks/usePreferences'
+import { useVideoScreenFocus } from './hooks/useVideoScreenFocus'
+import { handleButtonArrows } from './lib/keyboardNavigation'
+import { useWatchHistory } from './hooks/useWatchHistory'
+import { useVideoCatalog } from './hooks/useVideoCatalog'
+import { useVideoAudio } from './hooks/useVideoAudio'
+import { StudyTools } from './components/StudyTools'
+import type { StudyToolId } from './lib/workspace'
+import { storageGet, storageRemove, storageSet } from './lib/storage'
 
 /** Preferred subtitle language, re-applied to every video that has it. */
 function loadCaptionLang(): string | null {
   const stored = storageGet('sws.captionLang')
   return stored && /^[\w-]{2,10}$/.test(stored) ? stored : null
-}
-
-function loadVolume(): number {
-  const raw = storageGet('sws.volume')
-  if (raw === null) return 40 // Number(null) is 0 — don't let it pass as valid
-  const stored = Number(raw)
-  return Number.isFinite(stored) && stored >= 0 && stored <= 100 ? stored : 40
-}
-
-function loadPanelOpacity(): number {
-  const raw = storageGet('sws.panelOpacity')
-  const value = raw === null || raw.trim() === '' ? 88 : Number(raw)
-  return Number.isFinite(value) ? Math.max(65, Math.min(100, Math.round(value))) : 88
 }
 
 function toggleFullscreen() {
@@ -69,44 +41,52 @@ function toggleFullscreen() {
 
 export default function App() {
   const { playlist, isChecking } = usePlaylist()
-  const pendingDeepLink = useRef(new URLSearchParams(window.location.search).get('v'))
-  // null until the user picks a video on the welcome screen — unless the URL
-  // deep-links one (?v=<id>), which skips the welcome screen entirely.
-  const [videoId, setVideoId] = useState<string | null>(() => {
-    const v = new URLSearchParams(window.location.search).get('v')
-    return v && playlist.videos.some((video) => video.id === v) ? v : null
-  })
-  // A first-time link can name a video that exists only in the downloaded catalog.
-  useEffect(() => {
-    if (videoId !== null) pendingDeepLink.current = null
-    if (isChecking) return
-    const id = pendingDeepLink.current
-    pendingDeepLink.current = null
-    if (id && playlist.videos.some(video => video.id === id)) setVideoId(id)
-  }, [isChecking, playlist, videoId])
-  const [volume, setVolume] = useState(loadVolume)
-  const [catalogFilters, setCatalogFilters] = useState<CatalogFilters>(EMPTY_FILTERS)
-  // Autoplay policy forces every freshly-created player to start muted, and
-  // unmuting must come from an explicit user gesture — this tracks whether
-  // that gesture (volume slider or the unmute chip) has happened for the
-  // current player. Reset whenever the player is recreated.
-  const [muted, setMuted] = useState(true)
-  const [lastVideoId, setLastVideoId] = useState<string | null>(() => storageGet('sws.lastVideo'))
-  const [favorites, setFavorites] = useState<string[]>(loadFavorites)
-  const [theme, setTheme] = useState<Theme>(loadTheme)
-  const [customColor, setCustomColor] = useState<string>(loadCustomColor)
-  const [panelOpacity, setPanelOpacity] = useState(loadPanelOpacity)
-  const [appearanceOpen, setAppearanceOpen] = useState(false)
+  const { theme, setTheme, customColor, setCustomColor, panelOpacity, setPanelOpacity } = useAppearance()
+  const { preferences, setShowMilestones, setSingleKeyShortcuts } = usePreferences()
+  const settings = useMemo(() => <SettingsCard theme={theme} onSetTheme={setTheme} customColor={customColor}
+    onSetCustomColor={setCustomColor} opacity={panelOpacity} onSetOpacity={setPanelOpacity}
+    showMilestones={preferences.showMilestones} onSetShowMilestones={setShowMilestones}
+    singleKeyShortcuts={preferences.singleKeyShortcuts} onSetSingleKeyShortcuts={setSingleKeyShortcuts} />,
+  [theme, setTheme, customColor, setCustomColor, panelOpacity, setPanelOpacity, preferences.showMilestones, setShowMilestones, preferences.singleKeyShortcuts, setSingleKeyShortcuts])
   const [captionLang, setCaptionLang] = useState<string | null>(loadCaptionLang)
-  // videos YouTube refused to play embedded this session (copyright/embed
-  // restrictions surface only at playback time, not in playlist metadata)
-  const [blockedIds, setBlockedIds] = useState<string[]>([])
   const [notice, setNotice] = useState<string | null>(null)
   const [videoPlaying, setVideoPlaying] = useState(true)
   const [dockCollapsed, setDockCollapsed] = useState(false)
-  const [topPanel, setTopPanel] = useState<'timer' | 'sidebar' | 'tasks' | 'profile'>('timer')
+  const [topPanel, setTopPanel] = useState<StudyToolId>('timer')
   // Zen mode: everything but the video disappears (Z toggles, Esc exits).
   const [zen, setZen] = useState(false)
+  const [pauseOnBreak, setPauseOnBreak] = useState(() => storageGet('sws.pauseOnBreak') === '1')
+  const videoRef = useRef<VideoBackgroundHandle>(null)
+  const noticeTimer = useRef<number | undefined>(undefined)
+  const showNotice = useCallback((message: string, ms = 5000) => {
+    setNotice(message)
+    window.clearTimeout(noticeTimer.current)
+    noticeTimer.current = window.setTimeout(() => setNotice(null), ms)
+  }, [])
+  useEffect(() => () => window.clearTimeout(noticeTimer.current), [])
+  const { progression, recordStudy, recordTime, completeTask, updateProfile } = useProgression(showNotice)
+  const timer = useTimer(25, recordStudy, recordTime)
+  const setTaskDuration = timer.setDurationSeconds
+  const onBlocked = useCallback(() => {
+    showNotice("That video won't play embedded — skipped to another one")
+  }, [showNotice])
+  const repeatCurrentVideo = useCallback(() => videoRef.current?.restart(), [])
+  const {
+    videoId, setVideoId, selectVideo, currentVideo, lastVideo, playable, filteredVideos,
+    queuedVideos, queueVideo, removeQueuedVideo, moveQueuedVideo, clearQueue,
+    favorites, toggleFavorite, catalogFilters, setCatalogFilters,
+    handleUnplayable, handleEnded, handleSurprise, handlePreviousVideo, handleNextVideo,
+  } = useVideoCatalog(playlist.videos, onBlocked, repeatCurrentVideo, isChecking)
+  const historyVideos = useMemo(() => videoId && !playlist.videos.some(video => video.id === videoId)
+    ? [...playlist.videos, currentVideo] : playlist.videos, [playlist.videos, currentVideo, videoId])
+  const { history, stats: watchStats, onVideoStarted } = useWatchHistory(historyVideos, showNotice)
+  const backButton = useVideoScreenFocus(videoId)
+  const returnToCatalog = useCallback(() => { setVideoId(null); setZen(false) }, [setVideoId])
+  const queue = useMemo(() => ({ videos: queuedVideos, onPlay: selectVideo, onRemove: removeQueuedVideo, onMove: moveQueuedVideo, onClear: clearQueue }), [queuedVideos, selectVideo, removeQueuedVideo, moveQueuedVideo, clearQueue])
+  const { volume, muted, changeVolume, toggleMute } = useVideoAudio(videoId)
+  const historyView = useMemo(() => <WatchHistoryCard history={history} playable={playable} queuedVideos={queuedVideos}
+    onPlay={selectVideo} onQueue={queueVideo} />, [history, playable, queuedVideos, selectVideo, queueVideo])
+
   // WebView can retain the document's small-layout scroll offset when the
   // window expands, clipping the toolbar and leaving empty space below.
   useEffect(() => {
@@ -119,72 +99,6 @@ export default function App() {
     window.addEventListener('resize', resetScroll)
     return () => window.removeEventListener('resize', resetScroll)
   }, [videoId, dockCollapsed, zen])
-  const [pauseOnBreak, setPauseOnBreak] = useState(() => storageGet('sws.pauseOnBreak') === '1')
-  const videoRef = useRef<VideoBackgroundHandle>(null)
-  const noticeTimer = useRef<number | undefined>(undefined)
-  const showNotice = useCallback((message: string, ms = 5000) => {
-    setNotice(message)
-    window.clearTimeout(noticeTimer.current)
-    noticeTimer.current = window.setTimeout(() => setNotice(null), ms)
-  }, [])
-  const { progression, recordStudy, completeTask, updateProfile } = useProgression(showNotice)
-  const timer = useTimer(25, recordStudy)
-  const setTaskDuration = timer.setDurationSeconds
-  const openProfile = useCallback(() => { setDockCollapsed(false); setTopPanel('profile') }, [])
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark')
-    document.documentElement.classList.toggle('coffee', theme === 'coffee')
-    // The custom palette is inline vars on :root, so it has to be cleared
-    // when switching to a preset or it would keep overriding it.
-    if (theme === 'custom') applyCustomTheme(customColor)
-    else clearCustomTheme()
-    storageSet('sws.theme', theme)
-  }, [theme, customColor])
-
-  useEffect(() => {
-    storageSet('sws.customColor', customColor)
-  }, [customColor])
-
-  useEffect(() => {
-    document.documentElement.style.setProperty('--panel-opacity', String(panelOpacity / 100))
-    storageSet('sws.panelOpacity', String(panelOpacity))
-  }, [panelOpacity])
-
-  // Persisted from an effect rather than inside the setState updater:
-  // updaters should be pure (StrictMode runs them twice), and localStorage
-  // writes can throw.
-  useEffect(() => {
-    storageSetJson('sws.favorites', favorites)
-  }, [favorites])
-
-  useEffect(() => {
-    storageSet('sws.volume', String(volume))
-  }, [volume])
-
-  // Remember the last video so the welcome screen can offer to continue it.
-  // Leaving the video also unmounts the player, and its replacement will be
-  // created muted (autoplay policy) — reset here rather than in the "Change
-  // video" button, so every route back to the welcome screen is covered
-  // (e.g. the last playable video turning out to be embed-blocked).
-  useEffect(() => {
-    if (videoId) {
-      storageSet('sws.lastVideo', videoId)
-      setLastVideoId(videoId)
-    } else {
-      setMuted(true)
-    }
-  }, [videoId])
-
-  // Keep the URL shareable: ?v=<id> while a video plays, clean on the
-  // welcome screen.
-  useEffect(() => {
-    if (isChecking && videoId === null && pendingDeepLink.current) return
-    const url = new URL(window.location.href)
-    if (videoId) url.searchParams.set('v', videoId)
-    else url.searchParams.delete('v')
-    window.history.replaceState(null, '', url)
-  }, [videoId, isChecking])
 
   // The countdown lives in the tab title too, so it's visible from whatever
   // tab the actual studying happens in.
@@ -208,60 +122,15 @@ export default function App() {
     setVideoPlaying(pomodoroPhase === 'focus')
   }, [pomodoroPhase])
 
-  const playable = useMemo(
-    () => playlist.videos.filter((v) => !blockedIds.includes(v.id)),
-    [blockedIds, playlist],
-  )
-
-  // A catalog update may remove a video already playing. Keep its label and
-  // playback until the user chooses another; the updated pickers omit it.
-  const currentVideoRef = useRef(playlist.videos[0])
-  const selectedVideo = playlist.videos.find(video => video.id === videoId)
-  if (selectedVideo) currentVideoRef.current = selectedVideo
-  const currentVideo = currentVideoRef.current
-  const filteredVideos = useMemo(() => filterVideos(playable, catalogFilters, favorites), [playable, catalogFilters, favorites])
-
-  const lastVideo = useMemo(
-    () => playable.find((v) => v.id === lastVideoId) ?? null,
-    [playable, lastVideoId],
-  )
-
   const chooseCaptionLang = useCallback((code: string | null) => {
     setCaptionLang(code)
     if (code) storageSet('sws.captionLang', code)
     else storageRemove('sws.captionLang')
   }, [])
 
-  const toggleFavorite = useCallback((id: string) => {
-    setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]))
-  }, [])
-
-  const handleUnplayable = useCallback(() => {
-    if (!videoId || blockedIds.includes(videoId)) return
-    setBlockedIds((prev) => [...prev, videoId])
-    showNotice("That video won't play embedded — skipped to another one")
-    setVideoId(pickRandom(filteredVideos.filter((v) => v.id !== videoId)))
-  }, [videoId, blockedIds, filteredVideos, showNotice])
-
   const handleApiUnavailable = useCallback((message?: string) => {
     showNotice(message ?? 'Couldn’t reach YouTube — check your internet connection, then pick a video to retry', 8000)
   }, [showNotice])
-
-  const handleEnded = useCallback(() => {
-    const next = pickRandom(filteredVideos, videoId ?? undefined)
-    if (next && next === videoId) videoRef.current?.restart()
-    else setVideoId(next)
-  }, [filteredVideos, videoId])
-
-  const handleSurprise = useCallback(() => {
-    setVideoId(pickRandom(filteredVideos))
-  }, [filteredVideos])
-  const handlePreviousVideo = useCallback(() => {
-    setVideoId(prev => adjacentVideo(filteredVideos, prev, -1) ?? prev)
-  }, [filteredVideos])
-  const handleNextVideo = useCallback(() => {
-    setVideoId(prev => adjacentVideo(filteredVideos, prev, 1) ?? prev)
-  }, [filteredVideos])
 
   const handleTogglePlay = useCallback(() => setVideoPlaying((p) => !p), [])
   const loadTaskDuration = useCallback(
@@ -269,16 +138,11 @@ export default function App() {
       setTaskDuration(seconds)
       setDockCollapsed(false)
       setTopPanel('timer')
+      document.getElementById('tab-timer')?.focus()
       showNotice(`Timer set to ${Math.round(seconds / 60)} minutes — press Start when you’re ready`, 4000)
     },
     [setTaskDuration, showNotice],
   )
-  // The slider is an explicit gesture, so it may also unmute (autoplay policy).
-  const handleVolumeChange = useCallback((v: number) => {
-    setVolume(v)
-    setMuted(false)
-  }, [])
-  const handleUnmute = useCallback(() => setMuted(false), [])
   const handleSetPauseOnBreak = useCallback((v: boolean) => {
     setPauseOnBreak(v)
     storageSet('sws.pauseOnBreak', v ? '1' : '0')
@@ -300,16 +164,30 @@ export default function App() {
   useEffect(() => {
     if (videoId === null) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey) return
+      if (e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return
       const target = e.target as HTMLElement
       if (!(target instanceof HTMLElement)) return
+      if (e.key === 'Escape') {
+        // Local editors can prevent this event. Native disclosures close before
+        // navigation, retaining a useful focus target in the current screen.
+        const disclosure = target.closest<HTMLDetailsElement>('details[open]')
+        e.preventDefault()
+        if (disclosure) {
+          disclosure.open = false
+          disclosure.querySelector('summary')?.focus()
+        } else if (document.fullscreenElement) void document.exitFullscreen()
+        else returnToCatalog()
+        return
+      }
       // Typing fields own every key.
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) {
         return
       }
+      if (!preferences.singleKeyShortcuts && [' ', 'f', 'm', 't', 'z'].includes(e.key.toLowerCase())) return
       // Buttons/links own only their activation keys — a focused Start button
       // (focus lingers after any click) shouldn't swallow F/M/T/Z.
-      if (['BUTTON', 'A', 'SUMMARY'].includes(target.tagName) && (e.key === ' ' || e.key === 'Enter')) {
+      if (target.closest('button, a, summary, [role="tab"]') &&
+          (e.key === ' ' || e.key === 'Enter' || e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End')) {
         return
       }
       switch (e.key) {
@@ -329,7 +207,7 @@ export default function App() {
           break
         case 'm':
         case 'M':
-          setMuted((m) => !m) // a keypress is an explicit gesture too
+          toggleMute()
           break
         case 't':
         case 'T':
@@ -342,34 +220,28 @@ export default function App() {
             return !z
           })
           break
-        case 'Escape':
-          setZen(false)
-          setAppearanceOpen(false)
-          break
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [videoId, showNotice])
+  }, [videoId, showNotice, toggleMute, preferences.singleKeyShortcuts, returnToCatalog])
 
   if (videoId === null) {
     return (
       <>
         <WelcomeScreen
-          progression={progression}
-          onUpdateProfile={updateProfile}
           filters={catalogFilters}
           onFiltersChange={setCatalogFilters}
           videos={playable}
           favorites={favorites}
           lastVideo={lastVideo}
-          theme={theme}
-          onSetTheme={setTheme}
-          customColor={customColor}
-          onSetCustomColor={setCustomColor}
-          onSelect={setVideoId}
+          settings={settings}
+          history={historyView}
+          onSelect={selectVideo}
+          queue={queue}
+          onQueue={queueVideo}
           onSurprise={handleSurprise}
-          runningTimer={timer.isRunning ? timer.label : null}
+          timerLabel={timer.label} timerRunning={timer.isRunning} onToggleTimer={timer.toggle}
         />
 
       </>
@@ -378,48 +250,44 @@ export default function App() {
 
   return (
     <div className={'study-workspace' + (dockCollapsed ? ' tools-hidden' : '') + (zen ? ' is-zen' : '')}>
-      <header className="workspace-toolbar">
-        <div className="min-w-0 flex-1">
+      <a href="#playback-controls" className="skip-link">Skip to video controls</a>
+      <a href="#workspace-tools" className="skip-link" onClick={() => { setDockCollapsed(false); setZen(false) }}>Skip to study tools</a>
+      <header className="workspace-toolbar" onKeyDown={handleButtonArrows}>
+        <button ref={backButton} onClick={returnToCatalog}
+          aria-label="Back to video selection" aria-keyshortcuts="Escape" title="Back to video selection (Esc)"
+          className="workspace-button workspace-back toolbar-icon"><UIIcon name="arrowLeft" size={20} /></button>
+        <div className="workspace-heading">
           <p className="workspace-brand"><span className="brand-mark"><UIIcon name="leaf" size={20} /></span>study with soobin</p>
           <p className="workspace-video-title" title={currentVideo.title}>{currentVideo.title}</p>
         </div>
         <div className="toolbar-actions">
           {zen ? <button onClick={() => setZen(false)} className="workspace-button"><UIIcon name="leaf" />Exit zen</button> : <>
-            {muted && volume > 0 && <button onClick={handleUnmute} className="workspace-button"><UIIcon name="volume" />Unmute</button>}
-            <button onClick={() => setVideoId(null)} aria-label="Back to video selection" className="workspace-button"><UIIcon name="video" />Change video</button>
             <button onClick={() => setDockCollapsed(v => !v)} aria-expanded={!dockCollapsed} aria-controls="workspace-tools" className="workspace-button"><UIIcon name="panel" />{dockCollapsed ? 'Show tools' : 'Hide tools'}</button>
             <button onClick={() => { setDockCollapsed(false); setTopPanel('tasks') }} aria-controls="tool-tasks" className={'workspace-button' + (!dockCollapsed && topPanel === 'tasks' ? ' selected' : '')}><UIIcon name="tasks" />Tasks</button>
-            <ProfileLevelButton progression={progression} onClick={openProfile} />
-            <button onClick={() => setAppearanceOpen(value => !value)} aria-expanded={appearanceOpen} aria-controls="workspace-appearance" className={'workspace-button' + (appearanceOpen ? ' selected' : '')}><UIIcon name="palette" />Appearance</button>
             <button onClick={toggleFullscreen} aria-label="Toggle fullscreen" title="Fullscreen (F)" className="workspace-button toolbar-icon"><UIIcon name="fullscreen" /></button>
             <button onClick={() => setZen(true)} aria-label="Zen mode — hide all panels" title="Zen mode (Z)" className="workspace-button toolbar-icon"><UIIcon name="leaf" /></button>
           </>}
         </div>
       </header>
-      {appearanceOpen && !zen && <AppearancePanel theme={theme} onSetTheme={setTheme} customColor={customColor} onSetCustomColor={setCustomColor} opacity={panelOpacity} onSetOpacity={setPanelOpacity} />}
       {notice && <div role="status" className="workspace-notice">{notice}</div>}
       <main className="workspace-main">
-        <div className="video-stage" aria-label="Study video">
-          <VideoBackground ref={videoRef} videoId={videoId} volume={volume} muted={muted} isPlaying={videoPlaying} captionLang={captionLang} onEnded={handleEnded} onPlayingChange={setVideoPlaying} onUnplayable={handleUnplayable} onApiUnavailable={handleApiUnavailable} />
+        <div className="video-stage" role="group" aria-label="Study video">
+          <VideoBackground ref={videoRef} videoId={videoId} volume={volume} muted={muted} isPlaying={videoPlaying} captionLang={captionLang} onEnded={handleEnded} onPlayingChange={setVideoPlaying} onVideoStarted={onVideoStarted} onUnplayable={handleUnplayable} onApiUnavailable={handleApiUnavailable} />
         </div>
         <div hidden={zen}>
-          <VideoControls videoId={videoId} onPreviousVideo={handlePreviousVideo} onNextVideo={handleNextVideo} canNavigate={filteredVideos.some(v => v.id !== videoId)} player={videoRef} isPlaying={videoPlaying} onTogglePlay={handleTogglePlay} captionLang={captionLang} onSetCaptionLang={chooseCaptionLang} />
+          <VideoControls videoId={videoId} onPreviousVideo={handlePreviousVideo} onNextVideo={handleNextVideo} canPrevious={filteredVideos.some(v => v.id !== videoId)} canNext={queuedVideos.length > 0 || filteredVideos.some(v => v.id !== videoId)} player={videoRef} isPlaying={videoPlaying} onTogglePlay={handleTogglePlay} volume={volume} muted={muted} onToggleMute={toggleMute} onVolumeChange={changeVolume} captionLang={captionLang} onSetCaptionLang={chooseCaptionLang} />
         </div>
       </main>
-      <aside id="workspace-tools" className="workspace-dock" hidden={dockCollapsed || zen} aria-label="Study tools">
-        <div className="tool-tabs" role="tablist" aria-label="Study tools">
-          {([{ id: 'timer', label: 'Timer', icon: 'timer' }, { id: 'sidebar', label: 'Videos & sound', icon: 'headphones' }, { id: 'tasks', label: 'Tasks', icon: 'tasks' }, { id: 'profile', label: 'Profile', icon: 'user' }] as const).map(tab =>
-            <button key={tab.id} id={`tab-${tab.id}`} role="tab" aria-selected={topPanel === tab.id} aria-controls={`tool-${tab.id}`} onClick={() => setTopPanel(tab.id)} className={'tool-tab' + (topPanel === tab.id ? ' selected' : '')}><UIIcon name={tab.icon} size={17} /><span>{tab.label}</span></button>
-          )}
-        </div>
-        <div className="tool-body scrollbar-thin">
-          <div role="tabpanel" id="tool-timer" aria-labelledby="tab-timer" hidden={topPanel !== 'timer'}><TimerCard timer={timer} pauseOnBreak={pauseOnBreak} onSetPauseOnBreak={handleSetPauseOnBreak} /></div>
-          <div role="tabpanel" id="tool-sidebar" aria-labelledby="tab-sidebar" hidden={topPanel !== 'sidebar'}><Sidebar filters={catalogFilters} onFiltersChange={setCatalogFilters} videos={playable} currentVideo={currentVideo} onSelectVideo={setVideoId} volume={volume} onVolumeChange={handleVolumeChange} playlistUrl={playlist.sourceUrl} favorites={favorites} onToggleFavorite={toggleFavorite} theme={theme} onSetTheme={setTheme} customColor={customColor} onSetCustomColor={setCustomColor} /></div>
-          <div role="tabpanel" id="tool-tasks" aria-labelledby="tab-tasks" hidden={topPanel !== 'tasks'}><TasksCard onUseDuration={loadTaskDuration} onTaskCompleted={completeTask} /></div>
-          <div role="tabpanel" id="tool-profile" aria-labelledby="tab-profile" hidden={topPanel !== 'profile'}><ProfileCard progression={progression} onUpdateProfile={updateProfile} /></div>
-        </div>
-        {topPanel !== 'timer' && <div className="dock-timer"><button onClick={() => setTopPanel('timer')} aria-label="Open timer"><UIIcon name="timer" size={16} /><span>{timer.label}</span><span className="timer-status">{timer.isRunning ? 'Running' : 'Open timer'}</span></button></div>}
-      </aside>
+      <StudyTools active={topPanel} onSelect={setTopPanel} hidden={dockCollapsed || zen}
+        timerLabel={timer.label} timerRunning={timer.isRunning} panels={{
+          timer: <TimerCard timer={timer} pauseOnBreak={pauseOnBreak} onSetPauseOnBreak={handleSetPauseOnBreak} />,
+          sidebar: <Sidebar filters={catalogFilters} onFiltersChange={setCatalogFilters} videos={playable} currentVideo={currentVideo} onSelectVideo={selectVideo} queue={queue} onQueue={queueVideo} playlistUrl={playlist.sourceUrl} favorites={favorites} onToggleFavorite={toggleFavorite} />,
+          tasks: <TasksCard onUseDuration={loadTaskDuration} onTaskCompleted={completeTask} />,
+          history: historyView,
+          profile: <ProfileCard progression={progression} onUpdateProfile={updateProfile} showMilestones={preferences.showMilestones} watchStats={watchStats} />,
+          social: <SocialCard />,
+          settings,
+        }} />
     </div>
   )
 }

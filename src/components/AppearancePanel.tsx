@@ -1,7 +1,7 @@
-import type { Theme } from '../App'
+import type { Theme } from '../lib/theme'
 import { ThemeSwitcher } from './ThemeSwitcher'
 
-interface Props {
+export interface AppearancePanelProps {
   theme: Theme
   onSetTheme: (theme: Theme) => void
   customColor: string
@@ -10,9 +10,9 @@ interface Props {
   onSetOpacity: (value: number) => void
 }
 
-export function AppearancePanel({ opacity, onSetOpacity, ...themeProps }: Props) {
+export function AppearancePanel({ opacity, onSetOpacity, ...themeProps }: AppearancePanelProps) {
   return (
-    <section id="workspace-appearance" className="workspace-appearance" aria-label="Appearance settings">
+    <section className="appearance-settings" aria-label="Appearance settings">
       <div>
         <p className="surface-label">Color palette</p>
         <ThemeSwitcher {...themeProps} expanded />

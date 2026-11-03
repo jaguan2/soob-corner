@@ -11,6 +11,8 @@
 // preset's matching stop, and we solve for whatever lightness hits it. Contrast
 // is then identical to the shipped preset for every hue the user can pick.
 
+export type Theme = 'light' | 'coffee' | 'dark' | 'custom'
+
 /** Each stop's hue offset from the picked colour, its saturation, and the
  *  light-preset colour whose luminance it must match. The creams sit on the
  *  base hue; accents and text run a few degrees off it, as the hand-tuned
@@ -104,7 +106,7 @@ function solveLightness(h: number, s: number, target: number): number {
 }
 
 /** `--cream-50` → `"253 251 247"` for every palette variable. The values are
- *  space-separated RGB triplets because tailwind.config.js reads them as
+ *  space-separated RGB triplets because config/tailwind.config.js reads them as
  *  `rgb(var(--x) / <alpha-value>)`. */
 export function deriveThemeVars(hex: string): [string, string][] {
   const base = hexToHsl(hex) ?? hexToHsl(DEFAULT_CUSTOM_COLOR)!

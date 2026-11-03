@@ -1,65 +1,74 @@
-import { memo, useMemo } from 'react'
-import type { Theme } from '../App'
+import { memo, useId, useMemo, useRef, useState, type ReactNode } from 'react'
+import { handleVideoArrows } from '../lib/keyboardNavigation'
 import type { Video } from '../types/playlist'
-import { ThemeSwitcher } from './ThemeSwitcher'
 import { VideoTile } from './VideoTile'
 import { CatalogFilters } from './CatalogFilters'
 import { filterVideos, type CatalogFilters as Filters } from '../lib/catalog'
 import { UIIcon } from './UIIcon'
-import { ProfileCard } from './ProfileCard'
-import { progressionLevel, type ProfileAvatar, type Progression } from '../lib/progression'
+import { PauseIcon, PlayIcon } from './icons'
+import { VideoQueue, type VideoQueueProps } from './VideoQueue'
 
 interface WelcomeScreenProps {
-  progression: Progression
-  onUpdateProfile: (name: string, avatar: ProfileAvatar) => boolean
-  runningTimer: string | null
+  timerLabel: string
+  timerRunning: boolean
+  onToggleTimer: () => void
   filters: Filters
   onFiltersChange: (value: Filters) => void
   videos: Video[]
   favorites: string[]
   /** The video from the previous session (if still playable), for one-click resume. */
   lastVideo: Video | null
-  theme: Theme
-  onSetTheme: (theme: Theme) => void
-  customColor: string
-  onSetCustomColor: (hex: string) => void
+  settings: ReactNode
+  history: ReactNode
   onSelect: (id: string) => void
   onSurprise: () => void
+  queue: VideoQueueProps
+  onQueue: (id: string) => void
 }
 
 function WelcomeScreenInner({
-  progression,
-  onUpdateProfile,
-  runningTimer,
+  timerLabel,
+  timerRunning,
+  onToggleTimer,
   filters,
   onFiltersChange,
   videos,
   favorites,
   lastVideo,
-  theme,
-  onSetTheme,
-  customColor,
-  onSetCustomColor,
+  settings,
+  history,
   onSelect,
   onSurprise,
+  queue,
+  onQueue,
 }: WelcomeScreenProps) {
   const sorted = useMemo(() => filterVideos(videos, filters, favorites), [videos, filters, favorites])
-  const level = useMemo(() => progressionLevel(progression), [progression])
+  const [openTool, setOpenTool] = useState<'settings' | 'history' | null>(null)
+  const settingsButton = useRef<HTMLButtonElement>(null)
+  const historyButton = useRef<HTMLButtonElement>(null)
+  const videoHelpId = useId()
 
   return (
-    <div className="catalog-welcome min-h-screen w-full">
-      <div className="welcome-theme-row">
-        <ThemeSwitcher
-          theme={theme}
-          onSetTheme={onSetTheme}
-          customColor={customColor}
-          onSetCustomColor={onSetCustomColor}
-        />
+    <div className="catalog-welcome min-h-screen w-full" onKeyDown={event => {
+      if (event.key !== 'Escape' || event.defaultPrevented || !openTool) return
+      event.preventDefault()
+      const disclosure = event.target instanceof HTMLElement ? event.target.closest<HTMLDetailsElement>('details[open]') : null
+      if (disclosure) { disclosure.open = false; disclosure.querySelector('summary')?.focus(); return }
+      setOpenTool(null)
+      const trigger = openTool === 'settings' ? settingsButton : historyButton
+      trigger.current?.focus()
+    }}>
+      <a href="#video-catalog" className="skip-link">Skip to video choices</a>
+      <div className="welcome-settings-row">
+        <button ref={historyButton} className="workspace-button" aria-expanded={openTool === 'history'} aria-controls="welcome-history" onClick={() => setOpenTool(value => value === 'history' ? null : 'history')}><UIIcon name="history" size={17} />Watch history</button>
+        <button ref={settingsButton} className="workspace-button" aria-expanded={openTool === 'settings'} aria-controls="welcome-settings" onClick={() => setOpenTool(value => value === 'settings' ? null : 'settings')}><UIIcon name="settings" size={17} />Settings</button>
       </div>
+      <div className="welcome-tool-content" id="welcome-history" hidden={openTool !== 'history'}>{history}</div>
+      <div className="welcome-tool-content welcome-settings-content" id="welcome-settings" hidden={openTool !== 'settings'}>{settings}</div>
       <div className="mx-auto max-w-5xl px-4 pb-10 pt-4 sm:px-6">
         <header className="welcome-header text-center">
           <span className="welcome-mark"><UIIcon name="leaf" size={25} /></span>
-          <h1 className="text-3xl font-semibold text-ink-900 dark:text-cream-100">
+          <h1 tabIndex={-1} className="text-3xl font-semibold text-ink-900 dark:text-cream-100">
             study with soobin
           </h1>
           <p className="mt-2 text-sm text-ink-700 dark:text-cream-300">
@@ -82,11 +91,17 @@ function WelcomeScreenInner({
             </button>
           )}
         </header>
-        <details className="welcome-profile">
-          <summary><span><UIIcon name="user" size={17} />Your profile · Level {level.level}</span><span>{level.totalXP.toLocaleString()} XP<UIIcon name="chevron" size={15} /></span></summary>
-          <ProfileCard progression={progression} onUpdateProfile={onUpdateProfile} />
-        </details>
-        {runningTimer && <p role="status" className="mt-4 rounded-xl bg-cream-100 px-4 py-2 text-center text-sm text-ink-800 dark:bg-ink-800 dark:text-cream-200">⏱ {runningTimer} · timer still running</p>}
+        <div className="welcome-timer" role="group" aria-label="Focus timer">
+          <UIIcon name="timer" size={20} />
+          <div className="welcome-timer-summary">
+            <span className="welcome-timer-time" role="timer" aria-live="off" aria-label="Time remaining">{timerLabel}</span>
+            <span className="welcome-timer-status" role="status">{timerRunning ? 'Timer running' : 'Timer paused'}</span>
+          </div>
+          <button onClick={onToggleTimer} aria-label={timerRunning ? 'Pause timer' : 'Start timer'} className="primary-button">
+            {timerRunning ? <PauseIcon size={16} /> : <PlayIcon size={16} />}{timerRunning ? 'Pause' : 'Start'}
+          </button>
+        </div>
+        <div className="mt-6"><VideoQueue {...queue} /></div>
         <div className="mt-8">
           <CatalogFilters videos={videos} value={filters} onChange={onFiltersChange} />
           <p className="mt-4 text-xs text-ink-700 dark:text-cream-300">{sorted.length} of {videos.length} videos</p>
@@ -103,14 +118,14 @@ function WelcomeScreenInner({
           </p>
         )}
 
-        <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4">
-          {sorted.map(video => <VideoTile key={video.id} video={video} favorite={favorites.includes(video.id)} onSelect={onSelect} />)}
-        </div>
+        <p id={videoHelpId} className="sr-only">Use arrow keys to move between videos. Enter or Space plays the focused video or activates its queue button. Home and End jump to the first and last video.</p>
+        <ul id="video-catalog" tabIndex={-1} aria-label="Study videos" aria-describedby={videoHelpId} onKeyDown={handleVideoArrows} className="mt-4 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4">
+          {sorted.map(video => <VideoTile key={video.id} video={video} favorite={favorites.includes(video.id)} onSelect={onSelect} queued={queue.videos.some(item => item.id === video.id)} onQueue={onQueue} />)}
+        </ul>
       </div>
     </div>
   )
 }
 
-// memo: the timer keeps ticking in App while the welcome screen is shown
-// (after "Change video"); nothing here depends on it.
+// Keep the catalog calculation stable while the welcome countdown updates.
 export const WelcomeScreen = memo(WelcomeScreenInner)

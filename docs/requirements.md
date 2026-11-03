@@ -1,5 +1,8 @@
-Study w/ Soobin — Requirements
-==============================
+# Original product requirements
+
+Historical starting scope for Study w/ Soobin. Several features listed as out
+of scope below have since shipped. See the [current app guide](app-guide.md)
+for today's functionality, stack, and setup.
 
 This is a plain-language requirements spec, not a Python pip file (this
 project has no Python dependencies; JS/TS dependencies are pinned in
@@ -45,7 +48,7 @@ Non-functional requirements
 
 Desktop app (implemented)
 ---------------------------
-- `desktop.py` + `build-exe.bat` package the app as a single Windows
+- `desktop/launcher.py` + `scripts/build-exe.bat` package the app as a single Windows
   executable (`StudyWithSoobin.exe`, kept at the repo root so users can
   download it straight from GitHub) via pywebview + PyInstaller, following
   the same pattern as the TaskNook project. Favorites and theme persist

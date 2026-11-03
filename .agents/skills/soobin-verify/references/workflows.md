@@ -27,7 +27,7 @@ heading and Search videos field before driving it.
 | --- | --- | --- | --- |
 | Catalog discovery | Welcome screen, Search videos, member/type chips, Filters | Result count changes, empty state appears for a non-match, Clear filters restores the full count | `src/components/CatalogFilters.tsx`, `src/lib/catalog.test.ts` |
 | Timer lifecycle | Pick a video, Timer tab, Start, another tab, Open timer, Pause | Countdown continues while its panel is hidden and stops when paused | `src/components/TimerPanel.tsx`, `src/hooks/useTimer.ts` |
-| Study plan | Pick a video, Study plan tab, task input, task estimate | Task remains across tab switches; choosing its duration updates the timer | `src/components/TasksCard.tsx`, `src/lib/taskPlanning.test.ts` |
+| Study plan | Pick a video, Tasks tab, task input, task estimate | Task remains across tab switches; choosing its duration updates the timer | `src/components/TasksCard.tsx`, `src/lib/taskPlanning.test.ts` |
 | Media/captions | Pick a playable video, playback controls, CC | Real player begins playing; selected subtitles are visible in a screenshot | `src/components/VideoBackground.tsx`, `src/lib/videoPlayback.test.ts` |
 
 For a deterministic catalog smoke check, record the initial `N of N videos`
@@ -37,8 +37,8 @@ and confirm the original count and an enabled Surprise me return. Capture the
 empty state and restored state. This exercises actual controls without depending
 on network playback or modifying the catalog.
 
-For timer lifecycle, choose a video, use the Timer tab's Start button, and
-record its displayed time. Switch to Study plan, observe the running timer
+For timer lifecycle, choose a video, use the Timer tab's Start focus button, and
+record its displayed time. Switch to Tasks, observe the running timer
 footer decrease, use Open timer and Pause, then confirm it stops decreasing.
 Do not wait for a full focus block or credit fake study minutes. If YouTube
 cannot play, report that separately; do not count a player error as a timer

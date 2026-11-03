@@ -1,0 +1,39 @@
+# Documentation
+
+## Using and developing the app
+
+- [App guide](app-guide.md): features, local setup, video curation, and desktop builds.
+- [Keyboard access](accessibility.md): navigation controls, shortcut preferences, and accessibility checks.
+- [Repository layout](app-guide.md#project-structure): where application, desktop,
+  configuration, maintenance, and generated files belong.
+- [Screenshots and feature walkthrough](screenshots.md): examples of the app's main screens.
+- [Profile progression](LEVELS.md): XP, levels, milestones, check-ins, and lifetime study time.
+- [Watch history](watch-history.md): recent videos, rewatches, member counts, and local persistence.
+- [TXT social accounts](social.md): the Social tab, account links, and verification sources.
+- [TXT video catalog](video-catalog.md): the generated, member-organized collection of video links.
+- [Appearance refresh](ui-refresh.md): the TaskNook-inspired design choices.
+- [Stability test](stability-test.md): reproduced bugs, patches, verification, and remaining manual checks.
+
+## Repository guidance
+
+- [Structure and scalability review](architecture-review.md): module boundaries,
+  regression coverage, and prioritized next refactors.
+- [Recent code and UI/UX review](recent-changes-review.md): findings, fixes, and verification for the latest changes.
+- [Agent instructions](AGENTS.md): current architecture and maintenance rules.
+- [Earlier Claude guide](CLAUDE.md): retained reference; use the current agent instructions above.
+
+## Historical notes
+
+- [Original requirements](requirements.md): the starting product scope.
+- [Code review findings](FINDINGS.md): earlier reviews and feature opportunities.
+- [TaskNook feature comparison](TASKNOOK_PORT.md): the earlier study-plan and daily-goal work.
+
+Screenshot assets are stored in [images](images/). The short README and agent
+entry files remain at the repository root for GitHub and tool discovery.
+`requirements-desktop.txt` stays at the root because it is an executable pip
+dependency manifest, rather than a project document.
+
+## Catalog and agent workflows
+
+- [Catalog discovery and updates](CATALOG_UPDATES.md): reviewed public-source discovery and startup catalog downloads.
+- [Shared agent skills](AGENT_SKILLS.md): project adapters, the pinned toolkit, and setup.

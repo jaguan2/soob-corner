@@ -1,14 +1,8 @@
-# CLAUDE.md
+# Claude Code guidance
 
-Read and follow [AGENTS.md](AGENTS.md) before working in this repository. It is
-the canonical source for project architecture, commands, catalog curation,
-engineering workflow and verification requirements.
+Read [AGENTS.md](AGENTS.md) before working in this repository. Its canonical
+[project guide](docs/AGENTS.md) contains current architecture, commands, required
+TXT discovery, engineering workflow, and verification rules for both agents.
 
-For **every coding task**, perform the required TXT discovery check described
-in AGENTS.md, including new Soobin and other TXT members' vlogs and live archives.
-Use public YouTube feeds/pages, targeted searches or the research script;
-no YouTube API key is required. Report the findings or access limitation;
-never treat an unsuccessful check as evidence that no new videos exist.
-
-Keep project-wide instructions in AGENTS.md so Claude and Codex do not follow
-conflicting copies of the architecture or catalog rules.
+[docs/CLAUDE.md](docs/CLAUDE.md) is an older reference; current project instructions
+in `docs/AGENTS.md` take precedence. Paths there are relative to the repository root.

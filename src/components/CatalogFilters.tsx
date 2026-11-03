@@ -1,3 +1,4 @@
+import { handleButtonArrows } from '../lib/keyboardNavigation'
 import { useId, useRef, useState } from 'react'
 import type { Video } from '../types/playlist'
 import { catalogDate, EMPTY_FILTERS, MEMBERS, type CatalogFilters as Filters } from '../lib/catalog'
@@ -42,6 +43,7 @@ export function CatalogFilters({ videos, value, onChange }: Props) {
   return (
     <section className="catalog-discovery" aria-label="Find study videos" onKeyDown={e => {
       if (e.key === 'Escape' && expanded) {
+        e.preventDefault()
         e.stopPropagation()
         setExpanded(false)
         filterButton.current?.focus()
@@ -53,7 +55,7 @@ export function CatalogFilters({ videos, value, onChange }: Props) {
         {value.query && <button className="catalog-search-clear" aria-label="Clear search" onClick={() => { onChange({ ...value, query: '' }); searchInput.current?.focus() }}><CloseIcon /></button>}
       </div>
       <div className="catalog-member-row">
-      <div ref={memberRail} className="catalog-chip-rail" role="group" aria-label="Filter by member">
+      <div ref={memberRail} className="catalog-chip-rail" role="group" aria-label="Filter by member" onKeyDown={handleButtonArrows}>
         {[{ value: '', label: 'All members' }, ...MEMBERS].map(member =>
           <button key={member.value} aria-pressed={value.member === member.value} className="catalog-chip" onClick={() => onChange({ ...value, member: member.value as Filters['member'] })}>{member.label}</button>
         )}
@@ -64,7 +66,7 @@ export function CatalogFilters({ videos, value, onChange }: Props) {
       }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m9 5 7 7-7 7" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
       </div>
       <div className="catalog-filter-toolbar">
-        <div className="catalog-type-chips" role="group" aria-label="Filter by video type">
+        <div className="catalog-type-chips" role="group" aria-label="Filter by video type" onKeyDown={handleButtonArrows}>
           {TYPES.map(type => <button key={type.value} aria-pressed={(value.kind ?? '') === type.value} className="catalog-type" onClick={() => onChange({ ...value, kind: type.value })}>{type.label}</button>)}
         </div>
         <button ref={filterButton} className="catalog-filter-button" aria-expanded={expanded} aria-controls={panelId} onClick={() => setExpanded(v => !v)}>
@@ -93,7 +95,7 @@ export function CatalogFilters({ videos, value, onChange }: Props) {
         </fieldset>
       </div>}
       <div className="catalog-results-tools">
-        <div className="catalog-active-filters" aria-label="Selected filters">
+        <div className="catalog-active-filters" role="group" aria-label="Selected filters">
           {refinements.map(filter => <button key={filter.label} className="catalog-removable-chip" aria-label={'Remove ' + filter.label + ' filter'} onClick={filter.clear}>{filter.label}<CloseIcon /></button>)}
           {active && <button className="catalog-reset" onClick={() => onChange(EMPTY_FILTERS)}>Clear filters</button>}
         </div>
