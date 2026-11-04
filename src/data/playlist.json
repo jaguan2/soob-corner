@@ -1,7 +1,7 @@
 {
   "title": "Study w/ Soobin",
   "sourceUrl": "https://www.youtube.com/playlist?list=PLwzQP2wCE5w4hRj01BS0zxO2Bu8eaBDWt",
-  "fetchedAt": "2026-10-03T01:44:23.806Z",
+  "fetchedAt": "2026-11-03T23:16:44.492Z",
   "videos": [
     {
       "id": "Zgcmu8Wpsdc",
@@ -47,7 +47,7 @@
     },
     {
       "id": "_YjRPbg5ZRA",
-      "title": "토끼상의 새 친구(이)가 나타났다! 효과는 굉장했다!   「채씨표류기」 8화",
+      "title": "A new friend for the rabbit-face has appeared! It was super effective! 「Chae’s Castaway」 Episode 8",
       "duration": "33:39",
       "durationSeconds": 2019,
       "thumbnail": "https://i.ytimg.com/vi/_YjRPbg5ZRA/hqdefault.jpg",
@@ -57,7 +57,8 @@
       "kind": "other",
       "publishedAt": "2023-10-20",
       "broadcastDate": null,
-      "channel": "채씨표류기"
+      "channel": "채씨표류기",
+      "originalTitle": "토끼상의 새 친구(이)가 나타났다! 효과는 굉장했다!   「채씨표류기」 8화"
     },
     {
       "id": "wB57ZVKJfzY",
@@ -1338,7 +1339,7 @@
     },
     {
       "id": "ujWyDnIjHoo",
-      "title": "중국어는 너무 어려워 #1 | TXT-LOG | TXT (투모로우바이투게더)️",
+      "title": "TXT-LOG Huening's Chinese Challenge",
       "duration": "17:34",
       "durationSeconds": 1054,
       "thumbnail": "https://i.ytimg.com/vi/ujWyDnIjHoo/hqdefault.jpg",
@@ -1348,7 +1349,8 @@
       "kind": "vlog",
       "publishedAt": "2026-01-29",
       "broadcastDate": null,
-      "channel": "TOMORROW X TOGETHER OFFICIAL"
+      "channel": "TOMORROW X TOGETHER OFFICIAL",
+      "originalTitle": "중국어는 너무 어려워 #1 | TXT-LOG | TXT (투모로우바이투게더)️"
     },
     {
       "id": "n1hx82U1XIc",
@@ -3064,7 +3066,7 @@
     },
     {
       "id": "2gIZzQXs5es",
-      "title": "[MULTI SUB] TXT WEVERSE LIVE (2026.05.23) | YEONJUN LIVE",
+      "title": "[MULTI SUB] TXT WEVERSE LIVE (05/23/2026) | YEONJUN LIVE",
       "duration": "1:15:37",
       "durationSeconds": 4537,
       "thumbnail": "https://i.ytimg.com/vi/2gIZzQXs5es/hqdefault.jpg",
@@ -3074,7 +3076,8 @@
       "kind": "live",
       "publishedAt": "2026-05-23",
       "broadcastDate": "2026-05-23",
-      "channel": "TomorrowByEdits"
+      "channel": "TomorrowByEdits",
+      "originalTitle": "[MULTI SUB] TXT WEVERSE LIVE (2026.05.23) | YEONJUN LIVE"
     },
     {
       "id": "slQJe4MUn1c",
@@ -3234,7 +3237,7 @@
     },
     {
       "id": "jbm-bWsw7XQ",
-      "title": "[MULTI SUB] TXT WEVERSE LIVE (2026.05.27) | TAEHYUN LIVE",
+      "title": "[MULTI SUB] TXT WEVERSE LIVE (05/27/2026) | TAEHYUN LIVE",
       "duration": "33:54",
       "durationSeconds": 2034,
       "thumbnail": "https://i.ytimg.com/vi/jbm-bWsw7XQ/hqdefault.jpg",
@@ -3244,7 +3247,8 @@
       "kind": "live",
       "publishedAt": "2026-05-27",
       "broadcastDate": "2026-05-27",
-      "channel": "TomorrowByEdits"
+      "channel": "TomorrowByEdits",
+      "originalTitle": "[MULTI SUB] TXT WEVERSE LIVE (2026.05.27) | TAEHYUN LIVE"
     },
     {
       "id": "h_HLXwg9aQA",
@@ -3262,7 +3266,7 @@
     },
     {
       "id": "jTek-EKJgpU",
-      "title": "[MULTI SUB] TXT WEVERSE LIVE (2026.05.24) | HUENING KAI LIVE",
+      "title": "[MULTI SUB] TXT WEVERSE LIVE (05/24/2026) | HUENING KAI LIVE",
       "duration": "30:16",
       "durationSeconds": 1816,
       "thumbnail": "https://i.ytimg.com/vi/jTek-EKJgpU/hqdefault.jpg",
@@ -3272,7 +3276,8 @@
       "kind": "live",
       "publishedAt": "2026-05-24",
       "broadcastDate": "2026-05-24",
-      "channel": "TomorrowByEdits"
+      "channel": "TomorrowByEdits",
+      "originalTitle": "[MULTI SUB] TXT WEVERSE LIVE (2026.05.24) | HUENING KAI LIVE"
     },
     {
       "id": "_tpiUiHlB20",

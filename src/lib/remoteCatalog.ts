@@ -12,6 +12,7 @@ function isVideo(value: unknown): value is Video {
   if (!record(value)) return false
   return typeof value.id === 'string' && /^[\w-]{11}$/.test(value.id) &&
     typeof value.title === 'string' && value.title.length > 0 &&
+    (value.originalTitle === undefined || (typeof value.originalTitle === 'string' && value.originalTitle.trim().length > 0)) &&
     typeof value.duration === 'string' && /^\d+:\d{2}(?::\d{2})?$/.test(value.duration) &&
     typeof value.durationSeconds === 'number' && Number.isFinite(value.durationSeconds) && value.durationSeconds > 0 &&
     typeof value.thumbnail === 'string' && /^https:\/\/i\.ytimg\.com\//.test(value.thumbnail) &&

@@ -85,6 +85,14 @@ document. These tests do not verify live playback or interactive browser behavio
 
 ## Architecture
 
+`i18n/LanguageProvider` owns the separate validated `sws.language` preference
+and document `lang`; English is the default, with Simplified Chinese, Korean
+and Spanish alternatives. `useLanguage` supplies explicit typed message lookup
+from complete dictionaries. Translate app-owned labels, never user task/name
+text, catalog titles or stored identifiers. Keep subtitle language independent.
+Language changes update context without remounting timer/media/panels or changing
+reward/persistence effect dependencies. See [interface languages](languages.md).
+
 `App.tsx` composes feature hooks and views. `useAppearance` owns saved theme,
 custom color, panel opacity, and root styles; the shared `Theme` type lives in
 `lib/theme.ts`, never in `App`. `useVideoAudio` owns volume, mute, and audio gestures.
@@ -130,7 +138,13 @@ overwrites unreadable history. `lib/watchHistory.ts` validates snapshots and
 derives distinct-video, play, and per-member totals. `VideoBackground` reports
 the first confirmed PLAYING per selection/replay through `onVideoStarted`;
 pause/resume and stale events must not add plays. App connects this callback to
-the history hook. `WatchHistoryCard` is shared by History and the welcome screen;
+the history hook. `WatchHistoryCard` is shared by the History dock panel and the
+welcome screen's full-page Watch history tab. `WelcomeScreen` owns separate
+Videos/Watch history browsing tabs and its Settings disclosure. Both browsing
+panels remain mounted with `hidden`, retaining filters while switching tabs.
+History uses page scrolling, with no popover or height cap. Its shared card uses
+an h1 in the welcome view and h2 in the dock. The return-focus fallback targets
+`#welcome-videos h1` so it never chooses the hidden history heading.
 `WatchStats` renders the same history's totals inside Profile. Group videos
 count once overall and once for each featured member. Tracking starts with this
 feature; do not fabricate history from saved positions or the last selection.
@@ -174,6 +188,14 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
   failures. Research candidates with `scripts/research-catalog.mjs`, review the
   ignored research JSON, then run `scripts/curate-research.mjs` and inspect its
   diff before refreshing.
+  Title refreshes request an English session. `scripts/catalog-titles.mjs`
+  prefers the watch-page title, falls back to the original and retains a different
+  original in optional `Video.originalTitle`. Never invent translations. The
+  `--titles-only` refresh updates existing labels without changing IDs, order or
+  non-title metadata. Classification continues to use the original metadata.
+  Catalog/history search includes both labels. History display resolves current
+  catalog labels separately from playability, including session-blocked entries;
+  reading history must not rewrite snapshots or play counts.
   `useVideoCatalog` owns shared search/member/type/solo/favorites/date/sort state;
   `lib/catalog.ts` applies it to both video pickers, random selection and
   ordered previous/next controls. `VideoTile` supplies readable video cards. Changing filters

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLanguage } from '../i18n/useLanguage'
 import {
   editProfile, initializeStudyTime, normalizeProgression, PROGRESSION_KEY, recordCheckIn,
   rememberCompletedTasks, rewardFocusSession, rewardTaskCompletion, syncFocusHistory,
@@ -41,6 +42,9 @@ function createSession() {
 }
 
 export function useProgression(onNotice: (message: string) => void) {
+  const { t, text } = useLanguage()
+  const languageRef = useRef({ t, text })
+  languageRef.current = { t, text }
   const [session] = useState(createSession)
   const [progression, setProgression] = useState(session.getSnapshot)
   const saveWarningShown = useRef(false)
@@ -52,9 +56,9 @@ export function useProgression(onNotice: (message: string) => void) {
       }
     } else {
       saveWarningShown.current = false
-      if (result.earned > 0) onNotice(result.leveledUp
-        ? `Level ${result.level}! +${result.earned} XP · ${result.activity}`
-        : `+${result.earned} XP · ${result.activity}`)
+      if (result.earned > 0) onNotice(languageRef.current.t(result.leveledUp
+        ? 'Level {level}! +{xp} XP · {activity}' : '+{xp} XP · {activity}',
+      { level: result.level, xp: result.earned, activity: languageRef.current.text(result.activity ?? '') }))
     }
     return result.saved
   }, [session, onNotice])

@@ -11,7 +11,7 @@ export function useVideoScreenFocus(videoId: string | null) {
     if (videoId === null && previous !== null) {
       const card = [...document.querySelectorAll<HTMLButtonElement>('.catalog-welcome button[data-video-action="play"]')]
         .find(button => button.dataset.videoId === previous)
-      const fallback = document.querySelector<HTMLElement>('.catalog-welcome h1')
+      const fallback = document.querySelector<HTMLElement>('#welcome-videos h1')
       const destination = card ?? fallback
       destination?.focus()
     }

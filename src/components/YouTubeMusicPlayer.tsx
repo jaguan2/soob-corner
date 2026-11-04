@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/useLanguage'
 import { useEffect, useRef, useState } from 'react'
 import { loadYouTubeIframeApi } from '../hooks/useYouTubeIframeApi'
 import { storageGet, storageSet } from '../lib/storage'
@@ -27,6 +28,7 @@ interface YouTubeMusicPlayerProps {
 }
 
 export function YouTubeMusicPlayer({ videoId, isPlaylist }: YouTubeMusicPlayerProps) {
+  const { t } = useLanguage()
   const containerRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<YT.Player | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -172,17 +174,16 @@ export function YouTubeMusicPlayer({ videoId, isPlaylist }: YouTubeMusicPlayerPr
       <div className="rounded-xl border border-cream-300 bg-white/80 px-3 py-3 text-xs text-ink-700 dark:border-ink-700 dark:bg-ink-800/80 dark:text-cream-300">
         {error === 'api' ? (
           <>
-            <p className="font-medium">Couldn't reach YouTube.</p>
+            <p className="font-medium">{t("Couldn't reach YouTube.")}</p>
             <p className="mt-1 opacity-75">
-              Check your internet connection, then pick the station again to retry.
+              {t('Check your internet connection, then pick the station again to retry.')}
             </p>
           </>
         ) : (
           <>
-            <p className="font-medium">This station won't play here.</p>
+            <p className="font-medium">{t("This station won't play here.")}</p>
             <p className="mt-1 opacity-75">
-              Its owner disabled embedding, or the livestream restarted under a new link. Pick
-              another station, or paste a link below.
+              {t('Its owner disabled embedding, or the livestream restarted under a new link. Pick another station, or paste a link below.')}
             </p>
           </>
         )}
@@ -226,33 +227,33 @@ export function YouTubeMusicPlayer({ videoId, isPlaylist }: YouTubeMusicPlayerPr
         {isPlaylist ? (
           <ControlButton
             onClick={() => playerRef.current?.previousVideo?.()}
-            label="Previous track"
+            label={t('Previous track')}
             disabled={!ready}
           >
             <SkipIcon direction="back" />
           </ControlButton>
         ) : (
-          <ControlButton onClick={() => seekBy(-10)} label="Back 10 seconds" disabled={!ready}>
+          <ControlButton onClick={() => seekBy(-10)} label={t("Back 10 seconds")} disabled={!ready}>
             <SeekIcon direction="back" size={14} />
           </ControlButton>
         )}
-        <ControlButton onClick={togglePlay} label={isPlaying ? 'Pause music' : 'Play music'} disabled={!ready} primary>
+        <ControlButton onClick={togglePlay} label={t(isPlaying ? 'Pause music' : 'Play music')} disabled={!ready} primary>
           {isPlaying ? <PauseIcon size={12} /> : <PlayIcon size={12} />}
         </ControlButton>
         {isPlaylist ? (
           <ControlButton
             onClick={() => playerRef.current?.nextVideo?.()}
-            label="Next track"
+            label={t('Next track')}
             disabled={!ready}
           >
             <SkipIcon direction="forward" />
           </ControlButton>
         ) : (
-          <ControlButton onClick={() => seekBy(10)} label="Forward 10 seconds" disabled={!ready}>
+          <ControlButton onClick={() => seekBy(10)} label={t("Forward 10 seconds")} disabled={!ready}>
             <SeekIcon direction="forward" size={14} />
           </ControlButton>
         )}
-        <Slider value={volume} onChange={changeVolume} ariaLabel="Music volume" className="ml-1 flex-1" />
+        <Slider value={volume} onChange={changeVolume} ariaLabel={t('Music volume')} className="ml-1 flex-1" />
       </div>
     </div>
   )

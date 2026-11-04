@@ -14,6 +14,26 @@ documentation. Capture the running app, including real playback when available.
 
 ## Current dark-mode screenshots
 
+### Interface languages — November 3, 2026
+
+Settings offers English, Simplified Chinese, Korean and Spanish. These isolated
+demo captures show Chinese settings and the Spanish timer at a 375px viewport.
+The timer crop excludes a simulated background player; it does not verify live
+media. Language changes preserve the current study session and saved user text.
+
+![Simplified Chinese interface and language setting](images/language-settings.jpg)
+
+![Spanish timer with readable mobile presets](images/language-timer-spanish.jpg)
+
+### English-preferred video labels — November 3, 2026
+
+This real catalog entry uses YouTube's English watch-page title. Its Korean
+original remains searchable and available in the card tooltip. Titles without
+an English version remain in their original language. The capture uses an
+isolated browser profile and does not imply that playback was verified.
+
+![YouTube-supplied English video title](images/english-title.jpg)
+
 ### Mobile timer and welcome controls — November 3, 2026
 
 The narrow-screen dock grows with its content so Start and quick durations use
@@ -36,6 +56,12 @@ This capture uses an isolated browser profile with three catalog videos queued.
 ![Saved video queue and Add to queue controls](images/video-queue.jpg)
 
 ### Watch history and viewing stats — November 3, 2026
+
+The welcome screen's **Watch history** tab opens a dedicated full-page list, with
+**Videos** alongside it for returning to discovery. This capture uses four real
+catalog entries in an isolated demo history; it does not depict personal data.
+
+![Dedicated Watch history browsing tab](images/watch-history-page.jpg)
 
 History shows recent videos, member/search filters, replay and queue actions.
 Profile separates distinct videos from total plays and counts shared videos for

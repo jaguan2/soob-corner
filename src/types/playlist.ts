@@ -3,6 +3,8 @@ export type Member = 'soobin' | 'yeonjun' | 'beomgyu' | 'taehyun' | 'hueningkai'
 export interface Video {
   id: string
   title: string
+  /** Original upload title when YouTube supplies a different English title. */
+  originalTitle?: string
   /** Display string, e.g. "1:29:21". */
   duration: string
   /** Numeric duration for sorting/filtering. Optional: only present in

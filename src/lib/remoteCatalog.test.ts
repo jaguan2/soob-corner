@@ -28,6 +28,14 @@ describe('downloaded catalog', () => {
     expect(cachedCatalog(bundled).videos.length).toBe(1)
     expect(newerCatalog(bundled, { ...bundled, fetchedAt: '2020-01-01' })).toBe(bundled)
   })
+  it('accepts optional original titles while rejecting malformed title metadata', () => {
+    const catalog = incoming()
+    const translated = { ...catalog, videos: [{ ...catalog.videos[0], originalTitle: '수빈의 브이로그' }] }
+    expect(parseCatalog(translated)?.videos[0].originalTitle).toBe('수빈의 브이로그')
+    for (const originalTitle of [null, 42, '', '  ', {}]) {
+      expect(parseCatalog({ ...catalog, videos: [{ ...catalog.videos[0], originalTitle }] })).toBeNull()
+    }
+  })
   it('downloads and caches a newer catalog without accepting a later stale response', async () => {
     const next = await downloadCatalog(bundled, new AbortController().signal, async () => new Response(JSON.stringify(incoming())))
     expect(next.videos[1].title).toBe('New Soobin vlog')

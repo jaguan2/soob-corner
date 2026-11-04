@@ -289,3 +289,118 @@ is available from that build). Both checks used unused ports and disposable
 application-data directories. Results are in
 `build/skill-verification/merge-desktop-results.json`. These checks do not prove
 native window interaction or live YouTube playback.
+
+## Dedicated welcome History tab — November 3, 2026
+
+Replaced the start screen's history disclosure with separate Videos and Watch
+history browsing tabs. History uses the full content width and normal page
+scrolling. Search/member filters stay mounted across tab changes; Settings has
+its own dismissal state. Escape closes nested settings first, then returns to
+Videos. The video-return focus fallback explicitly targets the visible Videos
+heading instead of the hidden History heading.
+
+All **270 tests in 28 files**, build and lint passed. Two new mounted-component
+regressions cover independent panels/filter retention and keyboard tab activation.
+An isolated browser on strict port 4196 checked empty/populated history,
+20-to-25-entry pagination, search/member retention, catalog filter independence,
+queue/replay actions, Escape nesting, arrow navigation, return focus and timer
+continuity. Layout checks passed at 1440, 768, 375 and 320px without a history
+height cap or horizontal overflow. Selected axe checks found no WCAG A/AA
+violations in dark desktop/mobile and light mobile; contrast remained incomplete.
+The screenshot in `docs/images/watch-history-page.jpg` uses isolated demo data.
+
+The rebuilt executable contains all 61 frontend assets matching `dist`. Source
+startup reported `SELFTEST OK (webview import OK)` and the windowed executable's
+headless startup exited 0 using a disposable profile and unused port. These
+checks do not establish real media playback or native window interaction.
+
+The required November 3 discovery scan checked 15 recent entries from each of
+four trusted public channel feeds. Archive candidates `2uBq5VFl0V4` and
+`rgG0eMG6Ax0` remain unverified for duration, members, duplicates and original
+broadcast dates. No catalog additions were made; coverage is limited to those
+feeds. Evidence is under ignored `build/skill-verification/history-tab-*`.
+
+Suggested commit message: `feat: give watch history a dedicated browsing tab`
+
+## English-preferred titles — November 3, 2026
+
+Catalog refresh now requests English watch-page metadata and keeps original
+titles when unavailable. Optional `originalTitle` retains different originals
+for search/tooltips. A titles-only refresh checked all 254 existing videos:
+five labels changed (two translated titles and three English-locale date formats),
+with zero failed video lookups. IDs, order and every non-title video field were
+compared against the previous snapshot and remained identical. The YouTube
+parser emitted recoverable warnings for unrelated watch-page structures; the
+displayed titles were still available and verified.
+
+All **278 tests in 30 files**, build, lint and script syntax checks passed.
+New regressions cover localized/original fallback, failed localized requests,
+search in both languages, downloaded original-title validation, read-only history
+label updates and session-blocked history metadata. Browser checks with a real
+localized catalog entry verified cards, original tooltips, queue/workspace/history
+labels, both-language search, unchanged counts before replay, one additional play
+after confirmed replay, original-title fallback and narrow-screen layout.
+
+The Windows app was rebuilt and its 61 bundled assets match `dist`. Source startup
+reported `SELFTEST OK (webview import OK)` and the frozen headless startup exited 0
+using disposable application data. Browser playback was simulated; neither those
+checks nor successful metadata retrieval prove live streaming or native-window
+behavior. Evidence is under ignored `build/skill-verification/english-title*`.
+
+Required discovery checked public recent-upload feeds: Moa's Diary returned 15
+entries, while TXT official, V Live and TomorrowByEdits returned HTTP 404. Coverage
+is limited; archive candidates such as `N5Ghn9ODnR4` remain unverified for duration,
+members, duplicates and original broadcast dates. No videos were added or removed.
+
+Suggested commit message: `feat: prefer YouTube English titles with original fallback`
+
+## Interface languages — November 3, 2026
+
+Added Settings' immediate, saved interface language choice for English,
+Simplified Chinese, Korean and Spanish. The typed dictionaries contain 404
+messages each. Provider persistence uses the existing storage gateway;
+unsupported values fall back to English and blocked storage permits a temporary
+selection. Document language, history dates and discovery month names follow
+the selection. Video titles, caption preferences and user-owned text remain
+independent. See [language scope and maintenance](languages.md).
+
+Local structural self-review checked explicit lookup boundaries, complete
+dictionary keys/placeholders, stable component/player lifecycles and progression
+effect dependencies. The separately installed shared toolkit remains unavailable;
+the repository's local engineering/review/verify instructions were used.
+Review caught an untranslated month refinement and narrow Spanish preset text;
+both were fixed. Accessibility checks also caught the Chinese Start accessible
+name and Social member-link name overrides. Start now includes its visible label;
+member links derive their names from visible name/handle content, retaining a
+translated explanatory tooltip.
+
+**282 tests across 32 files**, build and lint passed. Four new regressions cover
+dictionary completeness, interpolation, saved/invalid/blocked language choices,
+document language and mounted draft retention. Production preview on strict port
+4196 used isolated profiles and a simulated player. All four language choices
+survived reload; changing them preserved task/profile drafts, current video,
+captions, queue, favorites and history, while the running timer continued and
+the background player was created once. Keyboard Home/Escape navigation passed.
+Sixty layout combinations (four languages, five panels, 1440/375/320px widths)
+had no horizontal overflow or clipped button labels. The Spanish expanded timer
+also fit at 375px. Localized January appeared as `enero`; the catalog smoke check
+restored all 254 videos after an empty search.
+
+Thirty selected axe checks across welcome Settings and mobile tool views found
+no WCAG A/AA violations. Contrast remained incomplete; this is not a full
+accessibility certification. Screenshots use isolated demo profiles in
+`docs/images/language-settings.jpg` and `language-timer-spanish.jpg`.
+
+The rebuilt executable's 61 frontend assets match the final `dist/`. Source
+startup reported `SELFTEST OK (webview import OK)` and the windowed executable
+exited 0 from headless startup using an unused port and disposable application
+data. These checks do not establish real playback, captions or native window
+interaction. Evidence is under ignored `build/skill-verification/languages-*`.
+
+The required discovery attempt ran November 3 at 23:25 UTC against the four
+trusted public feeds. TXT official, Moa's Diary and V Live returned HTTP 404;
+TomorrowByEdits returned HTTP 500. No recent uploads could be verified from
+these requests, so discovery coverage is incomplete. No catalog changes were
+made for this language feature.
+
+Suggested commit message: `feat: add English Chinese Korean and Spanish interface languages`

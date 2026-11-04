@@ -1,5 +1,6 @@
+import { useLanguage } from '../i18n/useLanguage'
 import { memo, useId, useMemo, useRef, useState, type ReactNode } from 'react'
-import { handleVideoArrows } from '../lib/keyboardNavigation'
+import { handleVideoArrows, tabDestination } from '../lib/keyboardNavigation'
 import type { Video } from '../types/playlist'
 import { VideoTile } from './VideoTile'
 import { CatalogFilters } from './CatalogFilters'
@@ -7,6 +8,11 @@ import { filterVideos, type CatalogFilters as Filters } from '../lib/catalog'
 import { UIIcon } from './UIIcon'
 import { PauseIcon, PlayIcon } from './icons'
 import { VideoQueue, type VideoQueueProps } from './VideoQueue'
+
+const BROWSE_VIEWS = [
+  { id: 'videos', label: 'Videos', icon: 'video' },
+  { id: 'history', label: 'Watch history', icon: 'history' },
+] as const
 
 interface WelcomeScreenProps {
   timerLabel: string
@@ -42,87 +48,111 @@ function WelcomeScreenInner({
   queue,
   onQueue,
 }: WelcomeScreenProps) {
+  const { t } = useLanguage()
   const sorted = useMemo(() => filterVideos(videos, filters, favorites), [videos, filters, favorites])
-  const [openTool, setOpenTool] = useState<'settings' | 'history' | null>(null)
+  const [view, setView] = useState<typeof BROWSE_VIEWS[number]['id']>('videos')
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const settingsButton = useRef<HTMLButtonElement>(null)
-  const historyButton = useRef<HTMLButtonElement>(null)
+  const videosButton = useRef<HTMLButtonElement>(null)
   const videoHelpId = useId()
+  const selectView = (next: typeof view) => { setView(next); setSettingsOpen(false) }
 
   return (
     <div className="catalog-welcome min-h-screen w-full" onKeyDown={event => {
-      if (event.key !== 'Escape' || event.defaultPrevented || !openTool) return
+      if (event.key !== 'Escape' || event.defaultPrevented || event.nativeEvent.isComposing) return
+      if (!settingsOpen && view === 'videos') return
       event.preventDefault()
       const disclosure = event.target instanceof HTMLElement ? event.target.closest<HTMLDetailsElement>('details[open]') : null
       if (disclosure) { disclosure.open = false; disclosure.querySelector('summary')?.focus(); return }
-      setOpenTool(null)
-      const trigger = openTool === 'settings' ? settingsButton : historyButton
-      trigger.current?.focus()
+      if (settingsOpen) {
+        setSettingsOpen(false)
+        settingsButton.current?.focus()
+      } else {
+        selectView('videos')
+        videosButton.current?.focus()
+      }
     }}>
-      <a href="#video-catalog" className="skip-link">Skip to video choices</a>
-      <div className="welcome-settings-row">
-        <button ref={historyButton} className="workspace-button" aria-expanded={openTool === 'history'} aria-controls="welcome-history" onClick={() => setOpenTool(value => value === 'history' ? null : 'history')}><UIIcon name="history" size={17} />Watch history</button>
-        <button ref={settingsButton} className="workspace-button" aria-expanded={openTool === 'settings'} aria-controls="welcome-settings" onClick={() => setOpenTool(value => value === 'settings' ? null : 'settings')}><UIIcon name="settings" size={17} />Settings</button>
+      <a href={view === 'videos' ? '#video-catalog' : '#welcome-history'} className="skip-link">{view === 'videos' ? t("Skip to video choices") : t("Skip to watch history")}</a>
+      <div className="welcome-navigation">
+        <div className="welcome-tabs" role="tablist" aria-label={t("Browse")}>
+          {BROWSE_VIEWS.map((item, index) => <button key={item.id} ref={item.id === 'videos' ? videosButton : undefined}
+            id={`welcome-tab-${item.id}`} role="tab" aria-selected={view === item.id}
+            aria-controls={`welcome-${item.id}`} tabIndex={view === item.id ? 0 : -1}
+            onClick={() => selectView(item.id)} onKeyDown={event => {
+              if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.nativeEvent.isComposing) return
+              const next = tabDestination(event.key, index, BROWSE_VIEWS.length)
+              if (next === null) return
+              event.preventDefault()
+              selectView(BROWSE_VIEWS[next].id)
+              event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus()
+            }} className={'welcome-tab' + (view === item.id ? ' selected' : '')}>
+            <UIIcon name={item.icon} size={17} />{t(item.label)}
+          </button>)}
+        </div>
+        <button ref={settingsButton} className="workspace-button" aria-expanded={settingsOpen} aria-controls="welcome-settings" onClick={() => setSettingsOpen(value => !value)}><UIIcon name="settings" size={17} />{t("Settings")}</button>
       </div>
-      <div className="welcome-tool-content" id="welcome-history" hidden={openTool !== 'history'}>{history}</div>
-      <div className="welcome-tool-content welcome-settings-content" id="welcome-settings" hidden={openTool !== 'settings'}>{settings}</div>
-      <div className="mx-auto max-w-5xl px-4 pb-10 pt-4 sm:px-6">
+      <div className="welcome-tool-content welcome-settings-content" id="welcome-settings" hidden={!settingsOpen}>{settings}</div>
+      <main className="mx-auto max-w-5xl px-4 pb-10 pt-4 sm:px-6">
+      <div id="welcome-history" role="tabpanel" aria-labelledby="welcome-tab-history" tabIndex={0} hidden={view !== 'history'} className="welcome-history-view">{history}</div>
+      <div id="welcome-videos" role="tabpanel" aria-labelledby="welcome-tab-videos" tabIndex={0} hidden={view !== 'videos'}>
         <header className="welcome-header text-center">
           <span className="welcome-mark"><UIIcon name="leaf" size={25} /></span>
           <h1 tabIndex={-1} className="text-3xl font-semibold text-ink-900 dark:text-cream-100">
             study with soobin
           </h1>
           <p className="mt-2 text-sm text-ink-700 dark:text-cream-300">
-            Pick a TXT vlog or live to study with today — all five members are here
+            {t("Pick a TXT vlog or live to study with today — all five members are here")}
           </p>
           <button
             onClick={onSurprise}
             disabled={sorted.length === 0}
             className="welcome-surprise primary-button"
           >
-            <UIIcon name="shuffle" size={17} />Surprise me
+            <UIIcon name="shuffle" size={17} />{t("Surprise me")}
           </button>
           {lastVideo && (
             <button
               onClick={() => onSelect(lastVideo.id)}
               className="mx-auto mt-3 flex max-w-full items-center gap-1.5 text-sm text-clay-600 underline-offset-2 hover:underline dark:text-clay-400"
             >
-              <span className="shrink-0">▶ Continue where you left off:</span>
+              <span className="shrink-0">{t("▶ Continue where you left off:")}</span>
               <span className="max-w-[18rem] truncate">{lastVideo.title}</span>
             </button>
           )}
         </header>
-        <div className="welcome-timer" role="group" aria-label="Focus timer">
+        <div className="welcome-timer" role="group" aria-label={t("Focus timer")}>
           <UIIcon name="timer" size={20} />
           <div className="welcome-timer-summary">
-            <span className="welcome-timer-time" role="timer" aria-live="off" aria-label="Time remaining">{timerLabel}</span>
-            <span className="welcome-timer-status" role="status">{timerRunning ? 'Timer running' : 'Timer paused'}</span>
+            <span className="welcome-timer-time" role="timer" aria-live="off" aria-label={t("Time remaining")}>{timerLabel}</span>
+            <span className="welcome-timer-status" role="status">{timerRunning ? t("Timer running") : t("Timer paused")}</span>
           </div>
-          <button onClick={onToggleTimer} aria-label={timerRunning ? 'Pause timer' : 'Start timer'} className="primary-button">
-            {timerRunning ? <PauseIcon size={16} /> : <PlayIcon size={16} />}{timerRunning ? 'Pause' : 'Start'}
+          <button onClick={onToggleTimer} aria-label={timerRunning ? t("Pause timer") : t("Start timer")} className="primary-button">
+            {timerRunning ? <PauseIcon size={16} /> : <PlayIcon size={16} />}{timerRunning ? t("Pause") : t("Start")}
           </button>
         </div>
         <div className="mt-6"><VideoQueue {...queue} /></div>
         <div className="mt-8">
           <CatalogFilters videos={videos} value={filters} onChange={onFiltersChange} />
-          <p className="mt-4 text-xs text-ink-700 dark:text-cream-300">{sorted.length} of {videos.length} videos</p>
-          {videos.length > 0 && sorted.length === 0 && <p className="mt-4 text-sm text-ink-700 dark:text-cream-300">No videos match these filters. Try changing or clearing your filters.</p>}
+          <p className="mt-4 text-xs text-ink-700 dark:text-cream-300">{t('{count} of {total} videos', { count: sorted.length, total: videos.length })}</p>
+          {videos.length > 0 && sorted.length === 0 && <p className="mt-4 text-sm text-ink-700 dark:text-cream-300">{t("No videos match these filters. Try changing or clearing your filters.")}</p>}
         </div>
 
         {/* every video can end up session-blocked (embeds refused at play
             time) — without this the grid is just silently empty */}
         {videos.length === 0 && (
           <p className="mt-16 text-center text-sm text-ink-700 dark:text-cream-300">
-            Nothing playable right now — every video refused to embed this session.
+            {t("Nothing playable right now — every video refused to embed this session.")}
             <br />
-            Reload the page to try again.
+            {t("Reload the page to try again.")}
           </p>
         )}
 
-        <p id={videoHelpId} className="sr-only">Use arrow keys to move between videos. Enter or Space plays the focused video or activates its queue button. Home and End jump to the first and last video.</p>
-        <ul id="video-catalog" tabIndex={-1} aria-label="Study videos" aria-describedby={videoHelpId} onKeyDown={handleVideoArrows} className="mt-4 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4">
+        <p id={videoHelpId} className="sr-only">{t("Use arrow keys to move between videos. Enter or Space plays the focused video or activates its queue button. Home and End jump to the first and last video.")}</p>
+        <ul id="video-catalog" tabIndex={-1} aria-label={t("Study videos")} aria-describedby={videoHelpId} onKeyDown={handleVideoArrows} className="mt-4 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4">
           {sorted.map(video => <VideoTile key={video.id} video={video} favorite={favorites.includes(video.id)} onSelect={onSelect} queued={queue.videos.some(item => item.id === video.id)} onQueue={onQueue} />)}
         </ul>
       </div>
+      </main>
     </div>
   )
 }

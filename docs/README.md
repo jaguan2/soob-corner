@@ -9,6 +9,7 @@
 - [Screenshots and feature walkthrough](screenshots.md): examples of the app's main screens.
 - [Profile progression](LEVELS.md): XP, levels, milestones, check-ins, and lifetime study time.
 - [Watch history](watch-history.md): recent videos, rewatches, member counts, and local persistence.
+- [Interface languages](languages.md): English, Simplified Chinese, Korean and Spanish settings.
 - [TXT social accounts](social.md): the Social tab, account links, and verification sources.
 - [TXT video catalog](video-catalog.md): the generated, member-organized collection of video links.
 - [Appearance refresh](ui-refresh.md): the TaskNook-inspired design choices.

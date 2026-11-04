@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/useLanguage'
 import { memo } from 'react'
 import type { Video } from '../types/playlist'
 import { VideoPicker } from './VideoPicker'
@@ -36,21 +37,22 @@ function SidebarInner({
   queue,
   onQueue,
 }: SidebarProps) {
+  const { t, text } = useLanguage()
   const isFavorite = favorites.includes(currentVideo.id)
 
   return (
-    <section className="flex min-w-0 flex-col" aria-label="Videos and sound">
+    <section className="flex min-w-0 flex-col" aria-label={t("Videos and sound")}>
       <header className="flex items-center justify-between px-4 py-3">
         <span className="section-heading">
-          <UIIcon name="headphones" />Videos & sound
+          <UIIcon name="headphones" />{t("Videos & sound")}
         </span>
         <div className="flex items-center gap-2 text-ink-700 dark:text-cream-300">
           <a
             href={GITHUB_URL}
             target="_blank"
             rel="noreferrer"
-            aria-label="This project on GitHub"
-            title="This project on GitHub"
+            aria-label={t("This project on GitHub")}
+            title={t("This project on GitHub")}
             className="transition hover:text-clay-500"
           >
             <GitHubIcon />
@@ -81,7 +83,7 @@ function SidebarInner({
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   onClick={() => onToggleFavorite(currentVideo.id)}
-                  aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                  aria-label={isFavorite ? t("Remove from favorites") : t("Add to favorites")}
                   className={
                     'transition hover:scale-110 ' +
                     (isFavorite ? 'text-clay-500' : 'text-ink-700/50 dark:text-cream-300/50')
@@ -93,7 +95,7 @@ function SidebarInner({
                   href={playlistUrl}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label="Open the full playlist on YouTube"
+                  aria-label={t("Open the full playlist on YouTube")}
                   className="text-ink-700/50 transition hover:text-clay-500 dark:text-cream-300/50"
                 >
                   <ListIcon />
@@ -102,9 +104,9 @@ function SidebarInner({
             </div>
 
             <div className="-mt-3 text-xs text-ink-700 dark:text-cream-300">
-              <p>{videoMetadata(currentVideo)}</p>
-              {currentVideo.broadcastDate && <p className="mt-1">Original live: {currentVideo.broadcastDate}</p>}
-              {currentVideo.channel && <p className="mt-1">Channel: {currentVideo.channel}</p>}
+              <p>{videoMetadata(currentVideo, text)}</p>
+              {currentVideo.broadcastDate && <p className="mt-1">{t('Original live: {date}', { date: currentVideo.broadcastDate })}</p>}
+              {currentVideo.channel && <p className="mt-1">{t('Channel: {channel}', { channel: currentVideo.channel })}</p>}
             </div>
 
             <div className="flex items-center justify-between text-xs">
@@ -114,7 +116,7 @@ function SidebarInner({
                 rel="noreferrer"
                 className="text-clay-600 underline-offset-2 hover:underline dark:text-clay-400"
               >
-                Watch on YouTube
+                {t("Watch on YouTube")}
               </a>
               <a
                 href={playlistUrl}
@@ -122,7 +124,7 @@ function SidebarInner({
                 rel="noreferrer"
                 className="text-clay-600 underline-offset-2 hover:underline dark:text-clay-400"
               >
-                Original Soobin playlist
+                {t("Original Soobin playlist")}
               </a>
             </div>
 
@@ -133,7 +135,7 @@ function SidebarInner({
             <AmbiencePanel />
 
             <footer className="mt-auto flex items-center justify-between pt-4 text-xs text-ink-700/70 dark:text-cream-300/60">
-              <span>made for MOA</span>
+              <span>{t("made for MOA")}</span>
             </footer>
       </div>
     </section>
