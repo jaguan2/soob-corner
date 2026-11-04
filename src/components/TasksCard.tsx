@@ -146,7 +146,7 @@ function TasksCardInner({ onUseDuration, onTaskCompleted }: TasksCardProps) {
               <button onClick={() => setTasks(previous => movePlannedTask(previous, task.id, -1))} disabled={index === 0} aria-label={t('Move {task} up', { task: task.text })} title={t("Move up")}><UIIcon name="up" size={14} /></button>
               <button onClick={() => setTasks(previous => movePlannedTask(previous, task.id, 1))} disabled={index === todo.length - 1} aria-label={t('Move {task} down', { task: task.text })} title={t("Move down")}><UIIcon name="down" size={14} /></button>
             </>}
-            <button onClick={() => { setActiveId(task.id); onUseDuration(task.duration * 60) }} aria-label={t('Focus on {task}', { task: task.text })} title={t('Load {minutes} minutes into the timer', { minutes: task.duration })} className="task-focus"><UIIcon name="timer" size={13} /><span>{active ? t("Loaded") : t("Focus")}</span></button>
+            <button onClick={() => { setActiveId(task.id); onUseDuration(task.duration * 60) }} aria-label={t(active ? 'Loaded: {task}' : 'Focus on {task}', { task: task.text })} title={t('Load {minutes} minutes into the timer', { minutes: task.duration })} className="task-focus"><UIIcon name="timer" size={13} /><span>{active ? t("Loaded") : t("Focus")}</span></button>
           </div>
         </div>}
       </>}

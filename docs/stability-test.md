@@ -404,3 +404,54 @@ these requests, so discovery coverage is incomplete. No catalog changes were
 made for this language feature.
 
 Suggested commit message: `feat: add English Chinese Korean and Spanish interface languages`
+
+## Japanese and translation review — November 3, 2026
+
+Added Japanese (`ja`, 日本語) to the same saved interface-language setting.
+Reviewed every source message and its Chinese, Korean, Spanish and Japanese
+translations for meaning, terminology, tone, count grammar and interface context.
+All five dictionaries now contain 405 messages with matching placeholders.
+See [the wording review](languages.md#wording-review--november-3-2026) for examples
+and review limits. No video titles, subtitle choices or user text were translated.
+
+Corrected Chinese date/library/XP labels, Korean ambience and state terminology,
+and Spanish task counts, streak units and check-in wording. An actual browser
+check found the task action's accessible name still said Focus after its visible
+label changed to Loaded. Added a state-specific name in every language, aligned
+the Spanish Focus name and separated the Japanese theme-name words for matching
+voice-control labels. A regression now checks action names against visible labels.
+
+The local structural review confirmed this extends the existing typed dictionary
+registry and provider, with no dependencies or changes to timer/player/progression
+lifecycles. The shared toolkit is not installed; the project-local engineering,
+review and verification instructions supplied the documented fallback.
+
+**283 tests across 32 files**, lint and production build passed. The focused
+translation/provider tests also passed. On a strict-port 4196
+preview with isolated profiles, all five language choices persisted after reload.
+Switching language preserved task/profile drafts, video, queue, favorites,
+history and captions while the timer continued with one background player.
+Home/Escape navigation passed. All 105 layout combinations (five languages,
+seven tools, 1440/375/320px widths) had no horizontal overflow or clipped buttons.
+The catalog smoke test restored 254 videos after an empty search, and the month
+filter displayed Spanish January as `enero`.
+
+Selected axe checks across 37 welcome/mobile views and five loaded-task views
+reported no remaining WCAG A/AA violations. Contrast remained incomplete. This
+does not certify full accessibility or real media playback; the player was
+simulated. Japanese settings and expanded mobile-timer screenshots were added
+under `docs/images/`, and Chinese settings were refreshed.
+
+The rebuilt executable includes 61 frontend assets identical to the final
+`dist/`. Source startup reported `SELFTEST OK (webview import OK)`; the windowed
+executable's headless startup exited 0 using an unused port and disposable data.
+Native window interaction and live streams were not verified. Evidence and
+browser recipes are under ignored `build/skill-verification/japanese-*`.
+
+Required discovery checked the latest 15 TXT official feed entries on November
+3 Eastern time (November 4, 03:41 UTC). Soobin vlog `llxqGauQkQU`, uploaded October
+17, is absent from the catalog and remains unverified for duration/eligibility.
+Moa's Diary, V Live and TomorrowByEdits feeds returned HTTP 404. Coverage is
+limited to these requests; no catalog changes were made for this feature.
+
+Suggested commit message: `feat: add Japanese and refine interface translations`

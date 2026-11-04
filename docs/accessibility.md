@@ -80,7 +80,7 @@ Reference guidance: [W3C keyboard access](https://www.w3.org/WAI/WCAG22/Understa
 
 Settings' language selector has a native label and shows language names in their
 own language. The document's `lang` and translated control names follow the
-selection. November 3 localization checks covered four-language welcome Settings
+selection. November 3 localization checks covered five-language welcome Settings
 and mobile tools with selected axe WCAG A/AA rules; no violations remained in
 those views, while contrast required manual follow-up. See
 [language verification](stability-test.md) for scope and media limits.

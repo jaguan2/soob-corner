@@ -16,14 +16,18 @@ documentation. Capture the running app, including real playback when available.
 
 ### Interface languages — November 3, 2026
 
-Settings offers English, Simplified Chinese, Korean and Spanish. These isolated
-demo captures show Chinese settings and the Spanish timer at a 375px viewport.
+Settings offers English, Simplified Chinese, Korean, Spanish and Japanese. These isolated
+demo captures show Chinese/Japanese settings and Spanish/Japanese timers at a 375px viewport.
 The timer crop excludes a simulated background player; it does not verify live
 media. Language changes preserve the current study session and saved user text.
 
 ![Simplified Chinese interface and language setting](images/language-settings.jpg)
 
 ![Spanish timer with readable mobile presets](images/language-timer-spanish.jpg)
+
+![Japanese interface and language setting](images/language-settings-japanese.jpg)
+
+![Japanese timer and expanded session settings](images/language-timer-japanese.jpg)
 
 ### English-preferred video labels — November 3, 2026
 

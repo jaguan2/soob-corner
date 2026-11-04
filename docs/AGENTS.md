@@ -86,8 +86,8 @@ document. These tests do not verify live playback or interactive browser behavio
 ## Architecture
 
 `i18n/LanguageProvider` owns the separate validated `sws.language` preference
-and document `lang`; English is the default, with Simplified Chinese, Korean
-and Spanish alternatives. `useLanguage` supplies explicit typed message lookup
+and document `lang`; English is the default, with Simplified Chinese, Korean,
+Spanish and Japanese alternatives. `useLanguage` supplies explicit typed message lookup
 from complete dictionaries. Translate app-owned labels, never user task/name
 text, catalog titles or stored identifiers. Keep subtitle language independent.
 Language changes update context without remounting timer/media/panels or changing

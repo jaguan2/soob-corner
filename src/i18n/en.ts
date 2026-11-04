@@ -403,7 +403,8 @@ export const en = {
   "Focus session complete": "Focus session complete",
   "Level {level}! +{xp} XP · {activity}": "Level {level}! +{xp} XP · {activity}",
   "+{xp} XP · {activity}": "+{xp} XP · {activity}",
-  "Find study videos": "Find study videos"
+  "Find study videos": "Find study videos",
+  "Loaded: {task}": "Loaded: {task}"
 } as const
 
 export type MessageKey = keyof typeof en

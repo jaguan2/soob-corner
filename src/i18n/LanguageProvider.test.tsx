@@ -38,11 +38,16 @@ describe('saved interface language', () => {
     expect(root!.root.findByType('input').props.value).toBe('My own text')
     expect(element.lang).toBe('es')
     expect(values.get('sws.language')).toBe('es')
+    act(() => languageApi.setLanguage('ja'))
+    expect(root!.root.findByType('h1').children).toEqual(['設定'])
+    expect(root!.root.findByType('input').props.value).toBe('My own text')
+    expect(element.lang).toBe('ja')
+    expect(values.get('sws.language')).toBe('ja')
     act(() => languageApi.setLanguage('invalid' as Language))
-    expect(languageApi.language).toBe('es')
+    expect(languageApi.language).toBe('ja')
     act(() => root!.unmount())
     mount()
-    expect(root!.root.findByType('h1').children).toEqual(['Ajustes'])
+    expect(root!.root.findByType('h1').children).toEqual(['設定'])
   })
 
   it('loads a saved language and remains usable when storage is unavailable', () => {

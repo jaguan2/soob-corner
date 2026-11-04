@@ -94,7 +94,7 @@ an internet connection since the videos stream from YouTube.)
   history counts; rechecking a task never awards it twice. Read the full
   [progression rules](LEVELS.md).
 - **Settings** includes a saved interface language choice: English, Simplified
-  Chinese, Korean or Spanish. Labels change immediately while tasks, profile text,
+  Chinese, Korean, Spanish or Japanese. Labels change immediately while tasks, profile text,
   video titles and subtitle choices retain their own language. See [languages](languages.md).
 - **Settings** groups appearance and profile display preferences. Open the dock's
   Settings tab, or Settings at the top right of the start screen. Turn off
