@@ -145,6 +145,12 @@ panels remain mounted with `hidden`, retaining filters while switching tabs.
 History uses page scrolling, with no popover or height cap. Its shared card uses
 an h1 in the welcome view and h2 in the dock. The return-focus fallback targets
 `#welcome-videos h1` so it never chooses the hidden history heading.
+`WatchHistoryCard` groups visible entries by their most recent play's local day
+using `localDayKey`, after filtering/sorting/pagination. Date headings are localized
+and include the year; row times omit the repeated date. Preserve one saved entry
+per video and lifetime play counts: replay moves its row to its latest day, not
+to a reconstructed per-play journal. No view operation writes history. Use h1/h2/h3
+for welcome history/day/video and h2/h3/h4 in the dock.
 `WatchStats` renders the same history's totals inside Profile. Group videos
 count once overall and once for each featured member. Tracking starts with this
 feature; do not fabricate history from saved positions or the last selection.
@@ -320,7 +326,11 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
     wrap on narrow screens. Do not reintroduce independently positioned panels
     that can cover each other or the video.
     The welcome screen also exposes the same timer's Start/Pause control. Keep
-    its countdown outside live status announcements, and keep the control mounted
+  its compact Timer card beside the wider Up next card at 768px and above;
+  smaller screens stack them in that order. The welcome queue list scrolls at
+  156px; scope these styles to `.welcome-session` so the shared dock queue keeps
+  its existing 220px list. Reuse the same callbacks and mounted controls. Keep
+  its countdown outside live status announcements, and keep the control mounted
     when pausing so focus is preserved. A completed Pomodoro restarts through the
     shared timer toggle, resetting to round 1 without repeating completion credit.
   - `SocialCard` is the Social dock tab. `data/social.ts` holds the group Instagram,

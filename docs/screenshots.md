@@ -14,6 +14,22 @@ documentation. Capture the running app, including real playback when available.
 
 ## Current dark-mode screenshots
 
+### Compact timer and queue — November 4, 2026
+
+The start screen places a small Timer card beside the wider Up next card, above
+video discovery. At widths below 768px they stack. Long queues scroll within
+their card, with all reorder/remove/play actions available. These isolated demo
+captures use three queued videos on desktop and two on mobile.
+
+![Video list with compact Timer and Up next cards](images/welcome-layout.jpg)
+
+![Stacked timer and queue cards on a narrow screen](images/welcome-layout-mobile.jpg)
+
+The timer keeps the same Start/Pause control. This isolated capture shows its
+keyboard focus outline while running; no player is visible.
+
+![Compact welcome timer with a pause action](images/welcome-timer.jpg)
+
 ### Interface languages — November 3, 2026
 
 Settings offers English, Simplified Chinese, Korean, Spanish and Japanese. These isolated
@@ -38,41 +54,48 @@ isolated browser profile and does not imply that playback was verified.
 
 ![YouTube-supplied English video title](images/english-title.jpg)
 
-### Mobile timer and welcome controls — November 3, 2026
+### Mobile focus timer — November 3, 2026
 
 The narrow-screen dock grows with its content so Start and quick durations use
 normal page scrolling. This crop shows the full dock at a 375px viewport with a
-15-minute preset. The welcome screen keeps Start/Pause available before choosing
-a video and after returning from one. Both captures use an isolated demo profile;
-the background player was mocked and is outside these crops.
+15-minute preset. This capture uses an isolated demo profile; the background
+player was mocked and is outside the crop.
 
 ![Mobile dock with timer transport and presets](images/mobile-timer.jpg)
 
-![Welcome timer with a pause action](images/welcome-timer.jpg)
-
-### Video queue — November 3, 2026
+### Video queue — November 4, 2026
 
 The start screen's **Up next** list saves your selected videos in order. Use
 the arrows to reorder, remove individual entries, or **Play queue** to begin.
 The same queue is available in the **Videos & sound** tab during study sessions.
 This capture uses an isolated browser profile with three catalog videos queued.
 
-![Saved video queue and Add to queue controls](images/video-queue.jpg)
+![Compact timer beside the saved video queue](images/video-queue.jpg)
 
-### Watch history and viewing stats — November 3, 2026
+### Watch history by day — November 4, 2026
 
 The welcome screen's **Watch history** tab opens a dedicated full-page list, with
-**Videos** alongside it for returning to discovery. This capture uses four real
-catalog entries in an isolated demo history; it does not depict personal data.
+**Videos** alongside it for returning to discovery. Videos appear under local
+date headings such as November 3 and November 2, without the distinct-video
+result count. These captures use three real catalog entries in an isolated demo
+history; they do not depict personal data. The mobile view uses a 375px viewport.
 
 ![Dedicated Watch history browsing tab](images/watch-history-page.jpg)
 
-History shows recent videos, member/search filters, replay and queue actions.
-Profile separates distinct videos from total plays and counts shared videos for
-each featured member. These captures use an isolated demo profile with three
-videos and two rewatches; player events were simulated for repeatable checks.
+![Watch history grouped by day on mobile](images/watch-history-mobile.jpg)
+
+History retains search/member filters, replay and queue actions. The dock capture
+shows a simulated replay moving Soobin's video to November 4 while the other
+videos remain on their previous dates. The cropped background player was mocked;
+these checks do not verify live streaming.
 
 ![Watch history tab](images/watch-history.jpg)
+
+### Profile viewing stats — November 3, 2026
+
+Profile separates distinct videos from total plays and counts shared videos for
+each featured member. This earlier capture uses an isolated demo profile with
+three videos and two rewatches; player events were simulated.
 
 ![Profile viewing stats by member](images/watch-stats.jpg)
 

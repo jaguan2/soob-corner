@@ -455,3 +455,94 @@ Moa's Diary, V Live and TomorrowByEdits feeds returned HTTP 404. Coverage is
 limited to these requests; no catalog changes were made for this feature.
 
 Suggested commit message: `feat: add Japanese and refine interface translations`
+
+## Watch history date groups — November 4, 2026
+
+Removed the distinct-video result count and grouped the visible history by each
+video's most recent play date. Both the start-page tab and study dock show newest
+local days first, localized date headings including the year, and times within
+each day. Filtering precedes grouping; pagination extends a day or adds older
+days once. The saved schema, lifetime play counts and Profile totals are unchanged.
+Repeat plays move the existing row to the latest day; older per-play dates are
+not reconstructed. See [history behavior](watch-history.md).
+
+The local structural review checked view-only grouping, stable day keys,
+local-calendar semantics, filtering/pagination order and heading levels in both
+containers. The shared toolkit remains unavailable; the repository's local
+engineering, review and verification instructions provided the fallback.
+
+**287 tests across 32 files**, lint and build passed. Four new component tests
+cover local midnight boundaries, newest-first rows, read-only snapshots,
+filtering/empty groups, a partially paginated day, different years, heading
+hierarchies, five-language dates and unchanged replay/queue identifiers.
+
+An isolated production preview on strict port 4196 used the America/New_York
+timezone and demo history. Browser checks confirmed November 3/2 grouping for
+late-night UTC timestamps, search/member/empty states, 20-to-26 pagination without
+duplicate date headings, disabled unavailable entries and read-only browsing.
+Both repeated 1:30 AM hours at the November 1 DST fallback stayed in the same day.
+A simulated confirmed replay moved its video to November 4 and added one play;
+the timer continued in History, one background player remained mounted, and
+Escape returned to discovery. All 24 tested welcome/dock layouts at
+1440/768/375/320px had no horizontal overflow. Six selected axe checks found no
+WCAG A/AA violations; contrast remained incomplete. This does not establish full
+accessibility conformance or real media playback.
+
+Screenshots were refreshed for the start page and dock, with a new mobile capture
+under `docs/images/`. The rebuilt executable's 61 frontend assets match `dist/`.
+Source startup reported `SELFTEST OK (webview import OK)` and the frozen app's
+headless startup exited 0 using an unused port and disposable application data.
+Native window interaction and live media remain outside these checks. Evidence
+is under ignored `build/skill-verification/history-days-*`.
+
+Required discovery checked 15 recent public-feed entries per trusted channel on
+November 4 at 14:07 UTC. Possible unreviewed additions include Soobin vlog
+`llxqGauQkQU` and archive uploads `2uBq5VFl0V4`, `rgG0eMG6Ax0`, `LIey7QYEMCs` and
+`N5Ghn9ODnR4`. Feed timestamps are upload dates; duration, participants, duplicates
+and original broadcast dates remain unverified. Coverage is limited to these
+60 entries, and no catalog changes were made.
+
+Suggested commit message: `feat: group watch history by day`
+
+## Compact welcome timer and queue — November 4, 2026
+
+Replaced the full-width timer strip and separate queue row with a compact Timer
+card beside a wider Up next card. At 768px and above they share a row; smaller
+screens stack them. The timer has its own heading, larger countdown, status and
+Start/Pause action. The welcome queue list scrolls within 156px; the shared dock
+queue retains its existing 220px limit. Card heights can grow for longer labels.
+
+Local structural review confirmed the change is limited to WelcomeScreen markup
+and scoped styles. It reuses all timer/queue state and callbacks, keeps the timer
+button mounted across Start/Pause and keeps the countdown outside live status.
+No dependencies, storage schemas or translation keys were added. The separately
+installed toolkit remains unavailable; project-local instructions were used.
+
+**287 existing tests**, lint and build passed. An isolated production preview on
+strict port 4196 checked 30 layouts across all five languages and widths of
+1440/1000/768/767/375/320px. Cards shared a row at desktop/tablet widths and stacked
+below the breakpoint, without horizontal overflow or clipped timer actions.
+The narrow tablet timer can wrap for long Spanish labels rather than clipping.
+Empty cards, an eight-video scrolling queue, reorder/remove/clear/play actions,
+keyboard removal and focus restoration passed. Space started the timer once;
+Pause held the countdown steady. The timer continued behind History and across
+video entry/return, and the dock queue retained its 220px limit. Eight selected
+axe checks across five-language mobile views and Light/Cafe/Dark desktop views
+found no WCAG A/AA violations; contrast remained incomplete. Playback was mocked,
+so these checks do not prove real streaming or full accessibility conformance.
+
+Updated queue and running-timer screenshots and added desktop/mobile layout
+captures under `docs/images/`, using isolated demo data. The rebuilt executable's
+61 frontend assets match the final `dist/`. Source startup reported
+`SELFTEST OK (webview import OK)` and the frozen headless startup exited 0 with an
+unused port and disposable data. Native window interaction remains unverified.
+Evidence is under ignored `build/skill-verification/welcome-cards-*`.
+
+Required discovery checked 15 recent entries from each of the four trusted public
+feeds on November 4 at 14:17 UTC. Unreviewed candidates include Soobin vlog
+`llxqGauQkQU` and live archives `2uBq5VFl0V4`, `rgG0eMG6Ax0`, `LIey7QYEMCs` and
+`N5Ghn9ODnR4`. Eligibility, participants, duplicates, durations and original
+broadcast dates remain unverified; feed dates describe uploads. Coverage is
+limited to those 60 entries. No catalog changes were made for this layout work.
+
+Suggested commit message: `feat: pair compact timer and queue cards on the welcome screen`

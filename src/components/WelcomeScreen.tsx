@@ -120,17 +120,21 @@ function WelcomeScreenInner({
             </button>
           )}
         </header>
-        <div className="welcome-timer" role="group" aria-label={t("Focus timer")}>
-          <UIIcon name="timer" size={20} />
-          <div className="welcome-timer-summary">
-            <span className="welcome-timer-time" role="timer" aria-live="off" aria-label={t("Time remaining")}>{timerLabel}</span>
-            <span className="welcome-timer-status" role="status">{timerRunning ? t("Timer running") : t("Timer paused")}</span>
-          </div>
-          <button onClick={onToggleTimer} aria-label={timerRunning ? t("Pause timer") : t("Start timer")} className="primary-button">
-            {timerRunning ? <PauseIcon size={16} /> : <PlayIcon size={16} />}{timerRunning ? t("Pause") : t("Start")}
-          </button>
+        <div className="welcome-session">
+          <section className="welcome-timer" aria-label={t("Focus timer")}>
+            <h2 className="section-heading"><UIIcon name="timer" size={16} />{t("Timer")}</h2>
+            <div className="welcome-timer-controls">
+              <div className="welcome-timer-summary">
+                <span className="welcome-timer-time" role="timer" aria-live="off" aria-label={t("Time remaining")}>{timerLabel}</span>
+                <span className="welcome-timer-status" role="status">{timerRunning ? t("Timer running") : t("Timer paused")}</span>
+              </div>
+              <button onClick={onToggleTimer} aria-label={timerRunning ? t("Pause timer") : t("Start timer")} className="primary-button">
+                {timerRunning ? <PauseIcon size={16} /> : <PlayIcon size={16} />}{timerRunning ? t("Pause") : t("Start")}
+              </button>
+            </div>
+          </section>
+          <VideoQueue {...queue} />
         </div>
-        <div className="mt-6"><VideoQueue {...queue} /></div>
         <div className="mt-8">
           <CatalogFilters videos={videos} value={filters} onChange={onFiltersChange} />
           <p className="mt-4 text-xs text-ink-700 dark:text-cream-300">{t('{count} of {total} videos', { count: sorted.length, total: videos.length })}</p>

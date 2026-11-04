@@ -22,8 +22,10 @@ an internet connection since the videos stream from YouTube.)
   including in Zen mode
 - Video titles prefer English metadata supplied by YouTube, keeping the original
   when unavailable. Search supports both titles, and card tooltips retain the original.
-- A compact timer on the start screen lets you start, pause or resume without
-  choosing a video. Returning from a video keeps the same countdown.
+- Compact **Timer** and **Up next** cards sit side by side on the start screen,
+  with more room for the queue. Narrow screens stack them, and long queues scroll
+  inside their card. Start, pause or resume without choosing a video; returning
+  from a video keeps the same countdown.
 - A saved **Up next** video queue on the start screen and in **Videos & sound**.
   Choose **Add to queue** under any video, move entries up/down, remove them,
   or clear the queue. **Play queue** starts the first entry; clicking a queued
@@ -100,7 +102,8 @@ an internet connection since the videos stream from YouTube.)
   Settings tab, or Settings at the top right of the start screen. Turn off
   **Show milestones** to hide their cards in Profile; earned progress, levels,
   XP, and study time remain saved. Preferences are remembered on this device.
-- **History** saves recently played videos with dates and play counts. Search,
+- **History** groups videos by their most recent play date, newest day first,
+  with localized headings, last-played times and lifetime play counts. Search,
   filter by member, play again, or add to your queue; the start screen has a
   dedicated **Watch history** tab too, with a full-page list beside the **Videos** tab.
   Profile shows distinct videos watched, plays
