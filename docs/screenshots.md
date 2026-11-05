@@ -14,6 +14,41 @@ documentation. Capture the running app, including real playback when available.
 
 ## Current dark-mode screenshots
 
+### Daily PPULBATU rotation — November 5, 2026
+
+The background rotates through three static poses per character, always showing
+one of each of the five characters. It updates at local midnight and catches up
+when returning to the app. These isolated captures demonstrate November 5 and 6
+using a simulated browser clock; the bank repeats every three days.
+
+![November 5 background sticker selection](images/daily-stickers-day-1.jpg)
+
+![November 6 background sticker selection](images/daily-stickers-day-2.jpg)
+
+### Selected Study Cottage logo — November 5, 2026
+
+The home page now welcomes visitors with all five PPULBATU character stickers
+spread across the background at 12% opacity. These transparent PNGs show complete
+poses without the earlier circular portrait crops.
+The selected purple Study Cottage logo appears beside the app name and in the
+browser/install icons. The stickers sit behind the content, remain static and
+do not block the timer, queue or navigation. The credit remains readable.
+See [artwork sources and credits](visual-assets.md).
+
+![Faint PPULBATU background and Study Cottage logo](images/ppulbatu-welcome.jpg)
+
+![PPULBATU welcome area on a narrow screen](images/ppulbatu-mobile.jpg)
+
+The welcome heading, workspace header, browser title and install name now read
+**Soob Corner**. These captures use an isolated demo profile. The workspace image
+is a header crop; playback was simulated and is outside the image.
+
+![Soob Corner welcome screen](images/soob-corner-home.jpg)
+
+![Soob Corner workspace header](images/soob-corner-workspace-header.jpg)
+
+Earlier captures below retain the display name used on their capture date.
+
 ### Compact timer and queue — November 4, 2026
 
 The start screen places a small Timer card beside the wider Up next card, above

@@ -2,7 +2,7 @@ import type { Playlist, Video } from '../types/playlist'
 import { storageGetJson, storageSetJson } from './storage'
 
 export const CATALOG_CACHE_KEY = 'sws.catalog.v1'
-export const CATALOG_URL = import.meta.env.VITE_CATALOG_URL ?? 'https://raw.githubusercontent.com/jaguan2/studywithsoobin/main/src/data/playlist.json'
+export const CATALOG_URL = import.meta.env.VITE_CATALOG_URL ?? 'https://raw.githubusercontent.com/jaguan2/soob-corner/main/src/data/playlist.json'
 
 const members = new Set(['soobin', 'yeonjun', 'beomgyu', 'taehyun', 'hueningkai'])
 const record = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null

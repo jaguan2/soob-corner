@@ -1,4 +1,5 @@
 import { useLanguage } from '../i18n/useLanguage'
+import { PROJECT_URL } from '../lib/branding'
 import { memo } from 'react'
 import type { Video } from '../types/playlist'
 import { VideoPicker } from './VideoPicker'
@@ -9,8 +10,6 @@ import { UIIcon } from './UIIcon'
 import type { CatalogFilters } from '../lib/catalog'
 import { videoMetadata } from '../lib/catalog'
 import { VideoQueue, type VideoQueueProps } from './VideoQueue'
-
-const GITHUB_URL = 'https://github.com/jaguan2'
 
 interface SidebarProps {
   filters: CatalogFilters
@@ -48,7 +47,7 @@ function SidebarInner({
         </span>
         <div className="flex items-center gap-2 text-ink-700 dark:text-cream-300">
           <a
-            href={GITHUB_URL}
+            href={PROJECT_URL}
             target="_blank"
             rel="noreferrer"
             aria-label={t("This project on GitHub")}

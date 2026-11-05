@@ -1,4 +1,5 @@
 import { useLanguage } from '../i18n/useLanguage'
+import { APP_NAME } from '../lib/branding'
 import { memo, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { handleVideoArrows, tabDestination } from '../lib/keyboardNavigation'
 import type { Video } from '../types/playlist'
@@ -8,6 +9,7 @@ import { filterVideos, type CatalogFilters as Filters } from '../lib/catalog'
 import { UIIcon } from './UIIcon'
 import { PauseIcon, PlayIcon } from './icons'
 import { VideoQueue, type VideoQueueProps } from './VideoQueue'
+import { PpulbatuWelcome } from './PpulbatuWelcome'
 
 const BROWSE_VIEWS = [
   { id: 'videos', label: 'Videos', icon: 'video' },
@@ -72,6 +74,7 @@ function WelcomeScreenInner({
         videosButton.current?.focus()
       }
     }}>
+      {view === 'videos' && <PpulbatuWelcome />}
       <a href={view === 'videos' ? '#video-catalog' : '#welcome-history'} className="skip-link">{view === 'videos' ? t("Skip to video choices") : t("Skip to watch history")}</a>
       <div className="welcome-navigation">
         <div className="welcome-tabs" role="tablist" aria-label={t("Browse")}>
@@ -96,13 +99,17 @@ function WelcomeScreenInner({
       <div id="welcome-history" role="tabpanel" aria-labelledby="welcome-tab-history" tabIndex={0} hidden={view !== 'history'} className="welcome-history-view">{history}</div>
       <div id="welcome-videos" role="tabpanel" aria-labelledby="welcome-tab-videos" tabIndex={0} hidden={view !== 'videos'}>
         <header className="welcome-header text-center">
-          <span className="welcome-mark"><UIIcon name="leaf" size={25} /></span>
           <h1 tabIndex={-1} className="text-3xl font-semibold text-ink-900 dark:text-cream-100">
-            study with soobin
+            <img className="welcome-home-logo" src="/soob-corner-logo.png" width={44} height={44} alt="" />
+            {APP_NAME}
           </h1>
           <p className="mt-2 text-sm text-ink-700 dark:text-cream-300">
             {t("Pick a TXT vlog or live to study with today — all five members are here")}
           </p>
+          <div className="ppulbatu-credit">
+            <a href="https://weverse.io/txt/notice/21278" target="_blank" rel="noopener noreferrer">PPULBATU</a>
+            <span>© BIGHIT MUSIC / HYBE</span>
+          </div>
           <button
             onClick={onSurprise}
             disabled={sorted.length === 0}

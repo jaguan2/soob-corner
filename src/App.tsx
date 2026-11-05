@@ -1,4 +1,5 @@
 import { useLanguage } from './i18n/useLanguage'
+import { APP_NAME } from './lib/branding'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePlaylist } from './hooks/usePlaylist'
 import { useBreakNudge } from './hooks/useBreakNudge'
@@ -106,7 +107,7 @@ export default function App() {
   // The countdown lives in the tab title too, so it's visible from whatever
   // tab the actual studying happens in.
   useEffect(() => {
-    document.title = timer.isRunning ? `⏱ ${timer.label} · study with soobin` : 'study with soobin'
+    document.title = timer.isRunning ? `⏱ ${timer.label} · ${APP_NAME}` : APP_NAME
   }, [timer.isRunning, timer.label])
 
 
@@ -260,7 +261,7 @@ export default function App() {
           aria-label={t("Back to video selection")} aria-keyshortcuts="Escape" title={t("Back to video selection (Esc)")}
           className="workspace-button workspace-back toolbar-icon"><UIIcon name="arrowLeft" size={20} /></button>
         <div className="workspace-heading">
-          <p className="workspace-brand"><span className="brand-mark"><UIIcon name="leaf" size={20} /></span>study with soobin</p>
+          <p className="workspace-brand"><img className="workspace-home-logo" src="/soob-corner-logo.png" width={24} height={24} alt="" />{APP_NAME}</p>
           <p className="workspace-video-title" title={currentVideo.title}>{currentVideo.title}</p>
         </div>
         <div className="toolbar-actions">

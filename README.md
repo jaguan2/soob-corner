@@ -1,4 +1,4 @@
-# study with soobin
+# Soob Corner
 
 A cozy Pomodoro study app with TXT videos, a task checklist, music and ambience,
 and a local profile with XP, levels, milestones, and lifetime study time.

@@ -86,7 +86,7 @@ check discovers and reports candidates; it does not publish them automatically.
 ## Updating installed apps
 
 New builds check the reviewed catalog at
-`https://raw.githubusercontent.com/jaguan2/studywithsoobin/main/src/data/playlist.json`
+`https://raw.githubusercontent.com/jaguan2/soob-corner/main/src/data/playlist.json`
 once on startup. This downloads ordinary public JSON, not YouTube API data.
 The bundled catalog is immediately usable. A valid newer snapshot replaces it
 and is cached on the device. Failed, malformed or stale downloads leave the

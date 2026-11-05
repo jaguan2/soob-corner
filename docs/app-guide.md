@@ -1,4 +1,4 @@
-# study with soobin 🐰
+# Soob Corner 🐰
 
 A LifeAt-style Pomodoro study app. Instead of generic cafe/nature scenery, the
 background is TXT members' vlogs, VLIVEs and Weverse lives — company for a study session, the
@@ -16,6 +16,16 @@ favorites and theme are remembered between launches. (Windows only; it needs
 an internet connection since the videos stream from YouTube.)
 
 ## Features
+
+- A faint **PPULBATU** background on the home page, featuring all five
+  members' characters, alongside Soob Corner's purple Study Cottage logo.
+  Complete character stickers with transparent backgrounds sit behind the content,
+  stay static and do not block controls.
+  They stay out of Watch history and the playback workspace. See
+  [artwork and logo sources](visual-assets.md).
+  A bank of 15 stickers (three per character) rotates at local midnight, always
+  keeping one of each character. The day's choices survive reloads; the current
+  bank repeats every three days. Returning after sleep catches up automatically.
 
 - Start screen to pick your study-companion video (or hit 🎲 Surprise me) —
   the **back arrow** at the top left takes you back any time,
@@ -232,7 +242,7 @@ point it at a different playlist, edit `PLAYLIST_ID` in
 
 ## Desktop app
 
-Study w/ Soobin can also run as a **native desktop application** — its own
+Soob Corner can also run as a **native desktop application** — its own
 window, no browser tab. `desktop/launcher.py` serves the built app on a local port and
 opens it in an OS window via [pywebview](https://pywebview.flowrl.com/)
 (WebView2 on Windows, WebKit on macOS).
@@ -252,13 +262,16 @@ and packages everything into **`StudyWithSoobin.exe`** at the repo root — one
 double-clickable file, no console window, nothing else to install. Your
 favorites/theme persist in `%LOCALAPPDATA%\StudyWithSoobin\`.
 
+The window displays **Soob Corner**. The existing executable filename and profile
+directory are retained so the branding change keeps your saved data available.
+
 > Note: the exe still needs an internet connection — the videos stream from
 > YouTube; only the app shell is bundled.
 
 ## Project structure
 
 ```text
-studywithsoobin/
+soob-corner/
 |-- src/                       # React application; tests beside the code they cover
 |   |-- components/            # Video, timer, tasks, profile, and social UI
 |   |-- hooks/                 # Timer, progression, and player lifecycle

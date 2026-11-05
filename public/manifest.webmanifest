@@ -1,12 +1,12 @@
 {
-  "name": "study with soobin",
-  "short_name": "study w/ soobin",
-  "description": "A Pomodoro study app with TXT Soobin's vlogs as the backdrop.",
+  "name": "Soob Corner",
+  "short_name": "Soob Corner",
+  "description": "Soob Corner — a cozy Pomodoro study space with TXT videos, tasks, music and ambience.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#FDFBF7",
   "theme_color": "#D9924F",
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    { "src": "/soob-corner-logo.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any" }
   ]
 }

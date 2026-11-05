@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, create, type ReactTestRenderer } from 'react-test-renderer'
 import { WelcomeScreen } from './WelcomeScreen'
 import { WatchHistoryCard } from './WatchHistoryCard'
@@ -21,9 +21,16 @@ function mount() {
     queue={{ videos: [], onPlay: noop, onMove: noop, onRemove: noop, onClear: noop }} />) })
 }
 
+beforeEach(() => {
+  vi.useFakeTimers()
+  vi.stubGlobal('window', new EventTarget())
+  vi.stubGlobal('document', Object.assign(new EventTarget(), { hidden: false }))
+})
 afterEach(() => {
   if (root) act(() => root!.unmount())
   root = undefined
+  vi.useRealTimers()
+  vi.unstubAllGlobals()
 })
 
 describe('welcome browsing tabs', () => {

@@ -13,6 +13,8 @@
 - [TXT social accounts](social.md): the Social tab, account links, and verification sources.
 - [TXT video catalog](video-catalog.md): the generated, member-organized collection of video links.
 - [Appearance refresh](ui-refresh.md): the TaskNook-inspired design choices.
+- [Visual assets](visual-assets.md): selected Study Cottage logo and PPULBATU artwork sources.
+- [Logo concepts](logo-concepts.md): three house-inspired Soob Corner directions and generation prompts.
 - [Stability test](stability-test.md): reproduced bugs, patches, verification, and remaining manual checks.
 
 ## Repository guidance

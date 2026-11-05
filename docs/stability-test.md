@@ -545,4 +545,247 @@ feeds on November 4 at 14:17 UTC. Unreviewed candidates include Soobin vlog
 broadcast dates remain unverified; feed dates describe uploads. Coverage is
 limited to those 60 entries. No catalog changes were made for this layout work.
 
+Follow-up review checked the unchanged build with a 12-hour timer and a custom
+gold palette. All 25 combinations of five languages and
+1440/768/720/480/320px widths retained the full countdown and timer action without
+horizontal overflow. A 720 CSS-pixel viewport at device scale factor 2 exercised
+the reflow width of a 1440px window at 200%; browser chrome zoom was not automated.
+Tab reached the bottom of the queue scroller, and the long timer started and
+paused through Space. Five additional selected axe checks reported no violations;
+contrast remained incomplete. No runtime fixes were needed, so the existing
+test/build/desktop evidence was reused. Additional evidence is under
+`build/skill-verification/welcome-cards-edge-*`.
+
 Suggested commit message: `feat: pair compact timer and queue cards on the welcome screen`
+
+## Soob Corner branding — November 5, 2026
+
+Updated the welcome heading, workspace brand, static and timer-aware browser
+titles, install manifest name/short name, description metadata and desktop window
+title to **Soob Corner**. React display names and the project link share
+`lib/branding.ts`. Package metadata, README and current app-guide branding match.
+The GitHub project link and default published-catalog URL now use the renamed
+`jaguan2/soob-corner` repository. Both URLs returned HTTP 200; the published JSON
+contained 254 videos.
+
+Review kept the branding separate from compatibility identifiers: `sws.*` keys,
+desktop profile folder, stable port and executable filename are retained. The
+source YouTube playlist's actual title and generated catalog were not changed.
+The cosmetic rename introduces no dependencies, migrations or new timer effects.
+
+**287 tests across 32 files**, lint and build passed. Isolated browser checks on
+strict port 4196 verified initial/idle/running/paused titles, install metadata,
+the project link, renamed catalog requests and welcome/workspace/return labels.
+All 15 layouts (five languages at 1440/375/320px) fit without horizontal overflow.
+Seeded existing task, favorite, queue and profile data survived startup/reload;
+profile XP claims and saved study time remained available. Brand screenshots
+were added under `docs/images/`. Browser playback was simulated, so this does
+not establish live streaming or actual native window interaction.
+
+The rebuilt executable's 61 frontend assets match `dist/`. Source startup printed
+`Starting Soob Corner` and `SELFTEST OK (webview import OK)`; frozen headless
+startup exited 0 using an unused port and disposable application data. The
+legacy profile directory was retained. Evidence is under ignored
+`build/skill-verification/soob-corner-*`.
+
+Required discovery checked 15 recent entries from each trusted channel feed on
+November 5 at 19:10 UTC. Unreviewed candidates include Soobin vlog `llxqGauQkQU`
+and live archives `2uBq5VFl0V4`, `rgG0eMG6Ax0`, `LIey7QYEMCs` and `N5Ghn9ODnR4`.
+Eligibility, duration, members, duplicates and original broadcast dates remain
+unverified; feed dates describe uploads. Coverage is limited to those 60 entries.
+No catalog changes were made for the rename.
+
+Suggested commit message: `feat: rebrand the app as Soob Corner`
+
+## PPULBATU welcome and portfolio logo — November 5, 2026
+
+Added all five PPULBATU portraits above the welcome title using a locally stored
+character-reveal image, with character/member alt labels and a BIGHIT MUSIC/HYBE
+credit linking to the official announcement. The image file is unchanged; CSS
+frames its five portraits. The artwork source, ownership and member mappings
+are recorded in [visual assets](visual-assets.md).
+
+The user confirmed the portfolio's purple HOME logo after the initial asset
+search. An exact copy now replaces the brand leaf marks and supplies the favicon,
+touch/install icons and Windows executable icon. The packaging script includes
+the PNG icon input for reproducible builds. Existing storage and control behavior
+remain unchanged. Local review checked layout bounds, static rendering, image
+alt labels, source credits and isolation from History/playback. Obsolete brand
+leaf styles were removed. No dependencies or preference/schema changes were added.
+
+**287 tests**, build and lint passed. Isolated production-preview checks on
+strict port 4196 verified five loaded portraits, the 2000px HOME asset, favicon,
+touch/install metadata and all 20 combinations of five languages and
+1440/768/375/320px widths. No horizontal overflow occurred. Light, Cafe, Dark and
+Custom themes passed the selected browser checks. The mascot row has no animation
+under normal or reduced-motion settings. Timer Start/Pause, queue consumption,
+History visibility and Escape return passed; mascots do not appear over playback.
+Nine selected axe checks reported no WCAG A/AA violations; contrast remained
+incomplete. Media playback was simulated, not verified live.
+
+Updated the branding screenshots and added desktop/mobile welcome crops. The
+rebuilt executable includes 63 assets identical to `dist/`, including both new
+images. Its Windows icon resource differs from the previous build; the portfolio
+PNG and reveal JPEG match their original files byte-for-byte. Source startup
+reported `SELFTEST OK (webview import OK)` and the frozen headless startup exited
+0 with unused port/disposable data. Native window interaction remains unverified.
+Evidence is under ignored `build/skill-verification/ppulbatu-*`.
+
+Required discovery checked the four trusted recent feeds on November 5 at
+19:18 UTC, 15 entries each. Possible additions such as `llxqGauQkQU`,
+`2uBq5VFl0V4`, `rgG0eMG6Ax0`, `LIey7QYEMCs` and `N5Ghn9ODnR4` remain unreviewed
+for eligibility, duration, participants, duplicates and original broadcast dates.
+Feed dates are upload dates; coverage is limited to these 60 entries. No catalog
+changes were made. Results are in `house-icon-discovery.json` in the evidence folder.
+
+Suggested commit message: `feat: welcome MOA with PPULBATU and the portfolio HOME logo`
+
+## Faint PPULBATU background — November 5, 2026
+
+Moved the five portraits out of the foreground row into a clipped home background
+at 12% opacity. The isolated stacking context keeps the decoration below controls;
+it has no pointer events, focus targets or accessible image announcements. The
+source credit remains readable in the header. History and playback omit the layer.
+Updated the desktop/mobile home screenshots and the visual-asset documentation.
+
+Build, lint and **287 tests** passed. An isolated production preview on strict
+port 4196 passed 20 layouts across all five languages and 1440/768/375/320px widths,
+without horizontal overflow. Browser checks covered all four themes, the decorative
+layer's opacity/stacking/accessibility attributes, credit, timer keyboard activation,
+queue consumption, History and Escape return. Nine selected axe WCAG A/AA checks
+reported no violations, with color contrast requiring manual review. Desktop Light
+and Dark and mobile Dark captures were visually inspected; this is not a complete
+accessibility audit. Playback was simulated.
+
+The rebuilt executable's 63 frontend assets match `dist/` byte for byte. Source
+self-test printed `SELFTEST OK (webview import OK)` and exited 0; the frozen
+self-test also exited 0 using a disposable profile and unused port. This verifies
+startup, not live media or a rendered native window. Evidence is under ignored
+`build/skill-verification/mascot-background-*`.
+
+Required discovery checked 15 recent feed entries per trusted channel at 19:33 UTC
+on November 5. Unreviewed live candidates include `N5Ghn9ODnR4`, `2uBq5VFl0V4`
+and `rgG0eMG6Ax0`. Members, duration, duplicates and original broadcast dates still
+need curation. Coverage is limited to those 60 recent entries, not complete channel
+histories; feed timestamps describe uploads. No catalog changes were made.
+
+Suggested commit message: `style: soften PPULBATU into the home background`
+
+## Complete transparent PPULBATU stickers — November 5, 2026
+
+Replaced the cropped reveal-poster portraits with five unmodified transparent PNG
+previews from [HYBE's official LINE sticker set](https://store.line.me/stickershop/product/34033/en).
+The images show complete poses, remain static at 12% opacity and use
+`object-fit: contain` without circular masks, zoom or image offsets. The local
+files total 64,815 bytes. Palette, stacking, noninteractive decoration and readable
+source-credit behavior are retained. Removed the unused poster asset; source URLs,
+dimensions and ownership are recorded in [visual assets](visual-assets.md).
+
+Build, lint and **287 tests** passed. Isolated production-preview checks on strict
+port 4196 verified all five local images, empty decorative alt text, no focus or
+pointer targets, preserved opacity, and complete image boxes inside the viewport.
+All 20 combinations of five languages and 1440/768/375/320px widths passed without
+horizontal overflow. Checks covered four themes, timer keyboard activation, queue
+consumption, History/playback separation and Escape return. Nine selected axe
+WCAG A/AA checks found no violations; contrast was incomplete and requires manual
+review. Desktop Dark/Light and mobile Dark screenshots were visually inspected
+and refreshed under `docs/images/`. Playback was simulated.
+
+The executable was rebuilt; its 67 frontend assets match `dist/` byte for byte.
+Source self-test printed `SELFTEST OK (webview import OK)` and exited 0; frozen
+self-test also exited 0 using disposable application data and an unused port.
+These checks do not establish real playback or native window behavior.
+Asset hashes, PNG transparency/frame checks, browser
+results and desktop results are under ignored `build/skill-verification/mascot-renders-*`.
+
+Required discovery checked the latest 15 public feed entries from each of the four
+trusted channels at 19:39 UTC on November 5. Unreviewed live candidates include
+`N5Ghn9ODnR4`, `2uBq5VFl0V4` and `rgG0eMG6Ax0`. Eligibility, members, duration,
+duplicates and original broadcast dates remain unverified. Coverage is limited
+to those 60 recent uploads, not complete channel histories. No catalog changes
+were made.
+
+Suggested commit message: `style: replace cropped mascots with transparent PPULBATU stickers`
+
+## Daily background sticker rotation — November 5, 2026
+
+Expanded the local bank to 15 unmodified static PNGs, three for each PPULBATU
+character. A deterministic local-calendar selection advances each character's
+pose daily, retaining exactly one of each character. The current bank repeats
+every three days; reloads and returning home keep the day's selection. A single
+cleaned-up timeout targets the next local midnight; focus/pageshow/visible return
+catch up after sleep. No storage schema, network service or dependency was added.
+Bank metadata, selection and date lifecycle live in separate data/lib/hook modules.
+Sources and extension instructions are in [visual assets](visual-assets.md).
+
+Build, final TypeScript check, lint and **302 tests across 34 files** passed.
+The 15 new tests cover unique character coverage, each bank's cycle, stable daily
+choices, calendar boundaries, midnight scheduling, wake recovery and cleanup.
+Existing welcome-tab tests now supply the browser event targets required by the
+date hook; their initial missing-document failures were resolved in the harness.
+Scoped local structural review found no remaining supported issues. The shared
+toolkit is not installed; local project review guidance was used instead.
+
+An isolated production preview on strict port 4196 used America/New_York and
+Playwright's simulated clock to verify live midnight replacement, stable reloads,
+returning from History and wake catch-up. A running focus timer continued through
+the swap at 24:57 and its two-item queue remained intact. All 15 bank images
+loaded across three dates. Twelve layouts (three dates at 1440/768/375/320px)
+fit without horizontal overflow or image-box clipping. The same bank remained
+decorative and noninteractive at 12% opacity. Separate 23-hour spring and 25-hour
+autumn days rotated exactly at local midnight. Desktop captures for all three
+sets and a mobile capture were visually inspected. Updated home screenshots and
+two consecutive-date examples live under `docs/images/`. No live media was tested.
+Prior unchanged CSS/theme/language accessibility evidence remains applicable;
+this change does not establish full accessibility compliance.
+
+The rebuilt executable's 77 frontend assets match `dist/` byte for byte. Source
+self-test printed `SELFTEST OK (webview import OK)` and exited 0; frozen self-test
+also exited 0 with disposable application data and an unused port. These checks
+verify startup, not a rendered native window. Browser results, image hashes,
+discovery, local review and desktop results are under ignored
+`build/skill-verification/daily-stickers-*`.
+
+Required discovery checked the latest 15 public feed entries from each trusted
+channel at 19:48 UTC on November 5. Unreviewed candidates include live uploads
+`N5Ghn9ODnR4`, `2uBq5VFl0V4` and `rgG0eMG6Ax0`. Eligibility, participants,
+duration, duplicates and original broadcast dates still need review. Coverage is
+limited to 60 recent uploads, not complete channel histories. No catalog changes
+were made.
+
+Suggested commit message: `feat: rotate PPULBATU background stickers daily`
+
+## Selected Study Cottage logo — November 5, 2026
+
+Applied the user's first selected logo concept as `public/soob-corner-logo.png`,
+an exact copy of `docs/images/logo-concepts/study-cottage.png`. The 1254px square
+RGBA image retains its pixels and alpha. It replaces the portfolio HOME wordmark
+in the welcome heading, workspace brand, favicon, touch/install metadata and
+Windows icon input. Branding images use contain sizing without a rounded mask.
+The original concept and generation prompt remain in `docs/`; the former HOME
+asset remains available at its old URL for compatibility.
+
+Build, lint and **302 tests** passed. Isolated browser verification on strict
+port 4196 checked the new asset in both headers, favicon/touch links and manifest
+dimensions. Twenty language/width layouts across five languages and
+1440/768/375/320px fit without horizontal overflow. All four themes were checked,
+along with timer/queue actions, History/playback boundaries and Escape return.
+Nine selected axe WCAG A/AA checks found no violations, with color contrast
+requiring manual review; this is not a full accessibility audit. Desktop Light,
+mobile Dark and the 24px workspace logo were visually inspected. Home/workspace
+and consecutive-day sticker screenshots were refreshed. Playback was simulated.
+
+The rebuilt executable's 78 frontend assets match `dist/` byte for byte. Its seven
+native icon resources changed from the previous HOME icon; the source logo hash
+matches the selected concept. Source self-test printed `SELFTEST OK (webview
+import OK)` and exited 0; frozen self-test also exited 0 using disposable data and
+an unused port. This verifies startup, not native window interaction or streaming.
+Evidence is under ignored `build/skill-verification/cottage-logo-*`.
+
+Required discovery checked the latest 15 public feed entries from each trusted
+channel at 19:59 UTC on November 5. Unreviewed candidates include live uploads
+`N5Ghn9ODnR4`, `2uBq5VFl0V4` and `rgG0eMG6Ax0`; eligibility, members, duration,
+duplicates and original broadcast dates remain unverified. Coverage is limited to
+60 recent uploads, not complete channel histories. No catalog changes were made.
+
+Suggested commit message: `style: adopt the Study Cottage logo for Soob Corner`

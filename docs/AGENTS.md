@@ -55,7 +55,7 @@ over upstream model-provider, delegation, rebasing and commit examples.
 
 ## What this is
 
-A LifeAt-style Pomodoro study app whose video background is drawn from the
+Soob Corner is a LifeAt-style Pomodoro study app whose video background is drawn from the
 "Study w/ Soobin" YouTube playlist (TXT member Soobin's vlogs/VLIVEs). React
 + Vite + TypeScript + Tailwind, client-side only, no backend.
 
@@ -84,6 +84,27 @@ React server render and YouTube API recovery with fake timers and a mocked
 document. These tests do not verify live playback or interactive browser behavior.
 
 ## Architecture
+
+The visible app name is **Soob Corner**, shared by React through
+`lib/branding.ts`. Keep browser/install metadata and the desktop window title in
+sync. Existing `sws.*` storage keys, the `StudyWithSoobin` desktop profile folder,
+stable port and executable filename are compatibility identifiers, independent
+of the display name. The source YouTube playlist keeps its original title.
+`PpulbatuWelcome` displays five faint stickers behind the Videos welcome view,
+one for each character. `data/ppulbatu.ts` groups the local sticker bank by character;
+`lib/ppulbatu.ts` selects one pose per group deterministically by local calendar day.
+Each character advances through its own bank, with the same selection on reload.
+`useLocalDay` refreshes at the next local midnight and on focus/pageshow/visible
+return, using a cleaned-up timeout rather than polling. Calendar arithmetic reuses
+`lib/stats.ts` and must remain independent of elapsed hours/DST. Selection never
+writes storage or changes timer/media state. The images remain static between
+daily swaps. The decorative layer is hidden from assistive technology and cannot
+receive pointer events or focus; the source/rights credit stays in the header. Its locally stored
+transparent PNGs and the selected Study Cottage logo are documented in
+[visual assets](visual-assets.md). `public/soob-corner-logo.png` is the unchanged
+selected PNG from `docs/images/logo-concepts/study-cottage.png`. Reuse it for browser/install
+icons and the Windows executable (`--icon` in `scripts/build-exe.bat`). Keep the
+mascots behind the content without animation, layout shifts or playback overlays.
 
 `i18n/LanguageProvider` owns the separate validated `sws.language` preference
 and document `lang`; English is the default, with Simplified Chinese, Korean,
