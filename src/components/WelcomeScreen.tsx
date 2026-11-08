@@ -100,7 +100,7 @@ function WelcomeScreenInner({
       <div id="welcome-videos" role="tabpanel" aria-labelledby="welcome-tab-videos" tabIndex={0} hidden={view !== 'videos'}>
         <header className="welcome-header text-center">
           <h1 tabIndex={-1} className="text-3xl font-semibold text-ink-900 dark:text-cream-100">
-            <img className="welcome-home-logo" src="/soob-corner-logo.png" width={44} height={44} alt="" />
+            <img className="welcome-home-logo" src="/soob-house-logo-transparent.png" width={44} height={44} alt="" />
             {APP_NAME}
           </h1>
           <p className="mt-2 text-sm text-ink-700 dark:text-cream-300">

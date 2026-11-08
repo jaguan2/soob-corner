@@ -7,6 +7,6 @@
   "background_color": "#FDFBF7",
   "theme_color": "#D9924F",
   "icons": [
-    { "src": "/soob-corner-logo.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any" }
+    { "src": "/soob-house-logo-transparent.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any" }
   ]
 }

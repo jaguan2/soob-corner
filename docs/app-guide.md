@@ -18,7 +18,7 @@ an internet connection since the videos stream from YouTube.)
 ## Features
 
 - A faint **PPULBATU** background on the home page, featuring all five
-  members' characters, alongside Soob Corner's purple Study Cottage logo.
+  members' characters, alongside Soob Corner's purple SOOB house logo.
   Complete character stickers with transparent backgrounds sit behind the content,
   stay static and do not block controls.
   They stay out of Watch history and the playback workspace. See

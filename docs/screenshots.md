@@ -25,17 +25,17 @@ using a simulated browser clock; the bank repeats every three days.
 
 ![November 6 background sticker selection](images/daily-stickers-day-2.jpg)
 
-### Selected Study Cottage logo — November 5, 2026
+### Selected SOOB house logo — November 7, 2026
 
 The home page now welcomes visitors with all five PPULBATU character stickers
 spread across the background at 12% opacity. These transparent PNGs show complete
 poses without the earlier circular portrait crops.
-The selected purple Study Cottage logo appears beside the app name and in the
+The selected purple SOOB house logo appears beside the app name and in the
 browser/install icons. The stickers sit behind the content, remain static and
 do not block the timer, queue or navigation. The credit remains readable.
 See [artwork sources and credits](visual-assets.md).
 
-![Faint PPULBATU background and Study Cottage logo](images/ppulbatu-welcome.jpg)
+![Faint PPULBATU background and SOOB house logo](images/ppulbatu-welcome.jpg)
 
 ![PPULBATU welcome area on a narrow screen](images/ppulbatu-mobile.jpg)
 

@@ -261,7 +261,7 @@ export default function App() {
           aria-label={t("Back to video selection")} aria-keyshortcuts="Escape" title={t("Back to video selection (Esc)")}
           className="workspace-button workspace-back toolbar-icon"><UIIcon name="arrowLeft" size={20} /></button>
         <div className="workspace-heading">
-          <p className="workspace-brand"><img className="workspace-home-logo" src="/soob-corner-logo.png" width={24} height={24} alt="" />{APP_NAME}</p>
+          <p className="workspace-brand"><img className="workspace-home-logo" src="/soob-house-logo-transparent.png" width={24} height={24} alt="" />{APP_NAME}</p>
           <p className="workspace-video-title" title={currentVideo.title}>{currentVideo.title}</p>
         </div>
         <div className="toolbar-actions">

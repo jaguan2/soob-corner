@@ -100,10 +100,11 @@ return, using a cleaned-up timeout rather than polling. Calendar arithmetic reus
 writes storage or changes timer/media state. The images remain static between
 daily swaps. The decorative layer is hidden from assistive technology and cannot
 receive pointer events or focus; the source/rights credit stays in the header. Its locally stored
-transparent PNGs and the selected Study Cottage logo are documented in
-[visual assets](visual-assets.md). `public/soob-corner-logo.png` is the unchanged
-selected PNG from `docs/images/logo-concepts/study-cottage.png`. Reuse it for browser/install
-icons and the Windows executable (`--icon` in `scripts/build-exe.bat`). Keep the
+transparent PNGs and the selected SOOB house logo are documented in
+[visual assets](visual-assets.md). `public/soob-house-logo-transparent.png` is the active
+RGBA house logo with SO / OB lettering and transparent negative space. Reuse it for
+browser/install icons and the Windows executable (`--icon` in `scripts/build-exe.bat`).
+The original white-background user image remains at `public/soob-house-logo.png`. Keep the
 mascots behind the content without animation, layout shifts or playback overlays.
 
 `i18n/LanguageProvider` owns the separate validated `sws.language` preference

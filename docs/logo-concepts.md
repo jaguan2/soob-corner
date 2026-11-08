@@ -2,11 +2,15 @@
 
 Generated November 5, 2026 using the built-in image generation tool and the
 `imagegen` skill.
-The user selected **Study Cottage** as the production logo.
+The user initially selected **Study Cottage**, then supplied a revised purple
+house icon containing **SO / OB** in a two-by-two letter grid. That exact supplied
+image, preserved at `public/soob-house-logo.png`, is the source of the production
+logo. Its transparent derivative is `public/soob-house-logo-transparent.png`; see
+[visual assets](visual-assets.md) for the background-removal prompt.
 All three PNGs have genuine transparency; source outputs were copied without
 altering their pixels or alpha. `public/soob-corner-logo.png` is an exact copy of
-the Study Cottage PNG and is used by the app, browser/install metadata and Windows
-executable icon. The other two directions remain archived explorations.
+the Study Cottage PNG and is retained as an earlier asset. The original three
+directions remain archived explorations; see [current visual assets](visual-assets.md).
 
 The brief is a welcoming house-inspired identity for a TXT fan study app,
 with simple silhouettes suitable for developing into small icons and a wordmark.
@@ -25,6 +29,9 @@ The selected design retains that appearance and its alpha channel. CSS uses
 as separate versions rather than overwriting the selected source artwork.
 
 ## Concepts
+
+The latest [minimal SOOB house exploration](soob-house-grid-notes.md) places the
+letters in a two-by-two grid, with full prompts and a transparent PNG.
 
 ### Study Cottage
 

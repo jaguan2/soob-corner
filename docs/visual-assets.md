@@ -1,8 +1,34 @@
 # Visual assets
 
-## Study Cottage logo
+## Selected SOOB house logo
 
-`public/soob-corner-logo.png` is the user's selected Study Cottage concept from
+`public/soob-house-logo-transparent.png` is the active 1254 x 1254px RGBA
+logo. The white background was removed with the built-in image editing tool on
+November 8, 2026, at the user's request. Transparent negative space extends
+inside the purple house and the SO / OB letter counters, so the mark blends into
+Light, Cafe, Dark and Custom backgrounds. SHA-256:
+`bcfe336e899486ef0ba9bf171c3fa29a4a7564bb72cc386ec9af14ad95e85ad3`.
+
+The welcome heading, workspace brand, favicon, touch/install metadata and Windows
+executable use the transparent asset. Header dimensions remain fixed with contain
+sizing. Packaging passes the PNG to PyInstaller's icon converter; all seven native
+icon sizes retain alpha transparency.
+
+The original user-provided RGB image remains unchanged at
+`public/soob-house-logo.png` (SHA-256
+`4cd3be53ecbf2fd3baf62b44e6b6a24ef94494e142d2913db1b598802a6f7e00`).
+Earlier explorations remain in [logo concepts](logo-concepts.md) and
+[the two-by-two prototype notes](soob-house-grid-notes.md).
+
+### Background-removal prompt
+
+```text
+Use case: background-extraction. Edit target: the supplied Soob house logo. Create the same logo with a genuinely transparent background. Remove all white/off-white background, including inside the house outline and the counters in the O and B letters. Preserve the purple house outline, exact SO / OB two-by-two lettering, purple gradient, shapes, relative position and proportions. No redesign, no extra artwork, no white matte, no shadow. Keep centered square composition. This is an app logo to blend cleanly into light, cafe, charcoal and custom theme backgrounds. Output RGBA PNG with clean antialiased edges.
+```
+
+## Previous Study Cottage logo
+
+`public/soob-corner-logo.png` is the previously selected Study Cottage concept from
 [the house-inspired logo exploration](logo-concepts.md). It was generated with
 the built-in image generation tool on November 5, 2026, then copied unchanged
 from `docs/images/logo-concepts/study-cottage.png`. The RGBA PNG is 1254 × 1254px
@@ -10,10 +36,9 @@ with genuine transparency; it depicts a purple cottage, cream facade, golden
 window and small star. Its SHA-256 is
 `6990eb659ab6e165bf58ad362a90e4566950b75bec3a8f741b8b33e81896a335`.
 
-The welcome heading, workspace brand, favicon, touch/install metadata and Windows
-executable use this asset. Keep the native PNG's transparency and use contain
-sizing; the packaging script passes it to PyInstaller's icon converter. The
-generation prompt and all three original concepts remain under `docs/`.
+This earlier asset remains at its previous URL for compatibility. Its generation
+prompt and the original concepts remain under `docs/`; active branding now uses
+`soob-house-logo-transparent.png`.
 
 ## Previous HOME logo
 
@@ -21,7 +46,7 @@ generation prompt and all three original concepts remain under `docs/`.
 `personal-portfolio/public/logo.png`, used at their request. The original is
 2000 × 2000px. It was used before the Study Cottage logo was selected. The
 original file is retained at its earlier URL for compatibility; active branding
-uses `soob-corner-logo.png`.
+uses `soob-house-logo-transparent.png`.
 
 ## PPULBATU background stickers
 

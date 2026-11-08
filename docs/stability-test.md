@@ -789,3 +789,97 @@ duplicates and original broadcast dates remain unverified. Coverage is limited t
 60 recent uploads, not complete channel histories. No catalog changes were made.
 
 Suggested commit message: `style: adopt the Study Cottage logo for Soob Corner`
+
+## User-selected SOOB house icon — November 7, 2026
+
+Replaced the Study Cottage branding with the exact user-provided PNG containing
+SO / OB inside a purple house. The 1254px square RGB file is stored at
+`public/soob-house-logo.png`; its white background, colors and bytes were preserved.
+The source SHA-256 is
+`4cd3be53ecbf2fd3baf62b44e6b6a24ef94494e142d2913db1b598802a6f7e00`.
+This is distinct from the earlier transparent generated prototype. Updated both
+app headers, favicon/touch links, install metadata and Windows packaging icon.
+Contain sizing and rounded badge corners accommodate its white background.
+
+Build, lint and **302 tests across 34 files** passed. Isolated production-preview
+checks on strict port 4196 verified the new image in both headers, favicon/touch
+links and manifest size. Twenty layouts (five languages at 1440/768/375/320px)
+fit without horizontal overflow; all four themes passed the feature checks.
+Timer/queue actions, History/playback boundaries and Escape return were checked.
+Nine selected axe WCAG A/AA checks found no violations; color contrast remained
+incomplete, so this is not a complete accessibility audit. Desktop Light, mobile
+Dark and the small workspace header were visually inspected. Current branding
+and consecutive-day sticker screenshots were refreshed. Playback was simulated.
+
+The rebuilt executable's 79 frontend assets match `dist/` byte for byte, including
+the exact selected PNG. All seven native icon resources were replaced. Source
+self-test printed `SELFTEST OK (webview import OK)` and exited 0; frozen self-test
+also exited 0 with disposable application data and an unused port. These checks
+verify server startup, not native window interaction or live media.
+
+Required catalog discovery attempted all four trusted public YouTube channel
+feeds at 07:07 UTC on November 7. Each returned HTTP 404, so recent upload coverage
+and candidate eligibility could not be verified. No catalog changes were made.
+The failure details and source/browser evidence are under ignored
+`build/skill-verification/soob-house-icon-*`.
+
+Suggested commit message: `style: use the SOOB house icon across the app`
+
+
+## Outgoing UI release review and transparent logo - November 8, 2026
+
+Reviewed the working tree and the four `dev` commits ahead of `origin/main`,
+covering branding, daily stickers, welcome/history layouts, languages, and
+English-preferred catalog titles. No release-blocking regression was found in
+this scope. Timer/media ownership, mounted tool panels, guarded persistence,
+local calendar arithmetic and theme cleanup remain intact. Shared toolkit
+skills were unavailable locally; review followed the repository adapters and
+architecture guidance without claiming the upstream rubric was completed.
+
+Replaced active logo references with `public/soob-house-logo-transparent.png`,
+a 1254 x 1254 RGBA derivative created with the built-in image editor. The original
+user image is preserved. Actual browser canvas reads confirmed alpha 0 in the
+outer background and the house interior. Both headers, favicon, touch icon,
+manifest and Windows packaging now select the transparent version. Visual asset
+documentation records the prompt and hash. Removed the badge rounding introduced
+for the former white background.
+
+Validation on the production preview at `http://127.0.0.1:4196/`:
+
+- TypeScript/production build, ESLint and all 302 Vitest tests across 34 files passed.
+  The 10 catalog-script tests also passed through their Vitest runner.
+- Catalog search changed 254 results to 0, disabled Surprise me, and restored 254
+  with Clear filters. Queue selection was consumed through normal playback.
+- Welcome, workspace Settings and Timer fit all five languages at widths 1440,
+  768, 375 and 320 without page horizontal overflow (60 layout measurements).
+- Light, Cafe, Dark and Custom controls worked; switching away from Custom
+  removed its inline palette overrides. Desktop and mobile screenshots were
+  visually inspected for logo blending, header placement and responsive layout.
+- A running timer continued in a hidden panel (24:18 to 24:16), then remained
+  at 24:15 after Pause. Tasks survived tab changes. History tabs, Escape focus,
+  Zen hiding and return navigation worked through normal user controls.
+- A live YouTube archive visibly played and produced one history entry. Captions,
+  audible output, full embed availability and a complete accessibility audit
+  remain outside this check. Console errors were blocked third-party ad requests.
+- Rebuilt `StudyWithSoobin.exe`; all 80 embedded frontend files match `dist/`
+  byte-for-byte. All seven native PNG icon resources retain alpha transparency.
+  Source and frozen self-tests printed `SELFTEST OK (webview import OK)` and
+  exited 0 using a disposable profile and unused port. This proves startup,
+  not native window interaction or persistence across launches.
+
+Required discovery checked the newest 15 public feed entries on each of the four
+trusted channels on November 8 (60 uploads total), compared IDs with the bundled
+catalog, and ran targeted public searches. Unlisted, unreviewed candidates include
+Soobin TXT-LOG `llxqGauQkQU` (uploaded October 17), and TomorrowByEdits archives
+`2uBq5VFl0V4` (title says November 1, Yeonjun/Beomgyu), `rgG0eMG6Ax0`
+(October 27, Beomgyu/Soobin), and `LIey7QYEMCs` (October 25, Yeonjun/Kai/Taehyun).
+These are candidates only: duration thresholds, explicit participation, multipart
+status, original broadcast dates and duplicate broadcasts still need review.
+Feed publication timestamps are upload dates, not verified broadcast dates.
+Older unlisted archive entries also remain unreviewed. This limited recent-feed
+check does not establish complete coverage of all members' channel histories.
+No catalog snapshots or curation files were changed.
+
+Logs, discovery JSON, bundle comparison, desktop diagnostics and screenshots are
+under ignored `build/skill-verification/release-20261108/`. No commit or push was
+performed.
