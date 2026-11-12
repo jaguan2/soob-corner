@@ -1,6 +1,6 @@
 # TXT video catalog
 
-Verified metadata on October 2, 2026 (America/New_York). 254 videos. Refresh with `npm run fetch-playlist`.
+Catalog generated at 2026-11-03T23:16:44.492Z (UTC). 254 videos. Refresh with `npm run fetch-playlist`.
 
 Sources: [Study w/ Soobin playlist](https://www.youtube.com/playlist?list=PLwzQP2wCE5w4hRj01BS0zxO2Bu8eaBDWt), [TXT official](https://www.youtube.com/@TXT_bighit), [Moa's Diary](https://www.youtube.com/channel/UC2JQbysBeEG5KmbEuxrSWDw), [V Live archive](https://www.youtube.com/channel/UC2fPZ1O4sXfOVVzdVvN_v5g), [TomorrowByEdits](https://www.youtube.com/channel/UC7m6u7W7QM1zv1hlPXbSPQA).
 
@@ -13,7 +13,7 @@ Release is the YouTube publication date; original live dates are listed separate
 | [[TXT-LOG] SOOBIN IN U.S l 수빈의 브이로그🐰](https://www.youtube.com/watch?v=Zgcmu8Wpsdc) | vlog | 21:12 | 2022-11-17 | — | TOMORROW X TOGETHER OFFICIAL |
 | [[TXT-LOG] SOOBIN IN JAPAN \| 수빈만의 말랑 감성으로 가득한 하루🐰💖](https://www.youtube.com/watch?v=eqfYyTEak8w) | vlog | 44:14 | 2023-07-17 | — | TOMORROW X TOGETHER OFFICIAL |
 | [[TXT-LOG] 수빈이의 첫 일본 여행 VLOG🐰✈️ l 버킷리스트🗒를 위한 ISFP의 J형 여행 도전기🚌💦](https://www.youtube.com/watch?v=EWRjRcNfrrs) | vlog | 31:49 | 2023-05-05 | — | TOMORROW X TOGETHER OFFICIAL |
-| [토끼상의 새 친구(이)가 나타났다! 효과는 굉장했다!   「채씨표류기」 8화](https://www.youtube.com/watch?v=_YjRPbg5ZRA) | other | 33:39 | 2023-10-20 | — | 채씨표류기 |
+| [A new friend for the rabbit-face has appeared! It was super effective! 「Chae’s Castaway」 Episode 8](https://www.youtube.com/watch?v=_YjRPbg5ZRA) | other | 33:39 | 2023-10-20 | — | 채씨표류기 |
 | [(ENG/INDO SUB) TXT Soobin VLive \| 220728 \| I'm here!](https://www.youtube.com/watch?v=wB57ZVKJfzY) | live | 1:29:20 | 2022-07-28 | 2022-07-28 | V Live |
 | [[MULTI SUB] TXT WEVERSE LIVE (27.04.2024) \| 🫠 - SOOBIN LIVE](https://www.youtube.com/watch?v=5Phvt3sZMrU) | live | 52:46 | 2024-04-26 | 2024-04-27 | S.M. KDrama & Kpop |
 | [TXT Soobin VLive \| 210408 (Eng/Indo/Thai/Viet Sub)](https://www.youtube.com/watch?v=sJY1FU3DrIE) | live | 40:21 | 2021-04-08 | 2021-04-08 | V Live |
@@ -156,7 +156,7 @@ Release is the YouTube publication date; original live dates are listed separate
 | [[MULTI SUB] TXT WEVERSE LIVE (2025.04.30) \| SOOBIN & YEONJUN LIVE](https://www.youtube.com/watch?v=3jCGIvGC_GM) | live | 43:15 | 2025-04-30 | 2025-04-30 | TomorrowByEdits |
 | [[TXT-LOG] TXT IN PARIS✈️ feat.연준캠🦊+범규캠🧸+카이캠🐧 \| 패션쇼🕺도 보고 에펠탑 앞에서 찰칵📸✨](https://www.youtube.com/watch?v=PkEox9R3sMQ) | vlog | 18:55 | 2024-02-22 | — | TOMORROW X TOGETHER OFFICIAL |
 | [[MULTI SUB] TXT WEVERSE LIVE (2025.09.28) \| YEONJUN LIVE](https://www.youtube.com/watch?v=yN3C244n4kg) | live | 1:21:12 | 2025-09-28 | 2025-09-28 | TomorrowByEdits |
-| [[MULTI SUB] TXT WEVERSE LIVE (2026.05.23) \| YEONJUN LIVE](https://www.youtube.com/watch?v=2gIZzQXs5es) | live | 1:15:37 | 2026-05-23 | 2026-05-23 | TomorrowByEdits |
+| [[MULTI SUB] TXT WEVERSE LIVE (05/23/2026) \| YEONJUN LIVE](https://www.youtube.com/watch?v=2gIZzQXs5es) | live | 1:15:37 | 2026-05-23 | 2026-05-23 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2026.02.08) \| YEONJUN LIVE](https://www.youtube.com/watch?v=slQJe4MUn1c) | live | 1:16:45 | 2026-02-08 | 2026-02-08 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2026.08.16) \| YEONJUN LIVE](https://www.youtube.com/watch?v=yk8fkVGbHS4) | live | 44:31 | 2026-08-16 | 2026-08-16 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2026.03.04) \| YEONJUN LIVE (7TH DEBUT ANNIVERSARY)](https://www.youtube.com/watch?v=hDsPxPc7N0M) | live | 41:51 | 2026-03-03 | 2026-03-04 | TomorrowByEdits |
@@ -281,7 +281,7 @@ Release is the YouTube publication date; original live dates are listed separate
 | [[MULTI SUB] TXT WEVERSE LIVE (2025.04.26) \| TAEHYUN & BEOMGYU LIVE](https://www.youtube.com/watch?v=kiYRhjfWVhs) | live | 47:46 | 2025-04-26 | 2025-04-26 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2025.12.07) \| TAEHYUN LIVE](https://www.youtube.com/watch?v=3xd97W2pNoI) | live | 33:47 | 2025-12-07 | 2025-12-07 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2026.01.18) \| TAEHYUN LIVE](https://www.youtube.com/watch?v=fDPCEnD1LWg) | live | 40:12 | 2026-01-18 | 2026-01-18 | TomorrowByEdits |
-| [[MULTI SUB] TXT WEVERSE LIVE (2026.05.27) \| TAEHYUN LIVE](https://www.youtube.com/watch?v=jbm-bWsw7XQ) | live | 33:54 | 2026-05-27 | 2026-05-27 | TomorrowByEdits |
+| [[MULTI SUB] TXT WEVERSE LIVE (05/27/2026) \| TAEHYUN LIVE](https://www.youtube.com/watch?v=jbm-bWsw7XQ) | live | 33:54 | 2026-05-27 | 2026-05-27 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2026.05.11) \| TAEHYUN LIVE](https://www.youtube.com/watch?v=x0TUDo9cRLs) | live | 42:51 | 2026-05-11 | 2026-05-11 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2025.08.29) \| TAEHYUN LIVE](https://www.youtube.com/watch?v=bxn__RjXHWs) | live | 47:33 | 2025-08-29 | 2025-08-29 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2026.06.17) \| TAEHYUN LIVE](https://www.youtube.com/watch?v=eghKdqOGZmo) | live | 40:45 | 2026-06-17 | 2026-06-17 | TomorrowByEdits |
@@ -294,7 +294,7 @@ Release is the YouTube publication date; original live dates are listed separate
 | [HUENINGKAI in Shanghai 🇨🇳 \| TXT-LOG \| TXT (투모로우바이투게더)](https://www.youtube.com/watch?v=lKqZB8PcLDs) | vlog | 23:13 | 2025-07-12 | — | TOMORROW X TOGETHER OFFICIAL |
 | [[TXT-LOG] HUENINGKAI IN U.S l 휴닝카이의 브이로그🐧](https://www.youtube.com/watch?v=1Bo885R_PLg) | vlog | 16:23 | 2022-10-27 | — | TOMORROW X TOGETHER OFFICIAL |
 | [[TXT-LOG] HUENINGKAI IN JAPAN l 투어 기간에는 무엇을 할까? 휴닝카이의 모든 일상 대공개🐧✨](https://www.youtube.com/watch?v=wD16qH1B6N0) | vlog | 28:13 | 2023-07-10 | — | TOMORROW X TOGETHER OFFICIAL |
-| [중국어는 너무 어려워 #1 \| TXT-LOG \| TXT (투모로우바이투게더)️](https://www.youtube.com/watch?v=ujWyDnIjHoo) | vlog | 17:34 | 2026-01-29 | — | TOMORROW X TOGETHER OFFICIAL |
+| [TXT-LOG Huening's Chinese Challenge](https://www.youtube.com/watch?v=ujWyDnIjHoo) | vlog | 17:34 | 2026-01-29 | — | TOMORROW X TOGETHER OFFICIAL |
 | [[TXT VLIVE] Hueningkai's First Birthday {14th Aug, 2020}](https://www.youtube.com/watch?v=n1hx82U1XIc) | live | 42:29 | 2022-09-20 | 2020-08-14 | Moa's Diary |
 | [[TXT VLIVE] 휴닝's 브이앱 / Huening Kai's V LIVE! {29th July, 2019}](https://www.youtube.com/watch?v=6TfJEp7u0T4) | live | 41:17 | 2022-08-09 | 2019-07-29 | Moa's Diary |
 | [(ENG/INDO SUB) TXT Hueningkai & Soobin VLive \| 220615 \| Gumz🐰🐧🫒🍉🍎🍋](https://www.youtube.com/watch?v=zi9vk_QQE3I) | live | 52:39 | 2022-06-15 | 2022-06-15 | V Live |
@@ -343,7 +343,7 @@ Release is the YouTube publication date; original live dates are listed separate
 | [TXT Hueningkai VLive \| 210708 \| I'm revealing it🐧 (Eng Sub)](https://www.youtube.com/watch?v=yZaMw1wNfxI) | live | 36:00 | 2021-07-08 | 2021-07-08 | V Live |
 | [TXT Taehyun & Hueningkai VLive \| 210523 \| 🌹Who knows how to make perfume~🐿🐧🌹 (Eng Sub)](https://www.youtube.com/watch?v=O8ynK4hrpAg) | live | 43:27 | 2021-05-23 | 2021-05-23 | V Live |
 | [[MULTI SUB] TXT WEVERSE LIVE (2025.10.22) \| KAI LIVE](https://www.youtube.com/watch?v=h_HLXwg9aQA) | live | 44:59 | 2025-10-22 | 2025-10-22 | TomorrowByEdits |
-| [[MULTI SUB] TXT WEVERSE LIVE (2026.05.24) \| HUENING KAI LIVE](https://www.youtube.com/watch?v=jTek-EKJgpU) | live | 30:16 | 2026-05-24 | 2026-05-24 | TomorrowByEdits |
+| [[MULTI SUB] TXT WEVERSE LIVE (05/24/2026) \| HUENING KAI LIVE](https://www.youtube.com/watch?v=jTek-EKJgpU) | live | 30:16 | 2026-05-24 | 2026-05-24 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2026.06.16) \| HUENING KAI LIVE](https://www.youtube.com/watch?v=gu33StEY-PU) | live | 33:05 | 2026-06-16 | 2026-06-16 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2025.11.16) \| KAI LIVE](https://www.youtube.com/watch?v=5ivUxeCBuqY) | live | 1:00:01 | 2025-11-16 | 2025-11-16 | TomorrowByEdits |
 | [[MULTI SUB] TXT WEVERSE LIVE (2026.06.20) \| YEONJUN & KAI LIVE (PLAYING OVERWATCH)](https://www.youtube.com/watch?v=HzbHnJdbRAo) | live | 1:31:52 | 2026-06-20 | 2026-06-20 | TomorrowByEdits |

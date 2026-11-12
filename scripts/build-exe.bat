@@ -25,6 +25,7 @@ echo Building StudyWithSoobin.exe (this can take a minute)...
   --distpath . ^
   --workpath build ^
   --specpath build ^
+  --icon "%CD%\public\soob-house-logo-transparent.png" ^
   --add-data "%CD%\dist;dist" ^
   desktop\launcher.py || goto :error
 

@@ -14,35 +14,123 @@ documentation. Capture the running app, including real playback when available.
 
 ## Current dark-mode screenshots
 
-### Mobile timer and welcome controls — November 3, 2026
+### Daily PPULBATU rotation — November 5, 2026
+
+The background rotates through three static poses per character, always showing
+one of each of the five characters. It updates at local midnight and catches up
+when returning to the app. These isolated captures demonstrate November 5 and 6
+using a simulated browser clock; the bank repeats every three days.
+
+![November 5 background sticker selection](images/daily-stickers-day-1.jpg)
+
+![November 6 background sticker selection](images/daily-stickers-day-2.jpg)
+
+### Selected SOOB house logo — November 7, 2026
+
+The home page now welcomes visitors with all five PPULBATU character stickers
+spread across the background at 12% opacity. These transparent PNGs show complete
+poses without the earlier circular portrait crops.
+The selected purple SOOB house logo appears beside the app name and in the
+browser/install icons. The stickers sit behind the content, remain static and
+do not block the timer, queue or navigation. The credit remains readable.
+See [artwork sources and credits](visual-assets.md).
+
+![Faint PPULBATU background and SOOB house logo](images/ppulbatu-welcome.jpg)
+
+![PPULBATU welcome area on a narrow screen](images/ppulbatu-mobile.jpg)
+
+The welcome heading, workspace header, browser title and install name now read
+**Soob Corner**. These captures use an isolated demo profile. The workspace image
+is a header crop; playback was simulated and is outside the image.
+
+![Soob Corner welcome screen](images/soob-corner-home.jpg)
+
+![Soob Corner workspace header](images/soob-corner-workspace-header.jpg)
+
+Earlier captures below retain the display name used on their capture date.
+
+### Compact timer and queue — November 4, 2026
+
+The start screen places a small Timer card beside the wider Up next card, above
+video discovery. At widths below 768px they stack. Long queues scroll within
+their card, with all reorder/remove/play actions available. These isolated demo
+captures use three queued videos on desktop and two on mobile.
+
+![Video list with compact Timer and Up next cards](images/welcome-layout.jpg)
+
+![Stacked timer and queue cards on a narrow screen](images/welcome-layout-mobile.jpg)
+
+The timer keeps the same Start/Pause control. This isolated capture shows its
+keyboard focus outline while running; no player is visible.
+
+![Compact welcome timer with a pause action](images/welcome-timer.jpg)
+
+### Interface languages — November 3, 2026
+
+Settings offers English, Simplified Chinese, Korean, Spanish and Japanese. These isolated
+demo captures show Chinese/Japanese settings and Spanish/Japanese timers at a 375px viewport.
+The timer crop excludes a simulated background player; it does not verify live
+media. Language changes preserve the current study session and saved user text.
+
+![Simplified Chinese interface and language setting](images/language-settings.jpg)
+
+![Spanish timer with readable mobile presets](images/language-timer-spanish.jpg)
+
+![Japanese interface and language setting](images/language-settings-japanese.jpg)
+
+![Japanese timer and expanded session settings](images/language-timer-japanese.jpg)
+
+### English-preferred video labels — November 3, 2026
+
+This real catalog entry uses YouTube's English watch-page title. Its Korean
+original remains searchable and available in the card tooltip. Titles without
+an English version remain in their original language. The capture uses an
+isolated browser profile and does not imply that playback was verified.
+
+![YouTube-supplied English video title](images/english-title.jpg)
+
+### Mobile focus timer — November 3, 2026
 
 The narrow-screen dock grows with its content so Start and quick durations use
 normal page scrolling. This crop shows the full dock at a 375px viewport with a
-15-minute preset. The welcome screen keeps Start/Pause available before choosing
-a video and after returning from one. Both captures use an isolated demo profile;
-the background player was mocked and is outside these crops.
+15-minute preset. This capture uses an isolated demo profile; the background
+player was mocked and is outside the crop.
 
 ![Mobile dock with timer transport and presets](images/mobile-timer.jpg)
 
-![Welcome timer with a pause action](images/welcome-timer.jpg)
-
-### Video queue — November 3, 2026
+### Video queue — November 4, 2026
 
 The start screen's **Up next** list saves your selected videos in order. Use
 the arrows to reorder, remove individual entries, or **Play queue** to begin.
 The same queue is available in the **Videos & sound** tab during study sessions.
 This capture uses an isolated browser profile with three catalog videos queued.
 
-![Saved video queue and Add to queue controls](images/video-queue.jpg)
+![Compact timer beside the saved video queue](images/video-queue.jpg)
 
-### Watch history and viewing stats — November 3, 2026
+### Watch history by day — November 4, 2026
 
-History shows recent videos, member/search filters, replay and queue actions.
-Profile separates distinct videos from total plays and counts shared videos for
-each featured member. These captures use an isolated demo profile with three
-videos and two rewatches; player events were simulated for repeatable checks.
+The welcome screen's **Watch history** tab opens a dedicated full-page list, with
+**Videos** alongside it for returning to discovery. Videos appear under local
+date headings such as November 3 and November 2, without the distinct-video
+result count. These captures use three real catalog entries in an isolated demo
+history; they do not depict personal data. The mobile view uses a 375px viewport.
+
+![Dedicated Watch history browsing tab](images/watch-history-page.jpg)
+
+![Watch history grouped by day on mobile](images/watch-history-mobile.jpg)
+
+History retains search/member filters, replay and queue actions. The dock capture
+shows a simulated replay moving Soobin's video to November 4 while the other
+videos remain on their previous dates. The cropped background player was mocked;
+these checks do not verify live streaming.
 
 ![Watch history tab](images/watch-history.jpg)
+
+### Profile viewing stats — November 3, 2026
+
+Profile separates distinct videos from total plays and counts shared videos for
+each featured member. This earlier capture uses an isolated demo profile with
+three videos and two rewatches; player events were simulated.
 
 ![Profile viewing stats by member](images/watch-stats.jpg)
 

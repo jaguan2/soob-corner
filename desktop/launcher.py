@@ -1,4 +1,4 @@
-"""Launch Study w/ Soobin as a native desktop application.
+"""Launch Soob Corner as a native desktop application.
 
 Serves the built Vite app (dist/) on a local port and opens it in a native OS
 window (pywebview / WebView2 on Windows), so the app runs like a regular
@@ -27,12 +27,14 @@ else:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DIST_DIR = os.path.join(BASE_DIR, "dist")
+APP_NAME = "Soob Corner"
 
 # A persistent, writable per-user folder for the desktop window's browser
 # storage (localStorage: favorites, theme, etc.). pywebview defaults to a
 # private/incognito-style session that forgets everything on close, so we
 # must give it an explicit storage_path and private_mode=False.
 _data_home = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+# Keep the legacy profile directory across display-name changes.
 APP_DATA_DIR = os.path.join(_data_home, "StudyWithSoobin")
 os.makedirs(APP_DATA_DIR, exist_ok=True)
 
@@ -104,7 +106,7 @@ def main():
     threading.Thread(target=serve, args=(port,), daemon=True).start()
 
     url = f"http://127.0.0.1:{port}/"
-    print(f"Starting Study w/ Soobin on {url}")
+    print(f"Starting {APP_NAME} on {url}")
     if not wait_until_up(url):
         print("[!] The local server did not start in time.")
         sys.exit(1)
@@ -130,7 +132,7 @@ def main():
 
     try:
         webview.create_window(
-            "study with soobin",
+            APP_NAME,
             url,
             width=1280,
             height=800,

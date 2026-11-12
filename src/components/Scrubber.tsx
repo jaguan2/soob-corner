@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/useLanguage'
 import { useState } from 'react'
 import { formatTime } from '../hooks/useTimer'
 
@@ -12,6 +13,7 @@ interface ScrubberProps {
 /** Elapsed / total times either side of a seek bar. Shared by the background
  *  video's control pill and the music mini-player. */
 export function Scrubber({ current, duration, onSeek }: ScrubberProps) {
+  const { t } = useLanguage()
   // Non-null only while the user is dragging, so a poll can't yank the handle
   // out from under them mid-drag.
   const [scrub, setScrub] = useState<number | null>(null)
@@ -46,7 +48,7 @@ export function Scrubber({ current, duration, onSeek }: ScrubberProps) {
         onPointerUp={commit}
         onKeyUp={commit}
         onBlur={commit}
-        aria-label="Seek video"
+        aria-label={t("Seek video")}
         style={{ '--played': `${played}%` } as React.CSSProperties}
         className="scrubber h-1.5 min-w-0 flex-1 cursor-pointer appearance-none rounded-full accent-clay-500 disabled:cursor-default disabled:opacity-40"
       />
@@ -60,11 +62,12 @@ export function Scrubber({ current, duration, onSeek }: ScrubberProps) {
 /** Livestreams report a duration (the DVR window — often weeks), so a seek bar
  *  would be meaningless. They get this instead. */
 export function LiveBadge() {
+  const { t } = useLanguage()
   return (
     <div className="flex flex-1 items-center gap-1.5">
       <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-clay-500" />
       <span className="text-[11px] font-medium uppercase tracking-wide text-ink-700 dark:text-cream-300">
-        Live
+        {t("Live")}
       </span>
     </div>
   )

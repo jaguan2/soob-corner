@@ -2,7 +2,7 @@ import type { Playlist, Video } from '../types/playlist'
 import { storageGetJson, storageSetJson } from './storage'
 
 export const CATALOG_CACHE_KEY = 'sws.catalog.v1'
-export const CATALOG_URL = import.meta.env.VITE_CATALOG_URL ?? 'https://raw.githubusercontent.com/jaguan2/studywithsoobin/main/src/data/playlist.json'
+export const CATALOG_URL = import.meta.env.VITE_CATALOG_URL ?? 'https://raw.githubusercontent.com/jaguan2/soob-corner/main/src/data/playlist.json'
 
 const members = new Set(['soobin', 'yeonjun', 'beomgyu', 'taehyun', 'hueningkai'])
 const record = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null
@@ -12,6 +12,7 @@ function isVideo(value: unknown): value is Video {
   if (!record(value)) return false
   return typeof value.id === 'string' && /^[\w-]{11}$/.test(value.id) &&
     typeof value.title === 'string' && value.title.length > 0 &&
+    (value.originalTitle === undefined || (typeof value.originalTitle === 'string' && value.originalTitle.trim().length > 0)) &&
     typeof value.duration === 'string' && /^\d+:\d{2}(?::\d{2})?$/.test(value.duration) &&
     typeof value.durationSeconds === 'number' && Number.isFinite(value.durationSeconds) && value.durationSeconds > 0 &&
     typeof value.thumbnail === 'string' && /^https:\/\/i\.ytimg\.com\//.test(value.thumbnail) &&

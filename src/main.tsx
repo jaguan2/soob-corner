@@ -9,11 +9,12 @@ import '@fontsource/inter/700.css'
 import './index.css'
 import App from './App'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { LanguageProvider } from './i18n/LanguageProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ErrorBoundary>
+    <LanguageProvider><ErrorBoundary>
       <App />
-    </ErrorBoundary>
+    </ErrorBoundary></LanguageProvider>
   </StrictMode>,
 )

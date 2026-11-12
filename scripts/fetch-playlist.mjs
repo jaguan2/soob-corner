@@ -5,6 +5,10 @@ import path from 'node:path'
 import { Innertube } from 'youtubei.js'
 import { secondsToDuration, renderCatalogLinks } from './catalog-output.mjs'
 import { membersFromTitle, broadcastDateFromTitle, kindFromTitle, validDate, sameBroadcast } from './catalog-metadata.mjs'
+import { catalogTitle, englishVideoInfo } from './catalog-titles.mjs'
+
+const titlesOnly = process.argv.includes('--titles-only')
+if (process.argv.slice(2).some(arg => arg !== '--titles-only')) throw new Error('Only --titles-only is supported')
 
 const PLAYLIST_ID = 'PLwzQP2wCE5w4hRj01BS0zxO2Bu8eaBDWt'
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
@@ -27,21 +31,26 @@ for (const entry of config.videos) {
 }
 const previous = await readJson(OUT_PATH, { videos: [] })
 const cached = new Map(previous.videos.map(v => [v.id, v]))
-const yt = await Innertube.create()
-let playlist = await yt.getPlaylist(PLAYLIST_ID)
-const title = playlist.info.title
+if (titlesOnly && !previous.videos.length) throw new Error('No existing catalog to update')
+const yt = await Innertube.create({ lang: 'en', location: 'US', retrieve_player: false,
+  fetch: (url, options) => fetch(url, { ...options, signal: AbortSignal.timeout(20_000) }) })
+let title = previous.title
 const upstream = []
-while (true) {
-  for (const item of playlist.items) {
-    const id = item.content_id ?? item.id
-    if (id && !upstream.includes(id)) upstream.push(id)
+if (!titlesOnly) {
+  let playlist = await yt.getPlaylist(PLAYLIST_ID)
+  title = playlist.info.title
+  while (true) {
+    for (const item of playlist.items) {
+      const id = item.content_id ?? item.id
+      if (id && !upstream.includes(id)) upstream.push(id)
+    }
+    if (!playlist.has_continuation) break
+    playlist = await playlist.getContinuation()
   }
-  if (!playlist.has_continuation) break
-  playlist = await playlist.getContinuation()
+  if (!upstream.length) throw new Error('Parsed 0 videos — refusing to overwrite the catalog. Check the YouTube playlist schema.')
 }
-if (!upstream.length) throw new Error('Parsed 0 videos — refusing to overwrite the catalog. Check the YouTube playlist schema.')
-const ids = [...new Set([...upstream, ...overrides.keys()])]
-console.log(`Resolving ${ids.length} videos (titles, durations, channels and release dates)...`)
+const ids = titlesOnly ? previous.videos.map(video => video.id) : [...new Set([...upstream, ...overrides.keys()])]
+console.log(`Resolving ${ids.length} videos (${titlesOnly ? 'English-preferred titles only' : 'titles, durations, channels and release dates'})...`)
 let cursor = 0
 let successes = 0
 let extraSuccesses = 0
@@ -53,23 +62,28 @@ await Promise.all(Array.from({ length: 4 }, async () => {
     const id = ids[index]
     const override = overrides.get(id)
     try {
-      const info = await yt.getBasicInfo(id)
+      const info = await englishVideoInfo(yt, id)
       const basic = info.basic_info
-      if (!basic.title || !basic.duration) throw new Error('No title/duration returned')
-      const micro = info.page[0].microformat
-      const inferred = membersFromTitle(basic.title)
-      results[index] = {
-        id, title: basic.title,
-        duration: secondsToDuration(basic.duration), durationSeconds: basic.duration,
-        thumbnail: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
-        members: override?.members ?? (inferred.length ? inferred : ['soobin']),
-        kind: override?.kind ?? kindFromTitle(basic.title),
-        publishedAt: validDate(micro?.publish_date) ?? cached.get(id)?.publishedAt ?? null,
-        broadcastDate: override?.broadcastDate ?? broadcastDateFromTitle(basic.title),
-        channel: basic.author ?? basic.channel?.name ?? '',
+      const labels = catalogTitle(info)
+      if (titlesOnly) {
+        results[index] = { ...cached.get(id), originalTitle: undefined, ...labels }
+      } else {
+        if (!basic.title || !basic.duration) throw new Error('No title/duration returned')
+        const micro = info.page[0].microformat
+        const inferred = membersFromTitle(basic.title)
+        results[index] = {
+          id, ...labels,
+          duration: secondsToDuration(basic.duration), durationSeconds: basic.duration,
+          thumbnail: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+          members: override?.members ?? (inferred.length ? inferred : ['soobin']),
+          kind: override?.kind ?? kindFromTitle(basic.title),
+          publishedAt: validDate(micro?.publish_date) ?? cached.get(id)?.publishedAt ?? null,
+          broadcastDate: override?.broadcastDate ?? broadcastDateFromTitle(basic.title),
+          channel: basic.author ?? basic.channel?.name ?? '',
+        }
+        if (override) extraSuccesses++
       }
       successes++
-      if (override) extraSuccesses++
     } catch (error) {
       failures++
       console.warn(`  ${id}: ${error.message}${cached.has(id) ? ' — keeping last verified metadata' : ' — skipping'}`)
@@ -78,18 +92,19 @@ await Promise.all(Array.from({ length: 4 }, async () => {
     if ((index + 1) % 25 === 0) console.log(`  ${index + 1}/${ids.length} checked`)
   }
 }))
-if (!successes || (overrides.size && !extraSuccesses) || failures > ids.length / 4) {
+if (!successes || (!titlesOnly && overrides.size && !extraSuccesses) || failures > ids.length / 4) {
   throw new Error('Too many metadata lookups failed — previous catalog was NOT overwritten. Check connectivity/YouTube schema.')
 }
 const videos = []
 for (const video of results.filter(Boolean)) {
-  const duplicate = videos.find(v => sameBroadcast(v, video))
+  const duplicate = !titlesOnly && videos.find(v => sameBroadcast(v, video))
   if (duplicate) { console.warn(`  ${video.id}: duplicate broadcast of ${duplicate.id}, omitted`); continue }
   videos.push(video)
 }
-const data = { title, sourceUrl: `https://www.youtube.com/playlist?list=${PLAYLIST_ID}`, fetchedAt: new Date().toISOString(), videos }
+const data = { title, sourceUrl: titlesOnly ? previous.sourceUrl : `https://www.youtube.com/playlist?list=${PLAYLIST_ID}`, fetchedAt: new Date().toISOString(), videos }
 await writeFile(OUT_PATH, JSON.stringify(data, null, 2) + '\n', 'utf8')
 const links = renderCatalogLinks(data)
 await mkdir(path.dirname(LINKS_PATH), { recursive: true })
 await writeFile(LINKS_PATH, links, 'utf8')
 console.log(`Wrote ${videos.length} videos and docs/video-catalog.md (${successes} fresh metadata lookups, ${failures} failures).`)
+console.log(`${videos.filter(v => v.originalTitle).length} titles differ from the original; ${videos.filter(v => v.title !== cached.get(v.id)?.title).length} displayed titles changed.`)

@@ -55,7 +55,7 @@ over upstream model-provider, delegation, rebasing and commit examples.
 
 ## What this is
 
-A LifeAt-style Pomodoro study app whose video background is drawn from the
+Soob Corner is a LifeAt-style Pomodoro study app whose video background is drawn from the
 "Study w/ Soobin" YouTube playlist (TXT member Soobin's vlogs/VLIVEs). React
 + Vite + TypeScript + Tailwind, client-side only, no backend.
 
@@ -84,6 +84,36 @@ React server render and YouTube API recovery with fake timers and a mocked
 document. These tests do not verify live playback or interactive browser behavior.
 
 ## Architecture
+
+The visible app name is **Soob Corner**, shared by React through
+`lib/branding.ts`. Keep browser/install metadata and the desktop window title in
+sync. Existing `sws.*` storage keys, the `StudyWithSoobin` desktop profile folder,
+stable port and executable filename are compatibility identifiers, independent
+of the display name. The source YouTube playlist keeps its original title.
+`PpulbatuWelcome` displays five faint stickers behind the Videos welcome view,
+one for each character. `data/ppulbatu.ts` groups the local sticker bank by character;
+`lib/ppulbatu.ts` selects one pose per group deterministically by local calendar day.
+Each character advances through its own bank, with the same selection on reload.
+`useLocalDay` refreshes at the next local midnight and on focus/pageshow/visible
+return, using a cleaned-up timeout rather than polling. Calendar arithmetic reuses
+`lib/stats.ts` and must remain independent of elapsed hours/DST. Selection never
+writes storage or changes timer/media state. The images remain static between
+daily swaps. The decorative layer is hidden from assistive technology and cannot
+receive pointer events or focus; the source/rights credit stays in the header. Its locally stored
+transparent PNGs and the selected SOOB house logo are documented in
+[visual assets](visual-assets.md). `public/soob-house-logo-transparent.png` is the active
+RGBA house logo with SO / OB lettering and transparent negative space. Reuse it for
+browser/install icons and the Windows executable (`--icon` in `scripts/build-exe.bat`).
+The original white-background user image remains at `public/soob-house-logo.png`. Keep the
+mascots behind the content without animation, layout shifts or playback overlays.
+
+`i18n/LanguageProvider` owns the separate validated `sws.language` preference
+and document `lang`; English is the default, with Simplified Chinese, Korean,
+Spanish and Japanese alternatives. `useLanguage` supplies explicit typed message lookup
+from complete dictionaries. Translate app-owned labels, never user task/name
+text, catalog titles or stored identifiers. Keep subtitle language independent.
+Language changes update context without remounting timer/media/panels or changing
+reward/persistence effect dependencies. See [interface languages](languages.md).
 
 `App.tsx` composes feature hooks and views. `useAppearance` owns saved theme,
 custom color, panel opacity, and root styles; the shared `Theme` type lives in
@@ -130,7 +160,19 @@ overwrites unreadable history. `lib/watchHistory.ts` validates snapshots and
 derives distinct-video, play, and per-member totals. `VideoBackground` reports
 the first confirmed PLAYING per selection/replay through `onVideoStarted`;
 pause/resume and stale events must not add plays. App connects this callback to
-the history hook. `WatchHistoryCard` is shared by History and the welcome screen;
+the history hook. `WatchHistoryCard` is shared by the History dock panel and the
+welcome screen's full-page Watch history tab. `WelcomeScreen` owns separate
+Videos/Watch history browsing tabs and its Settings disclosure. Both browsing
+panels remain mounted with `hidden`, retaining filters while switching tabs.
+History uses page scrolling, with no popover or height cap. Its shared card uses
+an h1 in the welcome view and h2 in the dock. The return-focus fallback targets
+`#welcome-videos h1` so it never chooses the hidden history heading.
+`WatchHistoryCard` groups visible entries by their most recent play's local day
+using `localDayKey`, after filtering/sorting/pagination. Date headings are localized
+and include the year; row times omit the repeated date. Preserve one saved entry
+per video and lifetime play counts: replay moves its row to its latest day, not
+to a reconstructed per-play journal. No view operation writes history. Use h1/h2/h3
+for welcome history/day/video and h2/h3/h4 in the dock.
 `WatchStats` renders the same history's totals inside Profile. Group videos
 count once overall and once for each featured member. Tracking starts with this
 feature; do not fabricate history from saved positions or the last selection.
@@ -174,6 +216,14 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
   failures. Research candidates with `scripts/research-catalog.mjs`, review the
   ignored research JSON, then run `scripts/curate-research.mjs` and inspect its
   diff before refreshing.
+  Title refreshes request an English session. `scripts/catalog-titles.mjs`
+  prefers the watch-page title, falls back to the original and retains a different
+  original in optional `Video.originalTitle`. Never invent translations. The
+  `--titles-only` refresh updates existing labels without changing IDs, order or
+  non-title metadata. Classification continues to use the original metadata.
+  Catalog/history search includes both labels. History display resolves current
+  catalog labels separately from playability, including session-blocked entries;
+  reading history must not rewrite snapshots or play counts.
   `useVideoCatalog` owns shared search/member/type/solo/favorites/date/sort state;
   `lib/catalog.ts` applies it to both video pickers, random selection and
   ordered previous/next controls. `VideoTile` supplies readable video cards. Changing filters
@@ -298,7 +348,11 @@ See `docs/architecture-review.md` for the review and next refactoring boundaries
     wrap on narrow screens. Do not reintroduce independently positioned panels
     that can cover each other or the video.
     The welcome screen also exposes the same timer's Start/Pause control. Keep
-    its countdown outside live status announcements, and keep the control mounted
+  its compact Timer card beside the wider Up next card at 768px and above;
+  smaller screens stack them in that order. The welcome queue list scrolls at
+  156px; scope these styles to `.welcome-session` so the shared dock queue keeps
+  its existing 220px list. Reuse the same callbacks and mounted controls. Keep
+  its countdown outside live status announcements, and keep the control mounted
     when pausing so focus is preserved. A completed Pomodoro restarts through the
     shared timer toggle, resetting to round 1 without repeating completion credit.
   - `SocialCard` is the Social dock tab. `data/social.ts` holds the group Instagram,

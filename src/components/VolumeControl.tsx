@@ -1,4 +1,5 @@
 import { Slider } from './Slider'
+import { useLanguage } from '../i18n/useLanguage'
 
 interface VolumeControlProps {
   volume: number
@@ -8,13 +9,14 @@ interface VolumeControlProps {
 }
 
 export function VolumeControl({ volume, muted, onToggleMute, onChange }: VolumeControlProps) {
+  const { t } = useLanguage()
   const silent = muted || volume === 0
-  const action = silent ? 'Unmute video' : 'Mute video'
+  const action = t(silent ? 'Unmute video' : 'Mute video')
   return (
-    <div className="video-volume" role="group" aria-label="Video audio">
+    <div className="video-volume" role="group" aria-label={t('Video audio')}>
       <button onClick={onToggleMute} aria-label={action} aria-pressed={silent}
         title={`${action} (M)`} className="video-mute-button"><SpeakerIcon muted={silent} /></button>
-      <Slider value={volume} onChange={onChange} ariaLabel="Video volume" className="video-volume-slider" />
+      <Slider value={volume} onChange={onChange} ariaLabel={t('Video volume')} className="video-volume-slider" />
       <span className="video-volume-value">{volume}%</span>
     </div>
   )

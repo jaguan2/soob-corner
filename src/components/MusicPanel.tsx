@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/useLanguage'
 import { useState } from 'react'
 import { resolveMusicLink, stationKey, type Station } from '../lib/musicLink'
 import { storageGet, storageGetJson, storageSet, storageSetJson } from '../lib/storage'
@@ -77,6 +78,7 @@ function spotifyEmbedProps(station: Station) {
 }
 
 export function MusicPanel() {
+  const { t, text } = useLanguage()
   const [musicOn, setMusicOn] = useState(false)
   const [customStations, setCustomStations] = useState<Station[]>(loadCustomStations)
   const [activeKey, setActiveKey] = useState(
@@ -122,7 +124,7 @@ export function MusicPanel() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <p className="section-heading"><UIIcon name="headphones" />Music</p>
+        <p className="section-heading"><UIIcon name="headphones" />{t("Music")}</p>
         <button
           onClick={() => setMusicOn((on) => !on)}
           className={
@@ -132,7 +134,7 @@ export function MusicPanel() {
               : 'bg-white/80 text-ink-700 hover:bg-white dark:bg-ink-800/80 dark:text-cream-300 dark:hover:bg-ink-800')
           }
         >
-          {musicOn ? 'On' : 'Off'}
+          {musicOn ? t('On') : t("Off")}
         </button>
       </div>
 
@@ -149,7 +151,7 @@ export function MusicPanel() {
               <div className="overflow-hidden rounded-xl border border-cream-300 dark:border-ink-700">
                 <iframe
                   key={stationKey(activeStation)}
-                  title="music player"
+                  title={t('music player')}
                   width="100%"
                   className="block"
                   {...spotifyEmbedProps(activeStation)}
@@ -160,8 +162,7 @@ export function MusicPanel() {
                   Nothing in the embed API changes it — only being signed in
                   does. */}
               <p className="mt-2 text-[11px] leading-relaxed text-ink-700 dark:text-cream-300">
-                Spotify plays 30-second previews unless you're signed in to Spotify in this
-                browser — the YouTube stations play in full either way.
+                {t("Spotify plays 30-second previews unless you're signed in to Spotify in this browser — the YouTube stations play in full either way.")}
               </p>
             </>
           )}
@@ -186,8 +187,8 @@ export function MusicPanel() {
             {s.custom && (
               <button
                 onClick={() => removeCustomStation(s)}
-                title="Remove station"
-                aria-label={`Remove ${s.label}`}
+                title={t('Remove station')}
+                aria-label={t('Remove {station}', { station: s.label })}
                 className="rounded-full rounded-l-none bg-white/60 px-1.5 py-1 text-xs text-ink-700/60 transition hover:bg-white hover:text-ink-900 dark:bg-ink-800/60 dark:text-cream-300/60 dark:hover:bg-ink-800 dark:hover:text-cream-100"
               >
                 ×
@@ -203,7 +204,7 @@ export function MusicPanel() {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && addCustomStation()}
-          placeholder="Paste a YouTube or Spotify link…"
+          placeholder={t('Paste a YouTube or Spotify link…')}
           className="min-w-0 flex-1 rounded-lg bg-white/80 px-2.5 py-1.5 text-xs text-ink-900 placeholder:text-ink-700/40 focus:outline-none focus:ring-1 focus:ring-clay-500 dark:bg-ink-800/80 dark:text-cream-100 dark:placeholder:text-cream-300/40"
         />
         <input
@@ -211,17 +212,17 @@ export function MusicPanel() {
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && addCustomStation()}
-          placeholder="name"
+          placeholder={t('name')}
           className="w-16 rounded-lg bg-white/80 px-2 py-1.5 text-xs text-ink-900 placeholder:text-ink-700/40 focus:outline-none focus:ring-1 focus:ring-clay-500 dark:bg-ink-800/80 dark:text-cream-100 dark:placeholder:text-cream-300/40"
         />
         <button
           onClick={addCustomStation}
           className="rounded-lg bg-white/80 px-2.5 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-white dark:bg-ink-800/80 dark:text-cream-300 dark:hover:bg-ink-800"
         >
-          Add
+          {t("Add")}
         </button>
       </div>
-      {error && <p className="mt-1 text-xs text-clay-600 dark:text-clay-400">{error}</p>}
+      {error && <p className="mt-1 text-xs text-clay-600 dark:text-clay-400">{text(error)}</p>}
     </div>
   )
 }

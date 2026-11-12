@@ -41,6 +41,32 @@ changes through the normal repository workflow. These scripts do not commit,
 push or merge changes themselves. They use `youtubei.js`, which relies on
 YouTube's undocumented page data and can need maintenance when that data changes.
 
+## English-preferred titles
+
+Refreshes request an English YouTube session and prefer its watch-page title.
+If no translated title is supplied, the original remains. This uses public
+metadata, not a translation service, and needs no API key. YouTube does not supply
+an English title for every upload; see its [localized metadata documentation](https://developers.google.com/youtube/v3/docs/videos#snippet.localized).
+
+To update labels for existing videos without adding, removing, reordering or
+reclassifying any entries, run:
+
+```powershell
+npm.cmd run fetch-playlist -- --titles-only
+```
+
+This regenerates the catalog and link document, preserving all non-title video
+fields. Different original titles are retained in optional `originalTitle`
+metadata for search and tooltips. Full refreshes still derive participant/type/date
+metadata from the original title. Failed watch-page requests fall back to basic
+video metadata; failed video lookups keep their previous entry, and widespread
+failures abort before overwriting the snapshot.
+
+Cards, the workspace and queue use the preferred catalog title. History also uses
+current catalog labels without rewriting stored snapshots or play counts merely
+by viewing it. Unavailable/removed entries retain their saved title, and searches
+match both original and preferred titles where those are available.
+
 ## Eligibility rules
 
 - Official TXT vlogs: explicitly named members and at least 10 minutes.
@@ -60,7 +86,7 @@ check discovers and reports candidates; it does not publish them automatically.
 ## Updating installed apps
 
 New builds check the reviewed catalog at
-`https://raw.githubusercontent.com/jaguan2/studywithsoobin/main/src/data/playlist.json`
+`https://raw.githubusercontent.com/jaguan2/soob-corner/main/src/data/playlist.json`
 once on startup. This downloads ordinary public JSON, not YouTube API data.
 The bundled catalog is immediately usable. A valid newer snapshot replaces it
 and is cached on the device. Failed, malformed or stale downloads leave the

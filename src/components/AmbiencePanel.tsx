@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/useLanguage'
 import { useEffect, useState } from 'react'
 import {
   applyMix,
@@ -38,6 +39,7 @@ function loadMix(): SoundMix {
 }
 
 export function AmbiencePanel() {
+  const { t, text } = useLanguage()
   // Restored from the last session. This panel mounts after the user picks a
   // video (a click), so the AudioContext is allowed to start right away and
   // the mix resumes where they left it.
@@ -81,7 +83,7 @@ export function AmbiencePanel() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <p className="section-heading"><UIIcon name="wind" />Ambience</p>
+        <p className="section-heading"><UIIcon name="wind" />{t("Ambience")}</p>
         {anyOn && (
           <button
             onClick={() => {
@@ -91,7 +93,7 @@ export function AmbiencePanel() {
             }}
             className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-ink-700 transition hover:bg-white dark:bg-ink-800/80 dark:text-cream-300 dark:hover:bg-ink-800"
           >
-            Silence all
+            {t('Silence all')}
           </button>
         )}
       </div>
@@ -107,7 +109,7 @@ export function AmbiencePanel() {
                   : 'text-ink-700 dark:text-cream-300')
               }
             >
-              <UIIcon name={CHANNEL_ICONS[key]} size={16} />{label}
+              <UIIcon name={CHANNEL_ICONS[key]} size={16} />{text(label)}
             </span>
             <Slider
               value={mix[key] ?? 0}
@@ -115,14 +117,14 @@ export function AmbiencePanel() {
               max={1}
               step={0.05}
               onChange={(v) => changeChannel(key, v)}
-              ariaLabel={`${label} volume`}
+              ariaLabel={t('{sound} volume', { sound: text(label) })}
             />
           </div>
         ))}
       </div>
 
       <p className="mt-3 text-[11px] leading-relaxed text-ink-700 dark:text-cream-300">
-        Layer a few sounds to find your quiet.
+        {t('Layer a few sounds to find your quiet.')}
       </p>
     </div>
   )

@@ -32,6 +32,11 @@ describe('catalog filters', () => {
     expect(filterVideos(entries, { ...EMPTY_FILTERS, favoritesOnly: true, soloOnly: true, kind: 'live' }, ['solo', 'shared']).map(v => v.id)).toEqual(['solo'])
     expect(filterVideos(entries, { ...EMPTY_FILTERS, favoritesOnly: true }, [])).toEqual([])
   })
+  it('finds English-preferred videos by either the English or original title', () => {
+    const entry = { ...videos[0], title: "Soobin's quiet study vlog", originalTitle: '수빈의 브이로그' }
+    expect(filterVideos([entry], { ...EMPTY_FILTERS, query: 'quiet' })).toEqual([entry])
+    expect(filterVideos([entry], { ...EMPTY_FILTERS, query: '수빈의' })).toEqual([entry])
+  })
   it('uses original dates for live archives without guessing missing broadcast dates', () => {
     const entries: Video[] = [
       { ...videos[0], kind: 'live', broadcastDate: '2019-07-22' },

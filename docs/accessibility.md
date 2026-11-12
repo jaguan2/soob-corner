@@ -33,6 +33,12 @@ or the catalog heading if filters exclude that card. Automatic video changes
 do not move focus. Queue buttons retain focus after adding a video, exposing the
 Queued state without preventing continued keyboard browsing.
 
+The welcome screen has a Browse tab list for Videos and Watch history, with one
+Tab stop, Left/Right wrapping and Home/End navigation. Its skip link targets the
+active view. Escape closes Settings or a nested disclosure first, then returns
+from Watch history to Videos and focuses that tab. The full-page history list
+uses document scrolling and keeps its filters when switching browsing tabs.
+
 Leaving the timer duration editor with Tab or a pointer preserves the destination
 control. Enter/Escape returns focus to the countdown. Removing a queued item
 focuses the next removal control, or the previous one at the end; removing the
@@ -70,3 +76,11 @@ broader audit before claiming conformance.
 Reference guidance: [W3C keyboard access](https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html),
 [tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/), and
 [character-key shortcuts](https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html).
+## Language selection
+
+Settings' language selector has a native label and shows language names in their
+own language. The document's `lang` and translated control names follow the
+selection. November 3 localization checks covered five-language welcome Settings
+and mobile tools with selected axe WCAG A/AA rules; no violations remained in
+those views, while contrast required manual follow-up. See
+[language verification](stability-test.md) for scope and media limits.

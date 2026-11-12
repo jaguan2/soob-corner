@@ -1,3 +1,5 @@
+import { useLanguage } from './i18n/useLanguage'
+import { APP_NAME } from './lib/branding'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePlaylist } from './hooks/usePlaylist'
 import { useBreakNudge } from './hooks/useBreakNudge'
@@ -40,6 +42,7 @@ function toggleFullscreen() {
 }
 
 export default function App() {
+  const { t, text } = useLanguage()
   const { playlist, isChecking } = usePlaylist()
   const { theme, setTheme, customColor, setCustomColor, panelOpacity, setPanelOpacity } = useAppearance()
   const { preferences, setShowMilestones, setSingleKeyShortcuts } = usePreferences()
@@ -84,8 +87,9 @@ export default function App() {
   const returnToCatalog = useCallback(() => { setVideoId(null); setZen(false) }, [setVideoId])
   const queue = useMemo(() => ({ videos: queuedVideos, onPlay: selectVideo, onRemove: removeQueuedVideo, onMove: moveQueuedVideo, onClear: clearQueue }), [queuedVideos, selectVideo, removeQueuedVideo, moveQueuedVideo, clearQueue])
   const { volume, muted, changeVolume, toggleMute } = useVideoAudio(videoId)
-  const historyView = useMemo(() => <WatchHistoryCard history={history} playable={playable} queuedVideos={queuedVideos}
-    onPlay={selectVideo} onQueue={queueVideo} />, [history, playable, queuedVideos, selectVideo, queueVideo])
+  const historyHeading = videoId === null ? 'h1' : 'h2'
+  const historyView = useMemo(() => <WatchHistoryCard history={history} playable={playable} catalogVideos={historyVideos} queuedVideos={queuedVideos}
+    onPlay={selectVideo} onQueue={queueVideo} headingLevel={historyHeading} />, [history, playable, historyVideos, queuedVideos, selectVideo, queueVideo, historyHeading])
 
   // WebView can retain the document's small-layout scroll offset when the
   // window expands, clipping the toolbar and leaving empty space below.
@@ -103,7 +107,7 @@ export default function App() {
   // The countdown lives in the tab title too, so it's visible from whatever
   // tab the actual studying happens in.
   useEffect(() => {
-    document.title = timer.isRunning ? `⏱ ${timer.label} · study with soobin` : 'study with soobin'
+    document.title = timer.isRunning ? `⏱ ${timer.label} · ${APP_NAME}` : APP_NAME
   }, [timer.isRunning, timer.label])
 
 
@@ -139,9 +143,9 @@ export default function App() {
       setDockCollapsed(false)
       setTopPanel('timer')
       document.getElementById('tab-timer')?.focus()
-      showNotice(`Timer set to ${Math.round(seconds / 60)} minutes — press Start when you’re ready`, 4000)
+      showNotice(t('Timer set to {minutes} minutes — press Start when you’re ready', { minutes: Math.round(seconds / 60) }), 4000)
     },
-    [setTaskDuration, showNotice],
+    [setTaskDuration, showNotice, t],
   )
   const handleSetPauseOnBreak = useCallback((v: boolean) => {
     setPauseOnBreak(v)
@@ -250,28 +254,28 @@ export default function App() {
 
   return (
     <div className={'study-workspace' + (dockCollapsed ? ' tools-hidden' : '') + (zen ? ' is-zen' : '')}>
-      <a href="#playback-controls" className="skip-link">Skip to video controls</a>
-      <a href="#workspace-tools" className="skip-link" onClick={() => { setDockCollapsed(false); setZen(false) }}>Skip to study tools</a>
+      <a href="#playback-controls" className="skip-link">{t("Skip to video controls")}</a>
+      <a href="#workspace-tools" className="skip-link" onClick={() => { setDockCollapsed(false); setZen(false) }}>{t("Skip to study tools")}</a>
       <header className="workspace-toolbar" onKeyDown={handleButtonArrows}>
         <button ref={backButton} onClick={returnToCatalog}
-          aria-label="Back to video selection" aria-keyshortcuts="Escape" title="Back to video selection (Esc)"
+          aria-label={t("Back to video selection")} aria-keyshortcuts="Escape" title={t("Back to video selection (Esc)")}
           className="workspace-button workspace-back toolbar-icon"><UIIcon name="arrowLeft" size={20} /></button>
         <div className="workspace-heading">
-          <p className="workspace-brand"><span className="brand-mark"><UIIcon name="leaf" size={20} /></span>study with soobin</p>
+          <p className="workspace-brand"><img className="workspace-home-logo" src="/soob-house-logo-transparent.png" width={24} height={24} alt="" />{APP_NAME}</p>
           <p className="workspace-video-title" title={currentVideo.title}>{currentVideo.title}</p>
         </div>
         <div className="toolbar-actions">
-          {zen ? <button onClick={() => setZen(false)} className="workspace-button"><UIIcon name="leaf" />Exit zen</button> : <>
-            <button onClick={() => setDockCollapsed(v => !v)} aria-expanded={!dockCollapsed} aria-controls="workspace-tools" className="workspace-button"><UIIcon name="panel" />{dockCollapsed ? 'Show tools' : 'Hide tools'}</button>
-            <button onClick={() => { setDockCollapsed(false); setTopPanel('tasks') }} aria-controls="tool-tasks" className={'workspace-button' + (!dockCollapsed && topPanel === 'tasks' ? ' selected' : '')}><UIIcon name="tasks" />Tasks</button>
-            <button onClick={toggleFullscreen} aria-label="Toggle fullscreen" title="Fullscreen (F)" className="workspace-button toolbar-icon"><UIIcon name="fullscreen" /></button>
-            <button onClick={() => setZen(true)} aria-label="Zen mode — hide all panels" title="Zen mode (Z)" className="workspace-button toolbar-icon"><UIIcon name="leaf" /></button>
+          {zen ? <button onClick={() => setZen(false)} className="workspace-button"><UIIcon name="leaf" />{t("Exit zen")}</button> : <>
+            <button onClick={() => setDockCollapsed(v => !v)} aria-expanded={!dockCollapsed} aria-controls="workspace-tools" className="workspace-button"><UIIcon name="panel" />{dockCollapsed ? t("Show tools") : t("Hide tools")}</button>
+            <button onClick={() => { setDockCollapsed(false); setTopPanel('tasks') }} aria-controls="tool-tasks" className={'workspace-button' + (!dockCollapsed && topPanel === 'tasks' ? ' selected' : '')}><UIIcon name="tasks" />{t("Tasks")}</button>
+            <button onClick={toggleFullscreen} aria-label={t("Toggle fullscreen")} title={t("Fullscreen (F)")} className="workspace-button toolbar-icon"><UIIcon name="fullscreen" /></button>
+            <button onClick={() => setZen(true)} aria-label={t("Zen mode — hide all panels")} title={t("Zen mode (Z)")} className="workspace-button toolbar-icon"><UIIcon name="leaf" /></button>
           </>}
         </div>
       </header>
-      {notice && <div role="status" className="workspace-notice">{notice}</div>}
+      {notice && <div role="status" className="workspace-notice">{text(notice)}</div>}
       <main className="workspace-main">
-        <div className="video-stage" role="group" aria-label="Study video">
+        <div className="video-stage" role="group" aria-label={t("Study video")}>
           <VideoBackground ref={videoRef} videoId={videoId} volume={volume} muted={muted} isPlaying={videoPlaying} captionLang={captionLang} onEnded={handleEnded} onPlayingChange={setVideoPlaying} onVideoStarted={onVideoStarted} onUnplayable={handleUnplayable} onApiUnavailable={handleApiUnavailable} />
         </div>
         <div hidden={zen}>

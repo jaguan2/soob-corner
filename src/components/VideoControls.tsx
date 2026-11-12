@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/useLanguage'
 import { memo, useEffect, useId, useRef, useState } from 'react'
 import { handleButtonArrows } from '../lib/keyboardNavigation'
 import { Scrubber } from './Scrubber'
@@ -23,6 +24,7 @@ interface VideoControlsProps {
 }
 
 function VideoControlsInner({ videoId, onPreviousVideo, onNextVideo, canPrevious, canNext, player, isPlaying, onTogglePlay, volume, muted, onToggleMute, onVolumeChange, captionLang, onSetCaptionLang }: VideoControlsProps) {
+  const { t } = useLanguage()
   const [current, setCurrent] = useState(0)
   const [duration, setDuration] = useState(0)
   const [tracks, setTracks] = useState<CaptionTrack[]>([])
@@ -53,7 +55,7 @@ function VideoControlsInner({ videoId, onPreviousVideo, onNextVideo, canPrevious
   const activeTrack = tracks.find(t => t.code === captionLang)
   const buttonStyle = 'grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-800 transition hover:bg-cream-200 disabled:opacity-40 dark:text-cream-200 dark:hover:bg-ink-700'
   return (
-    <div ref={menuRef} id="playback-controls" tabIndex={-1} role="group" className="workspace-controls" aria-label="Video controls" onKeyDown={event => {
+    <div ref={menuRef} id="playback-controls" tabIndex={-1} role="group" className="workspace-controls" aria-label={t("Video controls")} onKeyDown={event => {
       if (event.key === 'Escape' && menuOpen) {
         event.preventDefault(); event.stopPropagation(); setMenuOpen(false); captionButton.current?.focus()
         return
@@ -62,18 +64,18 @@ function VideoControlsInner({ videoId, onPreviousVideo, onNextVideo, canPrevious
     }}>
       <div className="player-controls">
         <div className="player-transport">
-        <button onClick={onPreviousVideo} disabled={!canPrevious} aria-label="Previous video" title="Previous video in filtered order" className={buttonStyle}><SkipIcon direction="back" /></button>
-        <button onClick={() => player.current?.seekBy(-10)} aria-label="Back 10 seconds" title="Back 10 seconds" className={buttonStyle}><SeekIcon direction="back" /></button>
-        <button onClick={onTogglePlay} aria-label={isPlaying ? 'Pause video' : 'Play video'} title={isPlaying ? 'Pause video' : 'Play video'} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-clay-500 text-white transition hover:bg-clay-600">{isPlaying ? <PauseIcon /> : <PlayIcon />}</button>
-        <button onClick={() => player.current?.seekBy(10)} aria-label="Forward 10 seconds" title="Forward 10 seconds" className={buttonStyle}><SeekIcon direction="forward" /></button>
-        <button onClick={onNextVideo} disabled={!canNext} aria-label="Next video" title="Next queued video, or next video in filtered order" className={buttonStyle}><SkipIcon direction="forward" /></button>
+        <button onClick={onPreviousVideo} disabled={!canPrevious} aria-label={t("Previous video")} title={t("Previous video in filtered order")} className={buttonStyle}><SkipIcon direction="back" /></button>
+        <button onClick={() => player.current?.seekBy(-10)} aria-label={t("Back 10 seconds")} title={t("Back 10 seconds")} className={buttonStyle}><SeekIcon direction="back" /></button>
+        <button onClick={onTogglePlay} aria-label={isPlaying ? t("Pause video") : t("Play video")} title={isPlaying ? t("Pause video") : t("Play video")} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-clay-500 text-white transition hover:bg-clay-600">{isPlaying ? <PauseIcon /> : <PlayIcon />}</button>
+        <button onClick={() => player.current?.seekBy(10)} aria-label={t("Forward 10 seconds")} title={t("Forward 10 seconds")} className={buttonStyle}><SeekIcon direction="forward" /></button>
+        <button onClick={onNextVideo} disabled={!canNext} aria-label={t("Next video")} title={t("Next queued video, or next video in filtered order")} className={buttonStyle}><SkipIcon direction="forward" /></button>
         </div>
         <VolumeControl volume={volume} muted={muted} onToggleMute={onToggleMute} onChange={onVolumeChange} />
         <div className="player-progress"><Scrubber key={videoId} current={current} duration={duration} onSeek={seconds => { player.current?.seekTo(seconds); setCurrent(seconds) }} /></div>
-        {tracks.length > 0 && <button ref={captionButton} onClick={() => setMenuOpen(o => !o)} aria-label="CC subtitles" aria-expanded={menuOpen} aria-controls={captionOptionsId} title={activeTrack ? `Subtitles: ${activeTrack.name}` : 'Subtitles'} className={buttonStyle + (activeTrack ? ' captions-active' : '')}>CC</button>}
+        {tracks.length > 0 && <button ref={captionButton} onClick={() => setMenuOpen(o => !o)} aria-label={t("CC subtitles")} aria-expanded={menuOpen} aria-controls={captionOptionsId} title={activeTrack ? t('Subtitles: {language}', { language: activeTrack.name }) : t("Subtitles")} className={buttonStyle + (activeTrack ? ' captions-active' : '')}>CC</button>}
       </div>
-      {menuOpen && <div id={captionOptionsId} className="caption-options" role="group" aria-label="Subtitle languages">
-        {[{ code: '', name: 'Off' }, ...tracks].map(track => <button key={track.code} onClick={() => { onSetCaptionLang(track.code || null); setMenuOpen(false); captionButton.current?.focus() }} aria-pressed={(captionLang ?? '') === track.code} className={'rounded-lg px-3 py-2 text-xs ' + ((captionLang ?? '') === track.code ? 'bg-clay-500 text-white' : 'bg-cream-100 text-ink-800 hover:bg-cream-200 dark:bg-ink-700 dark:text-cream-200')}>{track.name}</button>)}
+      {menuOpen && <div id={captionOptionsId} className="caption-options" role="group" aria-label={t("Subtitle languages")}>
+        {[{ code: '', name: t("Off") }, ...tracks].map(track => <button key={track.code} onClick={() => { onSetCaptionLang(track.code || null); setMenuOpen(false); captionButton.current?.focus() }} aria-pressed={(captionLang ?? '') === track.code} className={'rounded-lg px-3 py-2 text-xs ' + ((captionLang ?? '') === track.code ? 'bg-clay-500 text-white' : 'bg-cream-100 text-ink-800 hover:bg-cream-200 dark:bg-ink-700 dark:text-cream-200')}>{track.name}</button>)}
       </div>}
     </div>
   )

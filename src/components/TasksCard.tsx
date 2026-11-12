@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/useLanguage'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import {
   clampTaskDuration, isTaskOrder, movePlannedTask, normalizePlannedTask,
@@ -40,6 +41,7 @@ function taskId(): string {
 interface TasksCardProps { onUseDuration: (seconds: number) => void; onTaskCompleted: (id: string) => void }
 
 function TasksCardInner({ onUseDuration, onTaskCompleted }: TasksCardProps) {
+  const { t, text } = useLanguage()
   const [tasks, setTasks] = useState<Task[]>(loadTasks)
   const [draft, setDraft] = useState('')
   const [duration, setDuration] = useState('25')
@@ -120,31 +122,31 @@ function TasksCardInner({ onUseDuration, onTaskCompleted }: TasksCardProps) {
     return <li key={task.id} className={'checklist-task group' + (task.done ? ' is-done' : '') + (active ? ' is-active' : '')}>
       {editingId === task.id ? <form className="task-editor" onSubmit={event => { event.preventDefault(); saveEdit(task) }}
         onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); setEditingId(null) } }}>
-        <label className="task-field"><span>Task name</span><input autoFocus aria-label="Edit task name" value={editDraft.text} maxLength={200} required
+        <label className="task-field"><span>{t("Task name")}</span><input autoFocus aria-label={t("Edit task name")} value={editDraft.text} maxLength={200} required
           onChange={event => { setEditDraft({ ...editDraft, text: event.target.value }); setEditError('') }} /></label>
         <TaskOptions duration={editDraft.duration} priority={editDraft.priority}
           onDuration={value => setEditDraft({ ...editDraft, duration: value })}
           onPriority={value => setEditDraft({ ...editDraft, priority: value })} prefix="Edit" />
-        {editError && <p role="alert" className="task-error">{editError}</p>}
-        <div className="task-editor-actions"><button type="submit" className="primary-button">Save</button><button type="button" onClick={() => setEditingId(null)} className="workspace-button">Cancel</button></div>
+        {editError && <p role="alert" className="task-error">{text(editError)}</p>}
+        <div className="task-editor-actions"><button type="submit" className="primary-button">{t("Save")}</button><button type="button" onClick={() => setEditingId(null)} className="workspace-button">{t("Cancel")}</button></div>
       </form> : <>
         <div className="checklist-task-main">
           <input type="checkbox" checked={task.done} onChange={() => toggleTask(task)}
-            aria-label={`Mark ${task.text} ${task.done ? 'not done' : 'done'}`} className="task-checkbox" />
+            aria-label={t(task.done ? 'Mark {task} not done' : 'Mark {task} done', { task: task.text })} className="task-checkbox" />
           <span className="task-name">{task.text}</span>
           <div className="task-row-actions">
-            <button id={`task-edit-${task.id}`} onClick={() => beginEdit(task)} aria-label={`Edit ${task.text}`} title="Edit task" className="task-delete hover-reveal"><UIIcon name="edit" size={15} /></button>
-            <button onClick={() => removeTasks([task.id])} aria-label={`Delete ${task.text}`} title="Delete task" className="task-delete hover-reveal"><UIIcon name="close" size={15} /></button>
+            <button id={`task-edit-${task.id}`} onClick={() => beginEdit(task)} aria-label={t('Edit {task}', { task: task.text })} title={t("Edit task")} className="task-delete hover-reveal"><UIIcon name="edit" size={15} /></button>
+            <button onClick={() => removeTasks([task.id])} aria-label={t('Delete {task}', { task: task.text })} title={t("Delete task")} className="task-delete hover-reveal"><UIIcon name="close" size={15} /></button>
           </div>
         </div>
         {!task.done && <div className="checklist-task-meta">
-          <span>{task.duration} min</span><span className="task-priority" data-priority={task.priority}>{task.priority}</span>
+          <span>{task.duration} {t("min")}</span><span className="task-priority" data-priority={task.priority}>{t(task.priority === 'low' ? 'Low' : task.priority === 'high' ? 'High' : 'Medium')}</span>
           <div className="task-secondary-actions">
             {order === 'custom' && todo.length > 1 && <>
-              <button onClick={() => setTasks(previous => movePlannedTask(previous, task.id, -1))} disabled={index === 0} aria-label={`Move ${task.text} up`} title="Move up"><UIIcon name="up" size={14} /></button>
-              <button onClick={() => setTasks(previous => movePlannedTask(previous, task.id, 1))} disabled={index === todo.length - 1} aria-label={`Move ${task.text} down`} title="Move down"><UIIcon name="down" size={14} /></button>
+              <button onClick={() => setTasks(previous => movePlannedTask(previous, task.id, -1))} disabled={index === 0} aria-label={t('Move {task} up', { task: task.text })} title={t("Move up")}><UIIcon name="up" size={14} /></button>
+              <button onClick={() => setTasks(previous => movePlannedTask(previous, task.id, 1))} disabled={index === todo.length - 1} aria-label={t('Move {task} down', { task: task.text })} title={t("Move down")}><UIIcon name="down" size={14} /></button>
             </>}
-            <button onClick={() => { setActiveId(task.id); onUseDuration(task.duration * 60) }} aria-label={`Focus on ${task.text}`} title={`Load ${task.duration} minutes into the timer`} className="task-focus"><UIIcon name="timer" size={13} /><span>{active ? 'Loaded' : 'Focus'}</span></button>
+            <button onClick={() => { setActiveId(task.id); onUseDuration(task.duration * 60) }} aria-label={t(active ? 'Loaded: {task}' : 'Focus on {task}', { task: task.text })} title={t('Load {minutes} minutes into the timer', { minutes: task.duration })} className="task-focus"><UIIcon name="timer" size={13} /><span>{active ? t("Loaded") : t("Focus")}</span></button>
           </div>
         </div>}
       </>}
@@ -152,32 +154,32 @@ function TasksCardInner({ onUseDuration, onTaskCompleted }: TasksCardProps) {
   }
 
   return (
-    <section className="study-plan checklist-panel" aria-label="To-do list">
-      <header className="checklist-heading"><h2 className="section-heading"><UIIcon name="tasks" />Your tasks</h2><span>{todo.length} to do</span></header>
-      <p className="checklist-intro">Write it down. Take it one task at a time.</p>
+    <section className="study-plan checklist-panel" aria-label={t("To-do list")}>
+      <header className="checklist-heading"><h2 className="section-heading"><UIIcon name="tasks" />{t("Your tasks")}</h2><span>{t('{count} to do', { count: todo.length })}</span></header>
+      <p className="checklist-intro">{t("Write it down. Take it one task at a time.")}</p>
       <form className="task-add-form" onSubmit={event => { event.preventDefault(); addTask() }}>
-        <div className="task-add-row"><input ref={inputRef} aria-label="New task" value={draft} maxLength={200} onChange={event => setDraft(event.target.value)} placeholder="Add a task…" />
-          <button type="submit" disabled={!draft.trim()} className="primary-button" aria-label="Add task" title="Add task"><UIIcon name="plus" size={17} /><span>Add</span></button></div>
-        <details className="task-add-options"><summary><span>Estimate & priority</span><UIIcon name="chevron" size={14} /></summary>
+        <div className="task-add-row"><input ref={inputRef} aria-label={t("New task")} value={draft} maxLength={200} onChange={event => setDraft(event.target.value)} placeholder={t("Add a task…")} />
+          <button type="submit" disabled={!draft.trim()} className="primary-button" aria-label={t("Add task")} title={t("Add task")}><UIIcon name="plus" size={17} /><span>{t("Add")}</span></button></div>
+        <details className="task-add-options"><summary><span>{t("Estimate & priority")}</span><UIIcon name="chevron" size={14} /></summary>
           <TaskOptions duration={duration} priority={priority} onDuration={setDuration} onPriority={setPriority} prefix="New" />
         </details>
       </form>
       {tasks.length > 0 && <div className="checklist-progress">
-        <span>{done.length} of {tasks.length} completed</span><span>{completion}%</span>
-        <div role="progressbar" aria-label="Task completion" aria-valuenow={completion} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${completion}%` }} /></div>
+        <span>{t('{done} of {total} completed', { done: done.length, total: tasks.length })}</span><span>{completion}%</span>
+        <div role="progressbar" aria-label={t("Task completion")} aria-valuenow={completion} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${completion}%` }} /></div>
       </div>}
-      {todo.length > 1 && <label className="task-sort"><span>Arrange by</span><select aria-label="Task order" value={order} onChange={event => setOrder(event.target.value as TaskOrder)}>
-        {ORDER_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+      {todo.length > 1 && <label className="task-sort"><span>{t("Arrange by")}</span><select aria-label={t("Task order")} value={order} onChange={event => setOrder(event.target.value as TaskOrder)}>
+        {ORDER_OPTIONS.map(option => <option key={option.value} value={option.value}>{text(option.label)}</option>)}
       </select></label>}
-      {todo.length > 0 ? <ul className="checklist-list" aria-label="Tasks to do">{todo.map(renderTask)}</ul>
+      {todo.length > 0 ? <ul className="checklist-list" aria-label={t("Tasks to do")}>{todo.map(renderTask)}</ul>
         : <div className="plan-empty"><span className="plan-empty-icon"><UIIcon name={done.length ? 'check' : 'tasks'} size={24} /></span>
-          <p>{done.length ? 'All tasks checked off.' : 'A fresh start.'}</p><span>{done.length ? 'Enjoy a little breathing room.' : 'Add your first task above. Press Enter to keep adding.'}</span></div>}
-      {done.length > 0 && <details className="completed-tasks"><summary><span>Completed ({done.length})</span><UIIcon name="chevron" size={16} /></summary>
-        <ul className="checklist-list" aria-label="Completed tasks">{done.map(renderTask)}</ul>
-        <button onClick={() => removeTasks(done.map(task => task.id))} className="text-action task-clear">Clear completed</button>
+          <p>{done.length ? t("All tasks checked off.") : t("A fresh start.")}</p><span>{done.length ? t("Enjoy a little breathing room.") : t("Add your first task above. Press Enter to keep adding.")}</span></div>}
+      {done.length > 0 && <details className="completed-tasks"><summary><span>{t('Completed ({count})', { count: done.length })}</span><UIIcon name="chevron" size={16} /></summary>
+        <ul className="checklist-list" aria-label={t("Completed tasks")}>{done.map(renderTask)}</ul>
+        <button onClick={() => removeTasks(done.map(task => task.id))} className="text-action task-clear">{t("Clear completed")}</button>
       </details>}
-      {minutesLeft > 0 && <p className="task-plan-total">{minutesLeft} min planned · choose Focus to load a task's timer</p>}
-      {removal && <div className="task-undo" role="status"><span>{removal.ids.length === 1 ? 'Task removed.' : `${removal.ids.length} tasks removed.`}</span><button onClick={undoRemoval}>Undo</button></div>}
+      {minutesLeft > 0 && <p className="task-plan-total">{t("{minutes} min planned · choose Focus to load a task's timer", { minutes: minutesLeft })}</p>}
+      {removal && <div className="task-undo" role="status"><span>{removal.ids.length === 1 ? t("Task removed.") : t('{count} tasks removed.', { count: removal.ids.length })}</span><button onClick={undoRemoval}>{t("Undo")}</button></div>}
     </section>
   )
 }
@@ -187,10 +189,11 @@ interface TaskOptionsProps {
   onPriority: (value: TaskPriority) => void; prefix: 'New' | 'Edit'
 }
 function TaskOptions({ duration, priority, onDuration, onPriority, prefix }: TaskOptionsProps) {
+  const { t } = useLanguage()
   return <div className="task-option-fields">
-    <label className="task-field"><span>Estimate (min)</span><input type="number" min={1} max={720} step={1} aria-label={`${prefix} task estimated minutes`} value={duration} onChange={event => onDuration(event.target.value)} /></label>
-    <label className="task-field"><span>Priority</span><select aria-label={`${prefix} task priority`} value={priority} onChange={event => onPriority(event.target.value as TaskPriority)}>
-      <option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option>
+    <label className="task-field"><span>{t("Estimate (min)")}</span><input type="number" min={1} max={720} step={1} aria-label={t(`${prefix} task estimated minutes`)} value={duration} onChange={event => onDuration(event.target.value)} /></label>
+    <label className="task-field"><span>{t("Priority")}</span><select aria-label={t(`${prefix} task priority`)} value={priority} onChange={event => onPriority(event.target.value as TaskPriority)}>
+      <option value="low">{t("Low")}</option><option value="medium">{t("Medium")}</option><option value="high">{t("High")}</option>
     </select></label>
   </div>
 }

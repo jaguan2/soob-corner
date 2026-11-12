@@ -35,7 +35,7 @@ export function filterVideos(videos: Video[], filters: CatalogFilters, favorites
     (!filters.favoritesOnly || favorites.includes(video.id)) &&
     (!filters.year || catalogDate(video, filters.dateSource)?.slice(0, 4) === filters.year) &&
     (!filters.month || catalogDate(video, filters.dateSource)?.slice(5, 7) === filters.month) &&
-    terms.every(term => normalized([video.title, video.channel, video.id, ...(video.members ?? [])].join(' ')).includes(term)),
+    terms.every(term => normalized([video.title, video.originalTitle, video.channel, video.id, ...(video.members ?? [])].join(' ')).includes(term)),
   )
   if (!filters.sort || filters.sort === 'playlist') return filtered
   return filtered.sort((a, b) => {
@@ -59,7 +59,7 @@ export function adjacentVideo(videos: Video[], currentId: string | null, directi
   return videos[(index + direction + videos.length) % videos.length].id
 }
 
-export function videoMetadata(video: Video): string {
+export function videoMetadata(video: Video, localize: (message: string) => string = message => message): string {
   const members = MEMBERS.filter(m => video.members?.includes(m.value)).map(m => m.label).join(', ')
-  return [members, video.kind === 'live' ? 'Live archive' : video.kind === 'vlog' ? 'Vlog' : '', video.publishedAt?.slice(0, 7) ?? 'Release date unknown'].filter(Boolean).join(' · ')
+  return [members, localize(video.kind === 'live' ? 'Live archive' : video.kind === 'vlog' ? 'Vlog' : ''), video.publishedAt?.slice(0, 7) ?? localize('Release date unknown')].filter(Boolean).join(' · ')
 }

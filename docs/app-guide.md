@@ -1,4 +1,4 @@
-# study with soobin 🐰
+# Soob Corner 🐰
 
 A LifeAt-style Pomodoro study app. Instead of generic cafe/nature scenery, the
 background is TXT members' vlogs, VLIVEs and Weverse lives — company for a study session, the
@@ -17,11 +17,25 @@ an internet connection since the videos stream from YouTube.)
 
 ## Features
 
+- A faint **PPULBATU** background on the home page, featuring all five
+  members' characters, alongside Soob Corner's purple SOOB house logo.
+  Complete character stickers with transparent backgrounds sit behind the content,
+  stay static and do not block controls.
+  They stay out of Watch history and the playback workspace. See
+  [artwork and logo sources](visual-assets.md).
+  A bank of 15 stickers (three per character) rotates at local midnight, always
+  keeping one of each character. The day's choices survive reloads; the current
+  bank repeats every three days. Returning after sleep catches up automatically.
+
 - Start screen to pick your study-companion video (or hit 🎲 Surprise me) —
   the **back arrow** at the top left takes you back any time,
   including in Zen mode
-- A compact timer on the start screen lets you start, pause or resume without
-  choosing a video. Returning from a video keeps the same countdown.
+- Video titles prefer English metadata supplied by YouTube, keeping the original
+  when unavailable. Search supports both titles, and card tooltips retain the original.
+- Compact **Timer** and **Up next** cards sit side by side on the start screen,
+  with more room for the queue. Narrow screens stack them, and long queues scroll
+  inside their card. Start, pause or resume without choosing a video; returning
+  from a video keeps the same countdown.
 - A saved **Up next** video queue on the start screen and in **Videos & sound**.
   Choose **Add to queue** under any video, move entries up/down, remove them,
   or clear the queue. **Play queue** starts the first entry; clicking a queued
@@ -91,13 +105,18 @@ an internet connection since the videos stream from YouTube.)
   The first level-up takes 100 XP, then 150, 200, and so on. Available study
   history counts; rechecking a task never awards it twice. Read the full
   [progression rules](LEVELS.md).
+- **Settings** includes a saved interface language choice: English, Simplified
+  Chinese, Korean, Spanish or Japanese. Labels change immediately while tasks, profile text,
+  video titles and subtitle choices retain their own language. See [languages](languages.md).
 - **Settings** groups appearance and profile display preferences. Open the dock's
   Settings tab, or Settings at the top right of the start screen. Turn off
   **Show milestones** to hide their cards in Profile; earned progress, levels,
   XP, and study time remain saved. Preferences are remembered on this device.
-- **History** saves recently played videos with dates and play counts. Search,
+- **History** groups videos by their most recent play date, newest day first,
+  with localized headings, last-played times and lifetime play counts. Search,
   filter by member, play again, or add to your queue; the start screen has a
-  **Watch history** shortcut too. Profile shows distinct videos watched, plays
+  dedicated **Watch history** tab too, with a full-page list beside the **Videos** tab.
+  Profile shows distinct videos watched, plays
   including rewatches, and a count for each TXT member. Group videos count for
   every featured member and once overall. Playback must start to count; pausing
   does not add another play. Tracking starts with this update. See the
@@ -223,7 +242,7 @@ point it at a different playlist, edit `PLAYLIST_ID` in
 
 ## Desktop app
 
-Study w/ Soobin can also run as a **native desktop application** — its own
+Soob Corner can also run as a **native desktop application** — its own
 window, no browser tab. `desktop/launcher.py` serves the built app on a local port and
 opens it in an OS window via [pywebview](https://pywebview.flowrl.com/)
 (WebView2 on Windows, WebKit on macOS).
@@ -243,13 +262,16 @@ and packages everything into **`StudyWithSoobin.exe`** at the repo root — one
 double-clickable file, no console window, nothing else to install. Your
 favorites/theme persist in `%LOCALAPPDATA%\StudyWithSoobin\`.
 
+The window displays **Soob Corner**. The existing executable filename and profile
+directory are retained so the branding change keeps your saved data available.
+
 > Note: the exe still needs an internet connection — the videos stream from
 > YouTube; only the app shell is bundled.
 
 ## Project structure
 
 ```text
-studywithsoobin/
+soob-corner/
 |-- src/                       # React application; tests beside the code they cover
 |   |-- components/            # Video, timer, tasks, profile, and social UI
 |   |-- hooks/                 # Timer, progression, and player lifecycle

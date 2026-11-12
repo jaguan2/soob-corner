@@ -289,3 +289,597 @@ is available from that build). Both checks used unused ports and disposable
 application-data directories. Results are in
 `build/skill-verification/merge-desktop-results.json`. These checks do not prove
 native window interaction or live YouTube playback.
+
+## Dedicated welcome History tab — November 3, 2026
+
+Replaced the start screen's history disclosure with separate Videos and Watch
+history browsing tabs. History uses the full content width and normal page
+scrolling. Search/member filters stay mounted across tab changes; Settings has
+its own dismissal state. Escape closes nested settings first, then returns to
+Videos. The video-return focus fallback explicitly targets the visible Videos
+heading instead of the hidden History heading.
+
+All **270 tests in 28 files**, build and lint passed. Two new mounted-component
+regressions cover independent panels/filter retention and keyboard tab activation.
+An isolated browser on strict port 4196 checked empty/populated history,
+20-to-25-entry pagination, search/member retention, catalog filter independence,
+queue/replay actions, Escape nesting, arrow navigation, return focus and timer
+continuity. Layout checks passed at 1440, 768, 375 and 320px without a history
+height cap or horizontal overflow. Selected axe checks found no WCAG A/AA
+violations in dark desktop/mobile and light mobile; contrast remained incomplete.
+The screenshot in `docs/images/watch-history-page.jpg` uses isolated demo data.
+
+The rebuilt executable contains all 61 frontend assets matching `dist`. Source
+startup reported `SELFTEST OK (webview import OK)` and the windowed executable's
+headless startup exited 0 using a disposable profile and unused port. These
+checks do not establish real media playback or native window interaction.
+
+The required November 3 discovery scan checked 15 recent entries from each of
+four trusted public channel feeds. Archive candidates `2uBq5VFl0V4` and
+`rgG0eMG6Ax0` remain unverified for duration, members, duplicates and original
+broadcast dates. No catalog additions were made; coverage is limited to those
+feeds. Evidence is under ignored `build/skill-verification/history-tab-*`.
+
+Suggested commit message: `feat: give watch history a dedicated browsing tab`
+
+## English-preferred titles — November 3, 2026
+
+Catalog refresh now requests English watch-page metadata and keeps original
+titles when unavailable. Optional `originalTitle` retains different originals
+for search/tooltips. A titles-only refresh checked all 254 existing videos:
+five labels changed (two translated titles and three English-locale date formats),
+with zero failed video lookups. IDs, order and every non-title video field were
+compared against the previous snapshot and remained identical. The YouTube
+parser emitted recoverable warnings for unrelated watch-page structures; the
+displayed titles were still available and verified.
+
+All **278 tests in 30 files**, build, lint and script syntax checks passed.
+New regressions cover localized/original fallback, failed localized requests,
+search in both languages, downloaded original-title validation, read-only history
+label updates and session-blocked history metadata. Browser checks with a real
+localized catalog entry verified cards, original tooltips, queue/workspace/history
+labels, both-language search, unchanged counts before replay, one additional play
+after confirmed replay, original-title fallback and narrow-screen layout.
+
+The Windows app was rebuilt and its 61 bundled assets match `dist`. Source startup
+reported `SELFTEST OK (webview import OK)` and the frozen headless startup exited 0
+using disposable application data. Browser playback was simulated; neither those
+checks nor successful metadata retrieval prove live streaming or native-window
+behavior. Evidence is under ignored `build/skill-verification/english-title*`.
+
+Required discovery checked public recent-upload feeds: Moa's Diary returned 15
+entries, while TXT official, V Live and TomorrowByEdits returned HTTP 404. Coverage
+is limited; archive candidates such as `N5Ghn9ODnR4` remain unverified for duration,
+members, duplicates and original broadcast dates. No videos were added or removed.
+
+Suggested commit message: `feat: prefer YouTube English titles with original fallback`
+
+## Interface languages — November 3, 2026
+
+Added Settings' immediate, saved interface language choice for English,
+Simplified Chinese, Korean and Spanish. The typed dictionaries contain 404
+messages each. Provider persistence uses the existing storage gateway;
+unsupported values fall back to English and blocked storage permits a temporary
+selection. Document language, history dates and discovery month names follow
+the selection. Video titles, caption preferences and user-owned text remain
+independent. See [language scope and maintenance](languages.md).
+
+Local structural self-review checked explicit lookup boundaries, complete
+dictionary keys/placeholders, stable component/player lifecycles and progression
+effect dependencies. The separately installed shared toolkit remains unavailable;
+the repository's local engineering/review/verify instructions were used.
+Review caught an untranslated month refinement and narrow Spanish preset text;
+both were fixed. Accessibility checks also caught the Chinese Start accessible
+name and Social member-link name overrides. Start now includes its visible label;
+member links derive their names from visible name/handle content, retaining a
+translated explanatory tooltip.
+
+**282 tests across 32 files**, build and lint passed. Four new regressions cover
+dictionary completeness, interpolation, saved/invalid/blocked language choices,
+document language and mounted draft retention. Production preview on strict port
+4196 used isolated profiles and a simulated player. All four language choices
+survived reload; changing them preserved task/profile drafts, current video,
+captions, queue, favorites and history, while the running timer continued and
+the background player was created once. Keyboard Home/Escape navigation passed.
+Sixty layout combinations (four languages, five panels, 1440/375/320px widths)
+had no horizontal overflow or clipped button labels. The Spanish expanded timer
+also fit at 375px. Localized January appeared as `enero`; the catalog smoke check
+restored all 254 videos after an empty search.
+
+Thirty selected axe checks across welcome Settings and mobile tool views found
+no WCAG A/AA violations. Contrast remained incomplete; this is not a full
+accessibility certification. Screenshots use isolated demo profiles in
+`docs/images/language-settings.jpg` and `language-timer-spanish.jpg`.
+
+The rebuilt executable's 61 frontend assets match the final `dist/`. Source
+startup reported `SELFTEST OK (webview import OK)` and the windowed executable
+exited 0 from headless startup using an unused port and disposable application
+data. These checks do not establish real playback, captions or native window
+interaction. Evidence is under ignored `build/skill-verification/languages-*`.
+
+The required discovery attempt ran November 3 at 23:25 UTC against the four
+trusted public feeds. TXT official, Moa's Diary and V Live returned HTTP 404;
+TomorrowByEdits returned HTTP 500. No recent uploads could be verified from
+these requests, so discovery coverage is incomplete. No catalog changes were
+made for this language feature.
+
+Suggested commit message: `feat: add English Chinese Korean and Spanish interface languages`
+
+## Japanese and translation review — November 3, 2026
+
+Added Japanese (`ja`, 日本語) to the same saved interface-language setting.
+Reviewed every source message and its Chinese, Korean, Spanish and Japanese
+translations for meaning, terminology, tone, count grammar and interface context.
+All five dictionaries now contain 405 messages with matching placeholders.
+See [the wording review](languages.md#wording-review--november-3-2026) for examples
+and review limits. No video titles, subtitle choices or user text were translated.
+
+Corrected Chinese date/library/XP labels, Korean ambience and state terminology,
+and Spanish task counts, streak units and check-in wording. An actual browser
+check found the task action's accessible name still said Focus after its visible
+label changed to Loaded. Added a state-specific name in every language, aligned
+the Spanish Focus name and separated the Japanese theme-name words for matching
+voice-control labels. A regression now checks action names against visible labels.
+
+The local structural review confirmed this extends the existing typed dictionary
+registry and provider, with no dependencies or changes to timer/player/progression
+lifecycles. The shared toolkit is not installed; the project-local engineering,
+review and verification instructions supplied the documented fallback.
+
+**283 tests across 32 files**, lint and production build passed. The focused
+translation/provider tests also passed. On a strict-port 4196
+preview with isolated profiles, all five language choices persisted after reload.
+Switching language preserved task/profile drafts, video, queue, favorites,
+history and captions while the timer continued with one background player.
+Home/Escape navigation passed. All 105 layout combinations (five languages,
+seven tools, 1440/375/320px widths) had no horizontal overflow or clipped buttons.
+The catalog smoke test restored 254 videos after an empty search, and the month
+filter displayed Spanish January as `enero`.
+
+Selected axe checks across 37 welcome/mobile views and five loaded-task views
+reported no remaining WCAG A/AA violations. Contrast remained incomplete. This
+does not certify full accessibility or real media playback; the player was
+simulated. Japanese settings and expanded mobile-timer screenshots were added
+under `docs/images/`, and Chinese settings were refreshed.
+
+The rebuilt executable includes 61 frontend assets identical to the final
+`dist/`. Source startup reported `SELFTEST OK (webview import OK)`; the windowed
+executable's headless startup exited 0 using an unused port and disposable data.
+Native window interaction and live streams were not verified. Evidence and
+browser recipes are under ignored `build/skill-verification/japanese-*`.
+
+Required discovery checked the latest 15 TXT official feed entries on November
+3 Eastern time (November 4, 03:41 UTC). Soobin vlog `llxqGauQkQU`, uploaded October
+17, is absent from the catalog and remains unverified for duration/eligibility.
+Moa's Diary, V Live and TomorrowByEdits feeds returned HTTP 404. Coverage is
+limited to these requests; no catalog changes were made for this feature.
+
+Suggested commit message: `feat: add Japanese and refine interface translations`
+
+## Watch history date groups — November 4, 2026
+
+Removed the distinct-video result count and grouped the visible history by each
+video's most recent play date. Both the start-page tab and study dock show newest
+local days first, localized date headings including the year, and times within
+each day. Filtering precedes grouping; pagination extends a day or adds older
+days once. The saved schema, lifetime play counts and Profile totals are unchanged.
+Repeat plays move the existing row to the latest day; older per-play dates are
+not reconstructed. See [history behavior](watch-history.md).
+
+The local structural review checked view-only grouping, stable day keys,
+local-calendar semantics, filtering/pagination order and heading levels in both
+containers. The shared toolkit remains unavailable; the repository's local
+engineering, review and verification instructions provided the fallback.
+
+**287 tests across 32 files**, lint and build passed. Four new component tests
+cover local midnight boundaries, newest-first rows, read-only snapshots,
+filtering/empty groups, a partially paginated day, different years, heading
+hierarchies, five-language dates and unchanged replay/queue identifiers.
+
+An isolated production preview on strict port 4196 used the America/New_York
+timezone and demo history. Browser checks confirmed November 3/2 grouping for
+late-night UTC timestamps, search/member/empty states, 20-to-26 pagination without
+duplicate date headings, disabled unavailable entries and read-only browsing.
+Both repeated 1:30 AM hours at the November 1 DST fallback stayed in the same day.
+A simulated confirmed replay moved its video to November 4 and added one play;
+the timer continued in History, one background player remained mounted, and
+Escape returned to discovery. All 24 tested welcome/dock layouts at
+1440/768/375/320px had no horizontal overflow. Six selected axe checks found no
+WCAG A/AA violations; contrast remained incomplete. This does not establish full
+accessibility conformance or real media playback.
+
+Screenshots were refreshed for the start page and dock, with a new mobile capture
+under `docs/images/`. The rebuilt executable's 61 frontend assets match `dist/`.
+Source startup reported `SELFTEST OK (webview import OK)` and the frozen app's
+headless startup exited 0 using an unused port and disposable application data.
+Native window interaction and live media remain outside these checks. Evidence
+is under ignored `build/skill-verification/history-days-*`.
+
+Required discovery checked 15 recent public-feed entries per trusted channel on
+November 4 at 14:07 UTC. Possible unreviewed additions include Soobin vlog
+`llxqGauQkQU` and archive uploads `2uBq5VFl0V4`, `rgG0eMG6Ax0`, `LIey7QYEMCs` and
+`N5Ghn9ODnR4`. Feed timestamps are upload dates; duration, participants, duplicates
+and original broadcast dates remain unverified. Coverage is limited to these
+60 entries, and no catalog changes were made.
+
+Suggested commit message: `feat: group watch history by day`
+
+## Compact welcome timer and queue — November 4, 2026
+
+Replaced the full-width timer strip and separate queue row with a compact Timer
+card beside a wider Up next card. At 768px and above they share a row; smaller
+screens stack them. The timer has its own heading, larger countdown, status and
+Start/Pause action. The welcome queue list scrolls within 156px; the shared dock
+queue retains its existing 220px limit. Card heights can grow for longer labels.
+
+Local structural review confirmed the change is limited to WelcomeScreen markup
+and scoped styles. It reuses all timer/queue state and callbacks, keeps the timer
+button mounted across Start/Pause and keeps the countdown outside live status.
+No dependencies, storage schemas or translation keys were added. The separately
+installed toolkit remains unavailable; project-local instructions were used.
+
+**287 existing tests**, lint and build passed. An isolated production preview on
+strict port 4196 checked 30 layouts across all five languages and widths of
+1440/1000/768/767/375/320px. Cards shared a row at desktop/tablet widths and stacked
+below the breakpoint, without horizontal overflow or clipped timer actions.
+The narrow tablet timer can wrap for long Spanish labels rather than clipping.
+Empty cards, an eight-video scrolling queue, reorder/remove/clear/play actions,
+keyboard removal and focus restoration passed. Space started the timer once;
+Pause held the countdown steady. The timer continued behind History and across
+video entry/return, and the dock queue retained its 220px limit. Eight selected
+axe checks across five-language mobile views and Light/Cafe/Dark desktop views
+found no WCAG A/AA violations; contrast remained incomplete. Playback was mocked,
+so these checks do not prove real streaming or full accessibility conformance.
+
+Updated queue and running-timer screenshots and added desktop/mobile layout
+captures under `docs/images/`, using isolated demo data. The rebuilt executable's
+61 frontend assets match the final `dist/`. Source startup reported
+`SELFTEST OK (webview import OK)` and the frozen headless startup exited 0 with an
+unused port and disposable data. Native window interaction remains unverified.
+Evidence is under ignored `build/skill-verification/welcome-cards-*`.
+
+Required discovery checked 15 recent entries from each of the four trusted public
+feeds on November 4 at 14:17 UTC. Unreviewed candidates include Soobin vlog
+`llxqGauQkQU` and live archives `2uBq5VFl0V4`, `rgG0eMG6Ax0`, `LIey7QYEMCs` and
+`N5Ghn9ODnR4`. Eligibility, participants, duplicates, durations and original
+broadcast dates remain unverified; feed dates describe uploads. Coverage is
+limited to those 60 entries. No catalog changes were made for this layout work.
+
+Follow-up review checked the unchanged build with a 12-hour timer and a custom
+gold palette. All 25 combinations of five languages and
+1440/768/720/480/320px widths retained the full countdown and timer action without
+horizontal overflow. A 720 CSS-pixel viewport at device scale factor 2 exercised
+the reflow width of a 1440px window at 200%; browser chrome zoom was not automated.
+Tab reached the bottom of the queue scroller, and the long timer started and
+paused through Space. Five additional selected axe checks reported no violations;
+contrast remained incomplete. No runtime fixes were needed, so the existing
+test/build/desktop evidence was reused. Additional evidence is under
+`build/skill-verification/welcome-cards-edge-*`.
+
+Suggested commit message: `feat: pair compact timer and queue cards on the welcome screen`
+
+## Soob Corner branding — November 5, 2026
+
+Updated the welcome heading, workspace brand, static and timer-aware browser
+titles, install manifest name/short name, description metadata and desktop window
+title to **Soob Corner**. React display names and the project link share
+`lib/branding.ts`. Package metadata, README and current app-guide branding match.
+The GitHub project link and default published-catalog URL now use the renamed
+`jaguan2/soob-corner` repository. Both URLs returned HTTP 200; the published JSON
+contained 254 videos.
+
+Review kept the branding separate from compatibility identifiers: `sws.*` keys,
+desktop profile folder, stable port and executable filename are retained. The
+source YouTube playlist's actual title and generated catalog were not changed.
+The cosmetic rename introduces no dependencies, migrations or new timer effects.
+
+**287 tests across 32 files**, lint and build passed. Isolated browser checks on
+strict port 4196 verified initial/idle/running/paused titles, install metadata,
+the project link, renamed catalog requests and welcome/workspace/return labels.
+All 15 layouts (five languages at 1440/375/320px) fit without horizontal overflow.
+Seeded existing task, favorite, queue and profile data survived startup/reload;
+profile XP claims and saved study time remained available. Brand screenshots
+were added under `docs/images/`. Browser playback was simulated, so this does
+not establish live streaming or actual native window interaction.
+
+The rebuilt executable's 61 frontend assets match `dist/`. Source startup printed
+`Starting Soob Corner` and `SELFTEST OK (webview import OK)`; frozen headless
+startup exited 0 using an unused port and disposable application data. The
+legacy profile directory was retained. Evidence is under ignored
+`build/skill-verification/soob-corner-*`.
+
+Required discovery checked 15 recent entries from each trusted channel feed on
+November 5 at 19:10 UTC. Unreviewed candidates include Soobin vlog `llxqGauQkQU`
+and live archives `2uBq5VFl0V4`, `rgG0eMG6Ax0`, `LIey7QYEMCs` and `N5Ghn9ODnR4`.
+Eligibility, duration, members, duplicates and original broadcast dates remain
+unverified; feed dates describe uploads. Coverage is limited to those 60 entries.
+No catalog changes were made for the rename.
+
+Suggested commit message: `feat: rebrand the app as Soob Corner`
+
+## PPULBATU welcome and portfolio logo — November 5, 2026
+
+Added all five PPULBATU portraits above the welcome title using a locally stored
+character-reveal image, with character/member alt labels and a BIGHIT MUSIC/HYBE
+credit linking to the official announcement. The image file is unchanged; CSS
+frames its five portraits. The artwork source, ownership and member mappings
+are recorded in [visual assets](visual-assets.md).
+
+The user confirmed the portfolio's purple HOME logo after the initial asset
+search. An exact copy now replaces the brand leaf marks and supplies the favicon,
+touch/install icons and Windows executable icon. The packaging script includes
+the PNG icon input for reproducible builds. Existing storage and control behavior
+remain unchanged. Local review checked layout bounds, static rendering, image
+alt labels, source credits and isolation from History/playback. Obsolete brand
+leaf styles were removed. No dependencies or preference/schema changes were added.
+
+**287 tests**, build and lint passed. Isolated production-preview checks on
+strict port 4196 verified five loaded portraits, the 2000px HOME asset, favicon,
+touch/install metadata and all 20 combinations of five languages and
+1440/768/375/320px widths. No horizontal overflow occurred. Light, Cafe, Dark and
+Custom themes passed the selected browser checks. The mascot row has no animation
+under normal or reduced-motion settings. Timer Start/Pause, queue consumption,
+History visibility and Escape return passed; mascots do not appear over playback.
+Nine selected axe checks reported no WCAG A/AA violations; contrast remained
+incomplete. Media playback was simulated, not verified live.
+
+Updated the branding screenshots and added desktop/mobile welcome crops. The
+rebuilt executable includes 63 assets identical to `dist/`, including both new
+images. Its Windows icon resource differs from the previous build; the portfolio
+PNG and reveal JPEG match their original files byte-for-byte. Source startup
+reported `SELFTEST OK (webview import OK)` and the frozen headless startup exited
+0 with unused port/disposable data. Native window interaction remains unverified.
+Evidence is under ignored `build/skill-verification/ppulbatu-*`.
+
+Required discovery checked the four trusted recent feeds on November 5 at
+19:18 UTC, 15 entries each. Possible additions such as `llxqGauQkQU`,
+`2uBq5VFl0V4`, `rgG0eMG6Ax0`, `LIey7QYEMCs` and `N5Ghn9ODnR4` remain unreviewed
+for eligibility, duration, participants, duplicates and original broadcast dates.
+Feed dates are upload dates; coverage is limited to these 60 entries. No catalog
+changes were made. Results are in `house-icon-discovery.json` in the evidence folder.
+
+Suggested commit message: `feat: welcome MOA with PPULBATU and the portfolio HOME logo`
+
+## Faint PPULBATU background — November 5, 2026
+
+Moved the five portraits out of the foreground row into a clipped home background
+at 12% opacity. The isolated stacking context keeps the decoration below controls;
+it has no pointer events, focus targets or accessible image announcements. The
+source credit remains readable in the header. History and playback omit the layer.
+Updated the desktop/mobile home screenshots and the visual-asset documentation.
+
+Build, lint and **287 tests** passed. An isolated production preview on strict
+port 4196 passed 20 layouts across all five languages and 1440/768/375/320px widths,
+without horizontal overflow. Browser checks covered all four themes, the decorative
+layer's opacity/stacking/accessibility attributes, credit, timer keyboard activation,
+queue consumption, History and Escape return. Nine selected axe WCAG A/AA checks
+reported no violations, with color contrast requiring manual review. Desktop Light
+and Dark and mobile Dark captures were visually inspected; this is not a complete
+accessibility audit. Playback was simulated.
+
+The rebuilt executable's 63 frontend assets match `dist/` byte for byte. Source
+self-test printed `SELFTEST OK (webview import OK)` and exited 0; the frozen
+self-test also exited 0 using a disposable profile and unused port. This verifies
+startup, not live media or a rendered native window. Evidence is under ignored
+`build/skill-verification/mascot-background-*`.
+
+Required discovery checked 15 recent feed entries per trusted channel at 19:33 UTC
+on November 5. Unreviewed live candidates include `N5Ghn9ODnR4`, `2uBq5VFl0V4`
+and `rgG0eMG6Ax0`. Members, duration, duplicates and original broadcast dates still
+need curation. Coverage is limited to those 60 recent entries, not complete channel
+histories; feed timestamps describe uploads. No catalog changes were made.
+
+Suggested commit message: `style: soften PPULBATU into the home background`
+
+## Complete transparent PPULBATU stickers — November 5, 2026
+
+Replaced the cropped reveal-poster portraits with five unmodified transparent PNG
+previews from [HYBE's official LINE sticker set](https://store.line.me/stickershop/product/34033/en).
+The images show complete poses, remain static at 12% opacity and use
+`object-fit: contain` without circular masks, zoom or image offsets. The local
+files total 64,815 bytes. Palette, stacking, noninteractive decoration and readable
+source-credit behavior are retained. Removed the unused poster asset; source URLs,
+dimensions and ownership are recorded in [visual assets](visual-assets.md).
+
+Build, lint and **287 tests** passed. Isolated production-preview checks on strict
+port 4196 verified all five local images, empty decorative alt text, no focus or
+pointer targets, preserved opacity, and complete image boxes inside the viewport.
+All 20 combinations of five languages and 1440/768/375/320px widths passed without
+horizontal overflow. Checks covered four themes, timer keyboard activation, queue
+consumption, History/playback separation and Escape return. Nine selected axe
+WCAG A/AA checks found no violations; contrast was incomplete and requires manual
+review. Desktop Dark/Light and mobile Dark screenshots were visually inspected
+and refreshed under `docs/images/`. Playback was simulated.
+
+The executable was rebuilt; its 67 frontend assets match `dist/` byte for byte.
+Source self-test printed `SELFTEST OK (webview import OK)` and exited 0; frozen
+self-test also exited 0 using disposable application data and an unused port.
+These checks do not establish real playback or native window behavior.
+Asset hashes, PNG transparency/frame checks, browser
+results and desktop results are under ignored `build/skill-verification/mascot-renders-*`.
+
+Required discovery checked the latest 15 public feed entries from each of the four
+trusted channels at 19:39 UTC on November 5. Unreviewed live candidates include
+`N5Ghn9ODnR4`, `2uBq5VFl0V4` and `rgG0eMG6Ax0`. Eligibility, members, duration,
+duplicates and original broadcast dates remain unverified. Coverage is limited
+to those 60 recent uploads, not complete channel histories. No catalog changes
+were made.
+
+Suggested commit message: `style: replace cropped mascots with transparent PPULBATU stickers`
+
+## Daily background sticker rotation — November 5, 2026
+
+Expanded the local bank to 15 unmodified static PNGs, three for each PPULBATU
+character. A deterministic local-calendar selection advances each character's
+pose daily, retaining exactly one of each character. The current bank repeats
+every three days; reloads and returning home keep the day's selection. A single
+cleaned-up timeout targets the next local midnight; focus/pageshow/visible return
+catch up after sleep. No storage schema, network service or dependency was added.
+Bank metadata, selection and date lifecycle live in separate data/lib/hook modules.
+Sources and extension instructions are in [visual assets](visual-assets.md).
+
+Build, final TypeScript check, lint and **302 tests across 34 files** passed.
+The 15 new tests cover unique character coverage, each bank's cycle, stable daily
+choices, calendar boundaries, midnight scheduling, wake recovery and cleanup.
+Existing welcome-tab tests now supply the browser event targets required by the
+date hook; their initial missing-document failures were resolved in the harness.
+Scoped local structural review found no remaining supported issues. The shared
+toolkit is not installed; local project review guidance was used instead.
+
+An isolated production preview on strict port 4196 used America/New_York and
+Playwright's simulated clock to verify live midnight replacement, stable reloads,
+returning from History and wake catch-up. A running focus timer continued through
+the swap at 24:57 and its two-item queue remained intact. All 15 bank images
+loaded across three dates. Twelve layouts (three dates at 1440/768/375/320px)
+fit without horizontal overflow or image-box clipping. The same bank remained
+decorative and noninteractive at 12% opacity. Separate 23-hour spring and 25-hour
+autumn days rotated exactly at local midnight. Desktop captures for all three
+sets and a mobile capture were visually inspected. Updated home screenshots and
+two consecutive-date examples live under `docs/images/`. No live media was tested.
+Prior unchanged CSS/theme/language accessibility evidence remains applicable;
+this change does not establish full accessibility compliance.
+
+The rebuilt executable's 77 frontend assets match `dist/` byte for byte. Source
+self-test printed `SELFTEST OK (webview import OK)` and exited 0; frozen self-test
+also exited 0 with disposable application data and an unused port. These checks
+verify startup, not a rendered native window. Browser results, image hashes,
+discovery, local review and desktop results are under ignored
+`build/skill-verification/daily-stickers-*`.
+
+Required discovery checked the latest 15 public feed entries from each trusted
+channel at 19:48 UTC on November 5. Unreviewed candidates include live uploads
+`N5Ghn9ODnR4`, `2uBq5VFl0V4` and `rgG0eMG6Ax0`. Eligibility, participants,
+duration, duplicates and original broadcast dates still need review. Coverage is
+limited to 60 recent uploads, not complete channel histories. No catalog changes
+were made.
+
+Suggested commit message: `feat: rotate PPULBATU background stickers daily`
+
+## Selected Study Cottage logo — November 5, 2026
+
+Applied the user's first selected logo concept as `public/soob-corner-logo.png`,
+an exact copy of `docs/images/logo-concepts/study-cottage.png`. The 1254px square
+RGBA image retains its pixels and alpha. It replaces the portfolio HOME wordmark
+in the welcome heading, workspace brand, favicon, touch/install metadata and
+Windows icon input. Branding images use contain sizing without a rounded mask.
+The original concept and generation prompt remain in `docs/`; the former HOME
+asset remains available at its old URL for compatibility.
+
+Build, lint and **302 tests** passed. Isolated browser verification on strict
+port 4196 checked the new asset in both headers, favicon/touch links and manifest
+dimensions. Twenty language/width layouts across five languages and
+1440/768/375/320px fit without horizontal overflow. All four themes were checked,
+along with timer/queue actions, History/playback boundaries and Escape return.
+Nine selected axe WCAG A/AA checks found no violations, with color contrast
+requiring manual review; this is not a full accessibility audit. Desktop Light,
+mobile Dark and the 24px workspace logo were visually inspected. Home/workspace
+and consecutive-day sticker screenshots were refreshed. Playback was simulated.
+
+The rebuilt executable's 78 frontend assets match `dist/` byte for byte. Its seven
+native icon resources changed from the previous HOME icon; the source logo hash
+matches the selected concept. Source self-test printed `SELFTEST OK (webview
+import OK)` and exited 0; frozen self-test also exited 0 using disposable data and
+an unused port. This verifies startup, not native window interaction or streaming.
+Evidence is under ignored `build/skill-verification/cottage-logo-*`.
+
+Required discovery checked the latest 15 public feed entries from each trusted
+channel at 19:59 UTC on November 5. Unreviewed candidates include live uploads
+`N5Ghn9ODnR4`, `2uBq5VFl0V4` and `rgG0eMG6Ax0`; eligibility, members, duration,
+duplicates and original broadcast dates remain unverified. Coverage is limited to
+60 recent uploads, not complete channel histories. No catalog changes were made.
+
+Suggested commit message: `style: adopt the Study Cottage logo for Soob Corner`
+
+## User-selected SOOB house icon — November 7, 2026
+
+Replaced the Study Cottage branding with the exact user-provided PNG containing
+SO / OB inside a purple house. The 1254px square RGB file is stored at
+`public/soob-house-logo.png`; its white background, colors and bytes were preserved.
+The source SHA-256 is
+`4cd3be53ecbf2fd3baf62b44e6b6a24ef94494e142d2913db1b598802a6f7e00`.
+This is distinct from the earlier transparent generated prototype. Updated both
+app headers, favicon/touch links, install metadata and Windows packaging icon.
+Contain sizing and rounded badge corners accommodate its white background.
+
+Build, lint and **302 tests across 34 files** passed. Isolated production-preview
+checks on strict port 4196 verified the new image in both headers, favicon/touch
+links and manifest size. Twenty layouts (five languages at 1440/768/375/320px)
+fit without horizontal overflow; all four themes passed the feature checks.
+Timer/queue actions, History/playback boundaries and Escape return were checked.
+Nine selected axe WCAG A/AA checks found no violations; color contrast remained
+incomplete, so this is not a complete accessibility audit. Desktop Light, mobile
+Dark and the small workspace header were visually inspected. Current branding
+and consecutive-day sticker screenshots were refreshed. Playback was simulated.
+
+The rebuilt executable's 79 frontend assets match `dist/` byte for byte, including
+the exact selected PNG. All seven native icon resources were replaced. Source
+self-test printed `SELFTEST OK (webview import OK)` and exited 0; frozen self-test
+also exited 0 with disposable application data and an unused port. These checks
+verify server startup, not native window interaction or live media.
+
+Required catalog discovery attempted all four trusted public YouTube channel
+feeds at 07:07 UTC on November 7. Each returned HTTP 404, so recent upload coverage
+and candidate eligibility could not be verified. No catalog changes were made.
+The failure details and source/browser evidence are under ignored
+`build/skill-verification/soob-house-icon-*`.
+
+Suggested commit message: `style: use the SOOB house icon across the app`
+
+
+## Outgoing UI release review and transparent logo - November 8, 2026
+
+Reviewed the working tree and the four `dev` commits ahead of `origin/main`,
+covering branding, daily stickers, welcome/history layouts, languages, and
+English-preferred catalog titles. No release-blocking regression was found in
+this scope. Timer/media ownership, mounted tool panels, guarded persistence,
+local calendar arithmetic and theme cleanup remain intact. Shared toolkit
+skills were unavailable locally; review followed the repository adapters and
+architecture guidance without claiming the upstream rubric was completed.
+
+Replaced active logo references with `public/soob-house-logo-transparent.png`,
+a 1254 x 1254 RGBA derivative created with the built-in image editor. The original
+user image is preserved. Actual browser canvas reads confirmed alpha 0 in the
+outer background and the house interior. Both headers, favicon, touch icon,
+manifest and Windows packaging now select the transparent version. Visual asset
+documentation records the prompt and hash. Removed the badge rounding introduced
+for the former white background.
+
+Validation on the production preview at `http://127.0.0.1:4196/`:
+
+- TypeScript/production build, ESLint and all 302 Vitest tests across 34 files passed.
+  The 10 catalog-script tests also passed through their Vitest runner.
+- Catalog search changed 254 results to 0, disabled Surprise me, and restored 254
+  with Clear filters. Queue selection was consumed through normal playback.
+- Welcome, workspace Settings and Timer fit all five languages at widths 1440,
+  768, 375 and 320 without page horizontal overflow (60 layout measurements).
+- Light, Cafe, Dark and Custom controls worked; switching away from Custom
+  removed its inline palette overrides. Desktop and mobile screenshots were
+  visually inspected for logo blending, header placement and responsive layout.
+- A running timer continued in a hidden panel (24:18 to 24:16), then remained
+  at 24:15 after Pause. Tasks survived tab changes. History tabs, Escape focus,
+  Zen hiding and return navigation worked through normal user controls.
+- A live YouTube archive visibly played and produced one history entry. Captions,
+  audible output, full embed availability and a complete accessibility audit
+  remain outside this check. Console errors were blocked third-party ad requests.
+- Rebuilt `StudyWithSoobin.exe`; all 80 embedded frontend files match `dist/`
+  byte-for-byte. All seven native PNG icon resources retain alpha transparency.
+  Source and frozen self-tests printed `SELFTEST OK (webview import OK)` and
+  exited 0 using a disposable profile and unused port. This proves startup,
+  not native window interaction or persistence across launches.
+
+Required discovery checked the newest 15 public feed entries on each of the four
+trusted channels on November 8 (60 uploads total), compared IDs with the bundled
+catalog, and ran targeted public searches. Unlisted, unreviewed candidates include
+Soobin TXT-LOG `llxqGauQkQU` (uploaded October 17), and TomorrowByEdits archives
+`2uBq5VFl0V4` (title says November 1, Yeonjun/Beomgyu), `rgG0eMG6Ax0`
+(October 27, Beomgyu/Soobin), and `LIey7QYEMCs` (October 25, Yeonjun/Kai/Taehyun).
+These are candidates only: duration thresholds, explicit participation, multipart
+status, original broadcast dates and duplicate broadcasts still need review.
+Feed publication timestamps are upload dates, not verified broadcast dates.
+Older unlisted archive entries also remain unreviewed. This limited recent-feed
+check does not establish complete coverage of all members' channel histories.
+No catalog snapshots or curation files were changed.
+
+Logs, discovery JSON, bundle comparison, desktop diagnostics and screenshots are
+under ignored `build/skill-verification/release-20261108/`. No commit or push was
+performed.
